@@ -29,3 +29,6 @@ build/downloads/
 # Betriebssystem
 Thumbs.db
 .DS_Store
+
+# Einzelbilder zur Prüfung des Visitenkarten-Films
+video/out/vk/
