@@ -1,4 +1,19 @@
-# Lokanon – Produktvideo (Remotion)
+# Lokanon – Produktvideos (Remotion)
+
+Zwei Kompositionen, beide 1920 × 1080, 30 fps, ohne Ton:
+
+| Komposition | Länge | Datei | Befehl |
+| --- | --- | --- | --- |
+| `LokanonTeaser` | 30 s | `out/lokanon-teaser.mp4` | `npm run build` |
+| `LokanonVisitenkarte` | 2:06 | `out/lokanon-visitenkarte.mp4` | `npm run build:visitenkarte` |
+
+Der Visitenkarten-Film erzählt die Marketing-Geschichte in drei Akten (Ausgangslage, Wende, Auflösung) und zeigt
+danach Funktionen, Ablauf, echte Bildschirme (`public/shots/`), Grenzen und die drei Visitenkarten der Gewerke.
+Seine Texte stehen in `src/texts_vk.ts`, die Szenen in `src/scenes/vk/`, die Szenenfolge mit Längen in
+`src/LokanonVisitenkarte.tsx` (`SZENEN`). Die Szenen „Erkennen und Prüfen“ und „KI und Rückübersetzung“ sind
+dieselben wie im Teaser.
+
+## Teaser
 
 30-Sekunden-Teaser, 1920 × 1080, 30 fps, ohne Ton. Alles ist Vektorgrafik in React
 (Remotion), es gibt keine Bild- oder Videodateien. Die Schriften Source Sans 3 und
