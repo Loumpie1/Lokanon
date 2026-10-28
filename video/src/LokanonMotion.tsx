@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AbsoluteFill, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 
 /**
  * Brücke zur motion-anything-Seite (public/ma/index.html): Die Seite läuft in einem gleich-origin iframe und
@@ -57,6 +57,8 @@ export const LokanonMotion: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ background: "#0D2240" }}>
+      {/* Tonspur, per Code erzeugt (tools/sound.py): Ambient-Bett plus Klänge auf die Schlüsselmomente */}
+      <Audio src={staticFile("ma/audio/lokanon-motion.mp3")} />
       <iframe
         ref={ref}
         title="Lokanon Motion"

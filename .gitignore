@@ -33,3 +33,6 @@ Thumbs.db
 # Einzelbilder zur Prüfung des Visitenkarten-Films
 video/out/vk/
 video/out/ma/
+
+# Tonspur: WAV entsteht aus video/tools/sound.py, nur das AAC wird versioniert
+video/public/ma/audio/*.wav

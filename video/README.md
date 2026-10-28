@@ -23,6 +23,14 @@ Verwendete Rezepte (`public/ma/recipes/`): `_fx/shaderbg.js` + `strands` (mit Lo
 `MOTION-SPEC.md` von motion-anything. Öffnet man `public/ma/index.html` direkt im Browser, läuft der Film in Schleife
 (`?noloop` hält ihn an, `?noshader` lässt den Shader weg).
 
+**Ton:** Die Tonspur entsteht per Code, ohne Fremdaufnahmen (`python tools\sound.py` mit dem Lokanon-venv, braucht nur
+numpy): ein Ambient-Bett aus vier Akkorden in D-Moll mit Sub-Bass, darüber kurze Klänge auf die Schlüsselmomente
+(Schild, Buchstaben, Markierungen, Platzhalter, Schalter, Dokumentflug, Rückübersetzung, Kennzahlen, Bildschirme,
+Abspann); die Sekundenangaben stehen in `tools/sound.py` und entsprechen der Zeitleiste in `public/ma/index.html`.
+Ausgabe `public/ma/audio/lokanon-motion.wav`, daraus `lokanon-motion.mp3` (Remotions ffmpeg kann kein M4A schreiben):
+`npx remotion ffmpeg -i public/ma/audio/lokanon-motion.wav -c:a libmp3lame -b:a 192k public/ma/audio/lokanon-motion.mp3`.
+Teaser und Visitenkarten-Film sind weiterhin stumm.
+
 Der Visitenkarten-Film erzählt die Marketing-Geschichte in drei Akten (Ausgangslage, Wende, Auflösung) und zeigt
 danach Funktionen, Ablauf, echte Bildschirme (`public/shots/`), Grenzen und die drei Visitenkarten der Gewerke.
 Seine Texte stehen in `src/texts_vk.ts`, die Szenen in `src/scenes/vk/`, die Szenenfolge mit Längen in
