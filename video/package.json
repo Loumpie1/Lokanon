@@ -9,7 +9,8 @@
     "build:hochkant": "remotion render LokanonTeaserHochkant out/lokanon-teaser-9x16.mp4 --codec=h264",
     "stills": "remotion still LokanonTeaser out/frame-045.png --frame=45 && remotion still LokanonTeaser out/frame-360.png --frame=360 && remotion still LokanonTeaser out/frame-700.png --frame=700",
     "build:visitenkarte": "remotion render LokanonVisitenkarte out/lokanon-visitenkarte.mp4 --codec=h264",
-    "stills:visitenkarte": "remotion still LokanonVisitenkarte out/vk-0300.png --frame=300 && remotion still LokanonVisitenkarte out/vk-0700.png --frame=700"
+    "stills:visitenkarte": "remotion still LokanonVisitenkarte out/vk-0300.png --frame=300 && remotion still LokanonVisitenkarte out/vk-0700.png --frame=700",
+    "build:motion": "remotion render LokanonMotion out/lokanon-motion.mp4 --codec=h264 --gl=angle"
   },
   "dependencies": {
     "@fontsource/source-sans-3": "^5.3.1",

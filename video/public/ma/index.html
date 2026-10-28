@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Lokanon · Motion (motion-anything)</title>
+<!--
+  Lokanon-Motion-Film, gebaut mit motion-anything (nexu-io, Apache-2.0):
+  · Rezepte zur Laufzeit: _fx/shaderbg.js + strands (Lokanon-Palette), shiny-text, star-border, count-up
+  · Motion-Vokabular aus den Rezepten kinetic-headline (rise/pop/blur, 520 ms, 40–70 ms Staffelung),
+    bounce-cards, true-focus, rotating-text – hier als Web-Animations-Keyframes neu gesetzt, damit die
+    Seite der „einfrierbaren Zeitleiste“ (window.__maTimeline.seek(t)) folgt und bildgenau gerendert wird.
+  · Zeit- und Easing-Tokens nach MOTION-SPEC.md (ease-out cubic-bezier(.16,1,.3,1), cinematic 800–2000 ms).
+  Öffnet man die Seite direkt im Browser, spielt sie in Echtzeit in Schleife.
+-->
+<script>
+  // Virtuelle Uhr: rAF-Aufrufe der Rezepte (Shader) laufen über die Zeitleiste, nicht über die Wanduhr.
+  (function () {
+    var native = window.requestAnimationFrame.bind(window);
+    var queue = [];
+    window.__ma = { native: native, queue: queue, anims: [], hooks: [], now: 0 };
+    window.requestAnimationFrame = function (fn) { queue.push(fn); return queue.length; };
+    window.cancelAnimationFrame = function () {};
+  })();
+</script>
+<link rel="stylesheet" href="recipes/shiny-text.css">
+<link rel="stylesheet" href="recipes/star-border.css">
+<link rel="stylesheet" href="recipes/count-up.css">
+<style>
+  @font-face { font-family: "Source Sans 3"; font-weight: 400; src: url("../fonts/source-sans-3-latin-400-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Source Sans 3"; font-weight: 600; src: url("../fonts/source-sans-3-latin-600-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Source Sans 3"; font-weight: 700; src: url("../fonts/source-sans-3-latin-700-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Source Serif 4"; font-weight: 600; src: url("../fonts/source-serif-4-latin-600-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Source Serif 4"; font-weight: 700; src: url("../fonts/source-serif-4-latin-700-normal.woff2") format("woff2"); }
+
+  :root {
+    --primary: #16365C; --deep: #0D2240; --action: #1F5FA8; --accent: #0E9F8A; --accent-light: #7FD9CB;
+    --thread: #D13B5B; --bg: #F6F8FB; --text: #1A2433; --muted: #5B6678; --line: #D5DBE3; --bar: #E3E8EF; --card: #fff;
+    --mk-person: #FFD6D6; --mk-firma: #D6E4FF; --mk-adresse: #D9F2E3; --mk-nummer: #FFF3C4;
+    --sans: "Source Sans 3", "Segoe UI", Arial, sans-serif; --serif: "Source Serif 4", Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--deep); font-family: var(--sans); color: var(--text); }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+  #bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 55% at 50% 42%, #1E4A7A 0%, rgba(30,74,122,0) 70%), var(--deep); }
+  #strands { position: absolute; left: 0; width: 1920px; top: 300px; height: 1080px; }  /* Fäden im unteren Drittel, unter dem Text */
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .scene.light { background: var(--bg); }
+  .k-unit { display: inline-block; will-change: transform, opacity, filter; }
+  .k-space { display: inline-block; width: .28em; }
+  .eyebrow { font-size: 24px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--thread); display: flex; align-items: center; gap: 14px; }
+  .eyebrow::before { content: ""; width: 34px; height: 3px; background: currentColor; border-radius: 2px; }
+  .eyebrow.teal { color: var(--accent); }
+  .h { font-family: var(--serif); font-weight: 700; letter-spacing: -.01em; line-height: 1.08; }
+  .caption { position: absolute; left: 120px; right: 120px; top: 905px; text-align: center; font-family: var(--serif); font-weight: 600; font-size: 50px; color: var(--text); }
+  .dark .caption { color: #fff; }
+  .card { background: var(--card); border-radius: 14px; border: 1px solid var(--bar); box-shadow: 0 10px 34px rgba(22,54,92,.10); }
+  .pill { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 999px; font-size: 24px; font-weight: 600; }
+
+  /* Markierung → Platzhalter (zwei Lagen, je eigene Keyframes) */
+  .mk { display: inline-grid; align-items: center; justify-items: start; padding: 0 .25em; border-radius: 6px; line-height: 1.45; position: relative; white-space: nowrap; }
+  .mk > span { grid-area: 1 / 1; }
+  .mk .pillbg { position: absolute; inset: 0; border-radius: 6px; background: var(--mkc); transform-origin: left center; transform: scaleX(0); }
+  .mk .txt, .mk .chip { position: relative; }
+  .mk .chip { font-family: ui-monospace, Consolas, monospace; font-size: .86em; font-weight: 600; letter-spacing: .01em; opacity: 0; }
+  .mk .dash { position: absolute; left: .25em; right: .25em; bottom: .1em; border-bottom: 2px dashed var(--muted); opacity: 0; }
+  .doc { width: 840px; padding: 52px 56px; font-size: 26px; line-height: 40px; }
+  .doc .ln { white-space: nowrap; height: 40px; }
+  .doc .gap { height: 20px; }
+  .doc .bar { height: 13px; border-radius: 7px; background: var(--bar); margin: 13px 0 14px; }
+
+  .toggle { width: 68px; height: 38px; border-radius: 19px; background: var(--accent); position: relative; flex-shrink: 0; }
+  .toggle i { position: absolute; top: 4px; left: 34px; width: 30px; height: 30px; border-radius: 15px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+  .dot { display: inline-block; width: 16px; height: 16px; border-radius: 8px; border: 2px solid rgba(0,0,0,.18); }
+
+  /* Chat */
+  .chat { position: absolute; left: 1040px; top: 130px; width: 760px; height: 720px; overflow: hidden; }
+  .chat .bar2 { height: 60px; border-bottom: 1px solid var(--bar); display: flex; align-items: center; gap: 10px; padding: 0 22px; color: var(--muted); font-size: 22px; }
+  .chat .bar2 i { width: 13px; height: 13px; border-radius: 7px; background: var(--line); }
+  .bub { position: absolute; padding: 16px 22px; font-size: 24px; line-height: 38px; white-space: nowrap; border-radius: 18px; }
+  .bub.me { right: 40px; top: 84px; background: var(--action); color: #fff; border-bottom-right-radius: 6px; }
+  .bub.ai { left: 40px; top: 214px; background: #EEF2F7; border-bottom-left-radius: 6px; }
+  .typing { position: absolute; left: 40px; top: 214px; background: #EEF2F7; border-radius: 18px 18px 18px 6px; padding: 18px 22px; display: flex; gap: 8px; }
+  .typing i { width: 11px; height: 11px; border-radius: 6px; background: var(--muted); animation: ty 1.2s infinite; }
+  .typing i:nth-child(2) { animation-delay: .2s; } .typing i:nth-child(3) { animation-delay: .4s; }
+  @keyframes ty { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-4px); } }
+  .chipc { display: inline-block; padding: 1px 10px; border-radius: 7px; font-family: ui-monospace, Consolas, monospace; font-size: .86em; font-weight: 600; background: var(--mkc); color: var(--text); }
+  .flip { display: inline-grid; perspective: 600px; vertical-align: baseline; }
+  .flip > span { grid-area: 1 / 1; backface-visibility: hidden; padding: 0 .2em; border-radius: 6px; white-space: nowrap; }
+  .flip .a { font-family: ui-monospace, Consolas, monospace; font-size: .9em; background: #E3E8EF; }
+  .flip .b { background: var(--mkc); transform: rotateX(-180deg); opacity: 0; }
+
+  /* Kennzahlen, Chips */
+  .kpi { position: absolute; width: 405px; height: 150px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); padding: 22px 28px; color: #fff; }
+  .kpi b { font-family: var(--serif); font-weight: 700; font-size: 62px; line-height: 1; display: block; white-space: nowrap; }
+  .kpi b span { font: inherit; }
+  .kpi > span { display: block; margin-top: 10px; font-size: 22px; color: rgba(255,255,255,.72); }
+  .fchip { position: absolute; display: inline-flex; align-items: center; gap: 12px; padding: 14px 24px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); color: #fff; font-size: 27px; font-weight: 600; white-space: nowrap; }
+  .fchip i { width: 10px; height: 10px; border-radius: 5px; background: var(--accent-light); }
+
+  /* Bildschirme */
+  .shot { position: absolute; width: 1120px; height: 700px; border-radius: 16px; overflow: hidden; box-shadow: 0 18px 50px rgba(22,54,92,.18); border: 1px solid var(--bar); background: #fff; transform-origin: center; }
+  .shot img { display: block; width: 100%; height: 100%; object-fit: cover; transform-origin: 30% 20%; }
+  .shot .tag { position: absolute; left: 24px; top: 24px; padding: 8px 18px; border-radius: 999px; background: rgba(22,54,92,.9); color: #fff; font-size: 24px; font-weight: 600; }
+
+  /* Fokus-Satz (true-focus) */
+  .focus { position: absolute; left: 120px; right: 120px; top: 380px; text-align: center; font-family: var(--serif); font-weight: 600; font-size: 74px; line-height: 1.25; color: var(--text); }
+  .focus .w { display: inline-block; filter: blur(6px); opacity: .55; }
+
+  .shiny { --shiny-base: #C9D6E6; --shiny-hi: #FFFFFF; }
+  .star { --star-color: #7FD9CB; --star-w: 2px; background: rgba(255,255,255,.06); color: #fff; font: 600 28px/1 var(--sans); padding: 18px 34px; }
+
+  @media (prefers-reduced-motion: reduce) { .typing i, .shiny, .star::before { animation: none !important; } }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div id="strands" class="strands" data-fallback="#0D2240"></div>
+
+  <!-- 1 · Cover (0–6 s, dunkel) -->
+  <section class="scene dark" id="s1">
+    <div style="position:absolute;left:0;right:0;top:330px;display:flex;flex-direction:column;align-items:center;gap:40px">
+      <div style="display:flex;align-items:center;gap:40px">
+        <svg id="shield" width="140" height="165" viewBox="0 0 100 118" fill="none">
+          <path id="shieldPath" d="M50 5 L92 20 V56 C92 84 72 104 50 113 C28 104 8 84 8 56 V20 Z" fill="#0E9F8A" fill-opacity="0" stroke="#fff" stroke-width="6" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+          <path id="shieldCheck" d="M33 59 L46 72 L68 44" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+        </svg>
+        <div id="wordmark" class="h" style="font-size:150px;color:#fff;line-height:1">Lokanon</div>
+      </div>
+      <div id="subline" style="font-size:46px;color:rgba(255,255,255,.9)">Mandatsunterlagen sicher mit KI bearbeiten</div>
+      <div id="credits" style="display:flex;gap:16px;margin-top:14px">
+        <span class="pill" style="border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);color:#fff"><b style="color:var(--accent-light)">Motion</b>Bewegung mit Bedeutung</span>
+        <span class="pill" style="border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);color:#fff"><b style="color:var(--accent-light)">Produkt</b>Funktionen für Kanzleien</span>
+        <span class="pill" style="border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);color:#fff"><b style="color:var(--accent-light)">Regie</b>Ein roter Faden</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · Der Name (6–13 s, hell) -->
+  <section class="scene light" id="s2">
+    <div style="position:absolute;left:120px;top:150px;width:860px">
+      <div class="eyebrow" id="s2eye">Montag, 8:40 Uhr</div>
+      <div class="h" id="s2h" style="font-size:88px;margin-top:18px">Eine Akte.<br>Ein Name.<br>Die Cloud ist tabu.</div>
+      <div id="s2laws" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:44px">
+        <span class="pill card" style="color:var(--thread);font-family:var(--serif);font-size:30px">§ 203 StGB</span>
+        <span class="pill card" style="color:var(--thread);font-family:var(--serif);font-size:30px">§ 43e BRAO</span>
+        <span class="pill card" style="color:var(--thread);font-family:var(--serif);font-size:30px">Art. 28 DSGVO</span>
+      </div>
+      <div id="s2note" style="margin-top:30px;font-size:30px;color:var(--muted);width:780px;line-height:1.4">Drei Regeln, kein Verbot der KI. Jede verbietet den Klarnamen.</div>
+    </div>
+    <div id="s2doc" class="card doc" style="position:absolute;left:1000px;top:200px;width:800px">
+      <div class="ln"><span class="mk" style="--mkc:var(--mk-person)" data-m="p"><span class="pillbg"></span><span class="txt">Sabine Winter</span></span></div>
+      <div class="ln">Eppinghofer Straße 47</div>
+      <div class="ln">45468 Mülheim an der Ruhr</div>
+      <div class="gap"></div>
+      <div class="ln">Aktenzeichen: 14 VI 512/26</div>
+      <div class="gap"></div>
+      <div class="ln">Sehr geehrte Frau <span class="mk" style="--mkc:var(--mk-person)" data-m="p"><span class="pillbg"></span><span class="txt">Winter</span></span>,</div>
+      <div class="gap"></div>
+      <div class="ln">im Verfahren vor dem Amtsgericht Mülheim</div>
+      <div class="bar" style="width:94%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:52%"></div>
+    </div>
+    <svg id="thread" style="position:absolute;left:0;top:0" width="1920" height="1080" fill="none"><path id="threadPath" d="M1056 262 C 900 262, 760 520, 560 520" stroke="#D13B5B" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>
+  </section>
+
+  <!-- 3 · Erkennen (13–23 s, hell) -->
+  <section class="scene light" id="s3">
+    <div id="s3doc" class="card doc" style="position:absolute;left:120px;top:130px">
+      <div class="ln"><span class="mk" style="--mkc:var(--mk-person)" data-k="1"><span class="pillbg"></span><span class="txt">Sabine Winter</span><span class="chip">[PERSON_1]</span></span></div>
+      <div class="ln"><span class="mk" style="--mkc:var(--mk-adresse)" data-k="2"><span class="pillbg"></span><span class="txt">Eppinghofer Straße 47</span><span class="chip">[ADRESSE_1]</span></span></div>
+      <div class="ln"><span class="mk" style="--mkc:var(--mk-adresse)" data-k="3"><span class="pillbg"></span><span class="txt">45468 Mülheim an der Ruhr</span><span class="chip">[ORT_1]</span></span></div>
+      <div class="gap"></div>
+      <div class="ln">Aktenzeichen: <span class="mk" style="--mkc:var(--mk-nummer)" data-k="4"><span class="pillbg"></span><span class="txt">14 VI 512/26</span><span class="chip">[AZ_1]</span></span></div>
+      <div class="gap"></div>
+      <div class="ln">Sehr geehrte Frau <span class="mk" style="--mkc:var(--mk-person)" data-k="5"><span class="pillbg"></span><span class="txt">Winter</span><span class="chip">[PERSON_1]</span></span>,</div>
+      <div class="gap"></div>
+      <div class="ln">im Verfahren vor dem <span class="mk" style="--mkc:var(--mk-firma)" data-k="6"><span class="pillbg"></span><span class="txt">Amtsgericht Mülheim</span><span class="chip">[FIRMA_1]</span><span class="dash"></span></span> haben wir</div>
+      <div class="ln">fristgerecht Stellung genommen. Die Gegenseite hat</div>
+      <div class="bar" style="width:94%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:97%"></div><div class="bar" style="width:52%"></div>
+      <div class="gap"></div>
+      <div class="ln">Mit freundlichen Grüßen</div>
+    </div>
+    <div style="position:absolute;left:1040px;top:130px;width:760px">
+      <div class="h" id="s3t" style="font-size:40px;color:var(--primary)">Gefundene Personendaten</div>
+      <div id="s3legend" style="display:flex;flex-direction:column;gap:18px;margin-top:26px">
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 28px;font-size:28px"><span><i class="dot" style="background:var(--mk-person);margin-right:14px"></i>Person</span><b data-count="2" data-at="14.2" data-dur=".9" style="font-family:var(--serif);font-size:34px;color:var(--primary)">0</b></div>
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 28px;font-size:28px"><span><i class="dot" style="background:var(--mk-adresse);margin-right:14px"></i>Adresse / Ort</span><b data-count="2" data-at="14.7" data-dur=".9" style="font-family:var(--serif);font-size:34px;color:var(--primary)">0</b></div>
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 28px;font-size:28px"><span><i class="dot" style="background:var(--mk-nummer);margin-right:14px"></i>Nummern</span><b data-count="1" data-at="15.2" data-dur=".9" style="font-family:var(--serif);font-size:34px;color:var(--primary)">0</b></div>
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:18px 28px;font-size:28px"><span><i class="dot" style="background:var(--mk-firma);margin-right:14px"></i>Firma / Behörde</span><b data-count="1" data-at="15.7" data-dur=".9" style="font-family:var(--serif);font-size:34px;color:var(--primary)">0</b></div>
+      </div>
+      <div id="s3tech" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:30px">
+        <span class="pill" style="background:#E3E8EF;color:var(--text);font-size:21px;padding:8px 16px">spaCy Deutsch</span>
+        <span class="pill" style="background:#E3E8EF;color:var(--text);font-size:21px;padding:8px 16px">GLiNER</span>
+        <span class="pill" style="background:#E3E8EF;color:var(--text);font-size:21px;padding:8px 16px">13 deutsche Erkenner</span>
+        <span class="pill" style="background:#E3E8EF;color:var(--text);font-size:21px;padding:8px 16px">Texterkennung für Scans</span>
+      </div>
+    </div>
+    <div class="caption" id="s3cap">Erkennen. Lokal, ohne Internet.</div>
+  </section>
+
+  <!-- 4 · Prüfen (23–31 s, hell) -->
+  <section class="scene light" id="s4">
+    <div id="s4doc" class="card doc" style="position:absolute;left:120px;top:130px">
+      <div class="ln"><span class="flip" style="--mkc:var(--mk-person)" data-r="1"><span class="a">[PERSON_1]</span><span class="b" style="font-family:ui-monospace,Consolas,monospace;font-size:.9em;font-weight:600">[MANDANTIN]</span></span></div>
+      <div class="ln"><span class="chipc" style="--mkc:var(--mk-adresse)">[ADRESSE_1]</span></div>
+      <div class="ln"><span class="chipc" style="--mkc:var(--mk-adresse)">[ORT_1]</span></div>
+      <div class="gap"></div>
+      <div class="ln">Aktenzeichen: <span class="chipc" style="--mkc:var(--mk-nummer)">[AZ_1]</span></div>
+      <div class="gap"></div>
+      <div class="ln">Sehr geehrte Frau <span class="flip" style="--mkc:var(--mk-person)" data-r="2"><span class="a">[PERSON_1]</span><span class="b" style="font-family:ui-monospace,Consolas,monospace;font-size:.9em;font-weight:600">[MANDANTIN]</span></span>,</div>
+      <div class="gap"></div>
+      <div class="ln">im Verfahren vor dem <span class="mk" style="--mkc:var(--mk-firma)" id="s4court"><span class="pillbg" style="transform:none"></span><span class="txt" style="opacity:0">Amtsgericht Mülheim</span><span class="chip" style="opacity:1">[FIRMA_1]</span><span class="dash"></span></span> haben wir</div>
+      <div class="ln">fristgerecht Stellung genommen. Die Gegenseite hat</div>
+      <div class="bar" style="width:94%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:97%"></div><div class="bar" style="width:52%"></div>
+      <div class="gap"></div>
+      <div class="ln">Mit freundlichen Grüßen</div>
+    </div>
+    <div style="position:absolute;left:1040px;top:130px;width:760px">
+      <div class="h" id="s4t" style="font-size:40px;color:var(--primary)">Prüfen</div>
+      <div id="s4cards" style="display:flex;flex-direction:column;gap:16px;margin-top:26px">
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:20px 28px"><div><div style="font-size:28px;font-weight:600"><i class="dot" style="background:var(--mk-person);margin-right:14px"></i>Sabine Winter</div><div style="font-size:23px;color:var(--muted);padding-left:30px;margin-top:6px">→ <span class="flip" style="--mkc:var(--mk-person)" data-r="3"><span class="a">[PERSON_1]</span><span class="b" style="font-family:ui-monospace,Consolas,monospace;font-size:.9em;font-weight:600">[MANDANTIN]</span></span></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="toggle"><i></i></div><span style="font-size:21px;color:var(--accent)">wird ersetzt</span></div></div>
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:20px 28px"><div><div style="font-size:28px;font-weight:600"><i class="dot" style="background:var(--mk-adresse);margin-right:14px"></i>Eppinghofer Straße 47</div><div style="font-size:23px;color:var(--muted);padding-left:30px;margin-top:6px">→ <span class="chipc" style="--mkc:var(--mk-adresse)">[ADRESSE_1]</span></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="toggle"><i></i></div><span style="font-size:21px;color:var(--accent)">wird ersetzt</span></div></div>
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:20px 28px"><div><div style="font-size:28px;font-weight:600"><i class="dot" style="background:var(--mk-nummer);margin-right:14px"></i>14 VI 512/26</div><div style="font-size:23px;color:var(--muted);padding-left:30px;margin-top:6px">→ <span class="chipc" style="--mkc:var(--mk-nummer)">[AZ_1]</span></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="toggle"><i></i></div><span style="font-size:21px;color:var(--accent)">wird ersetzt</span></div></div>
+        <div class="card" id="s4gcard" style="display:flex;justify-content:space-between;align-items:center;padding:20px 28px"><div><div style="font-size:28px;font-weight:600"><i class="dot" style="background:var(--mk-firma);margin-right:14px"></i>Amtsgericht Mülheim</div><div style="font-size:23px;color:var(--muted);padding-left:30px;margin-top:6px;position:relative;height:30px"><span id="s4gl1" style="position:absolute;left:0;top:0">→ <span class="chipc" style="--mkc:var(--mk-firma)">[FIRMA_1]</span></span><span id="s4gl2" style="position:absolute;left:0;top:0;opacity:0">bleibt stehen</span></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="toggle" id="s4toggle"><i id="s4knob"></i></div><span style="font-size:21px;position:relative;height:26px;width:150px;text-align:center"><span id="s4gt1" style="position:absolute;inset:0;color:var(--accent)">wird ersetzt</span><span id="s4gt2" style="position:absolute;inset:0;color:var(--muted);opacity:0">bleibt stehen</span></span></div></div>
+      </div>
+      <div id="s4ren" class="pill" style="margin-top:26px;background:var(--action);color:#fff;font-size:26px">benennen: [MANDANTIN]</div>
+    </div>
+    <div class="caption" id="s4cap">Prüfen und entscheiden. Mit einem Schalter.</div>
+  </section>
+
+  <!-- 5 · KI (31–43 s, hell) -->
+  <section class="scene light" id="s5">
+    <div id="s5doc" class="card doc" style="position:absolute;left:120px;top:130px;transform-origin:top left">
+      <div class="ln"><span class="chipc" style="--mkc:var(--mk-person)">[MANDANTIN]</span></div>
+      <div class="ln"><span class="chipc" style="--mkc:var(--mk-adresse)">[ADRESSE_1]</span></div>
+      <div class="ln"><span class="chipc" style="--mkc:var(--mk-adresse)">[ORT_1]</span></div>
+      <div class="gap"></div>
+      <div class="ln">Aktenzeichen: <span class="chipc" style="--mkc:var(--mk-nummer)">[AZ_1]</span></div>
+      <div class="gap"></div>
+      <div class="ln">Sehr geehrte Frau <span class="chipc" style="--mkc:var(--mk-person)">[MANDANTIN]</span>,</div>
+      <div class="gap"></div>
+      <div class="ln">im Verfahren vor dem Amtsgericht Mülheim haben wir</div>
+      <div class="bar" style="width:94%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:52%"></div>
+    </div>
+    <div class="chat card" id="s5chat">
+      <div class="bar2"><i></i><i></i><i></i><span style="flex:1;text-align:center;padding-right:60px">KI-Assistent</span></div>
+      <div class="bub me" id="s5me">Bitte prüfen Sie die Fristen im Verfahren <span class="chipc" style="--mkc:var(--mk-nummer)">[AZ_1]</span><br>für <span class="chipc" style="--mkc:var(--mk-person)">[MANDANTIN]</span>.</div>
+      <div class="typing" id="s5typing"><i></i><i></i><i></i></div>
+      <div class="bub ai" id="s5ai">Im Verfahren <span class="chipc" style="--mkc:var(--mk-nummer)">[AZ_1]</span> endet die Frist für<br><span class="chipc" style="--mkc:var(--mk-person)">[MANDANTIN]</span> am 14. April 2026.<br>Die Zustellung an die Anschrift<br><span class="chipc" style="--mkc:var(--mk-adresse)">[ADRESSE_1]</span> sollte bis dahin erfolgen.</div>
+      <div style="position:absolute;left:28px;right:28px;bottom:26px;height:56px;border-radius:28px;border:1px solid var(--line);display:flex;align-items:center;padding:0 8px 0 24px;justify-content:space-between;color:var(--muted);font-size:22px"><span>Nachricht eingeben …</span><span style="width:40px;height:40px;border-radius:20px;background:var(--line)"></span></div>
+    </div>
+    <div id="s5back" class="card" style="position:absolute;left:120px;top:130px;width:840px;padding:40px 48px 44px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px">
+        <div class="h" style="font-size:34px;color:var(--primary);font-weight:600">Antwort zurückübersetzt</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+          <div style="display:flex;gap:6px"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0E9F8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="12" r="4.5"/><path d="M12 12h9.5M18 12v3.5M21 12v3"/></svg><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#16365C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v10.5"/></svg></div>
+          <span style="font-size:22px;color:var(--muted)">Schlüssel nur auf diesem PC</span>
+        </div>
+      </div>
+      <div style="font-size:28px;line-height:44px">
+        <div>Im Verfahren <span class="flip" style="--mkc:var(--mk-nummer)" data-b="1"><span class="a">[AZ_1]</span><span class="b">14 VI 512/26</span></span> endet die Frist für</div>
+        <div><span class="flip" style="--mkc:var(--mk-person)" data-b="2"><span class="a">[MANDANTIN]</span><span class="b">Sabine Winter</span></span> am 14. April 2026.</div>
+        <div>Die Zustellung an die Anschrift</div>
+        <div><span class="flip" style="--mkc:var(--mk-adresse)" data-b="3"><span class="a">[ADRESSE_1]</span><span class="b">Eppinghofer Straße 47</span></span> sollte bis dahin erfolgen.</div>
+      </div>
+    </div>
+    <div class="caption" id="s5cap1">Die KI arbeitet. Der Name bleibt zu Hause.</div>
+    <div class="caption" id="s5cap2">Zurückübersetzt. Der Schlüssel bleibt bei Ihnen.</div>
+  </section>
+
+  <!-- 6 · Kennzahlen und Funktionen (43–51 s, dunkel) -->
+  <section class="scene dark" id="s6">
+    <div class="eyebrow" id="s6eye" style="position:absolute;left:120px;top:150px;color:var(--accent-light)">Visitenkarte des Produkts</div>
+    <div class="h" id="s6h" style="position:absolute;left:120px;top:196px;font-size:86px;color:#fff">Was Lokanon kann</div>
+    <div class="kpi" style="left:120px;top:360px"><b><span data-count="98" data-at="43.9" data-dur="1.1">0</span> %</b><span>Erkennungsrate, Referenzfälle</span></div>
+    <div class="kpi" style="left:545px;top:360px"><b><span data-count="98" data-at="44.1" data-dur="1.1">0</span> %</b><span>Treffergenauigkeit</span></div>
+    <div class="kpi" style="left:970px;top:360px"><b><span data-count="0" data-at="44.3" data-dur="1.1">0</span> Bytes</b><span>gehen zur Laufzeit ins Netz</span></div>
+    <div class="kpi" style="left:1395px;top:360px"><b><span data-count="4" data-at="44.5" data-dur="1.1">0</span></b><span>Schritte bis zur Antwort</span></div>
+    <div class="fchip" style="left:120px;top:580px"><i></i>Läuft auf dem PC</div>
+    <div class="fchip" style="left:470px;top:580px"><i></i>Vorgangsordner in der Akte</div>
+    <div class="fchip" style="left:938px;top:580px"><i></i>Prüfen mit Schaltern</div>
+    <div class="fchip" style="left:1310px;top:580px"><i></i>Eigene Bezeichnungen</div>
+    <div class="fchip" style="left:120px;top:666px"><i></i>Scans inklusive</div>
+    <div class="fchip" style="left:410px;top:666px"><i></i>Leck-Test vor jeder Ausgabe</div>
+    <div class="fchip" style="left:870px;top:666px"><i></i>Vorgangsweit konsistent</div>
+    <div class="fchip" style="left:1290px;top:666px"><i></i>Schlüssel und Rückübersetzung</div>
+    <div class="caption" id="s6cap">Gebaut für den Schreibtisch, nicht für die IT-Abteilung.</div>
+  </section>
+
+  <!-- 7 · Bildschirme (51–60 s, hell) -->
+  <section class="scene light" id="s7">
+    <div class="shot" id="sh1" style="left:400px;top:150px"><img src="../shots/start.jpg" alt=""><span class="tag">1 · Vorgang anlegen</span></div>
+    <div class="shot" id="sh2" style="left:400px;top:150px"><img src="../shots/fertigstellen.jpg" alt=""><span class="tag">3 · Fertigstellen</span></div>
+    <div class="shot" id="sh3" style="left:400px;top:150px"><img src="../shots/pruefen.jpg" alt=""><span class="tag">2 · Prüfen</span></div>
+    <div class="caption" id="s7cap">Echte Bildschirme aus Lokanon 2.0, erfundener Vorgang.</div>
+  </section>
+
+  <!-- 8 · Grenzen (60–66 s, hell) -->
+  <section class="scene light" id="s8">
+    <div class="eyebrow teal" id="s8eye" style="position:absolute;left:0;right:0;top:300px;justify-content:center">Ehrlich gesagt</div>
+    <div class="focus" id="s8f1">Keine Erkennung ist vollständig. Die Prüfung bleibt beim Menschen.</div>
+    <div class="focus" id="s8f2">Pseudonym, nicht anonym. Der Schlüssel bleibt in der Kanzlei.</div>
+  </section>
+
+  <!-- 9 · Abspann (66–74 s, dunkel) -->
+  <section class="scene dark" id="s9">
+    <div style="position:absolute;left:0;right:0;top:300px;display:flex;flex-direction:column;align-items:center;gap:46px">
+      <div id="s9lock" style="display:flex;align-items:center;gap:30px">
+        <svg width="100" height="118" viewBox="0 0 100 118" fill="none"><path d="M50 5 L92 20 V56 C92 84 72 104 50 113 C28 104 8 84 8 56 V20 Z" fill="#0E9F8A" fill-opacity=".22" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><path d="M33 59 L46 72 L68 44" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="h" style="font-size:96px;color:#fff;line-height:1">Lokanon</div>
+      </div>
+      <div class="h shiny" id="s9claim" style="font-size:78px;font-weight:600">Lokanon. Läuft auf Ihrem PC.</div>
+      <button class="star" id="s9pill" type="button">Pilotversion für Kanzleien</button>
+      <div id="s9sub" style="font-size:28px;color:rgba(255,255,255,.7)">Windows 10/11 · pro Benutzer · ohne Adminrechte · ohne Internet</div>
+    </div>
+  </section>
+</div>
+
+<script>if (/noshader/.test(location.search)) document.getElementById('strands').className = '';</script>
+<script src="recipes/shaderbg.js"></script>
+<script src="recipes/strands-lokanon.js"></script>
+<script>
+(function () {
+  'use strict';
+  var MA = window.__ma;
+  var E = { out: 'cubic-bezier(.16,1,.3,1)', inout: 'cubic-bezier(.65,0,.35,1)', pop: 'cubic-bezier(.34,1.56,.64,1)', lin: 'linear', spring: 'cubic-bezier(.22,1.4,.36,1)' };
+  var DURATION = 74;
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+
+  // ---- Zeitleisten-Bausteine (Web Animations, pausiert; seek setzt currentTime) ----
+  function A(el, frames, start, dur, ease, opt) {
+    var o = { delay: start * 1000, duration: dur * 1000, easing: ease || E.out, fill: 'both' };
+    if (opt) for (var k in opt) o[k] = opt[k];
+    var a = el.animate(frames, o); a.pause(); MA.anims.push(a); return a;
+  }
+  function rise(el, at, dur, dist) { return A(el, [{ opacity: 0, transform: 'translateY(' + (dist || '.5em') + ')' }, { opacity: 1, transform: 'none' }], at, dur || .52); }
+  function pop(el, at, dur) { return A(el, [{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'none' }], at, dur || .5, E.pop); }
+  function blurIn(el, at, dur) { return A(el, [{ opacity: 0, filter: 'blur(10px)' }, { opacity: 1, filter: 'blur(0px)' }], at, dur || .62); }
+  function fade(el, at, dur, from, to) { return A(el, [{ opacity: from == null ? 0 : from }, { opacity: to == null ? 1 : to }], at, dur || .4); }
+  function split(el, mode) {
+    var text = el.textContent; el.textContent = '';
+    var units = mode === 'letters' ? text.split('') : text.split(/(\s+)/), spans = [];
+    units.forEach(function (u) { if (!u) return; var s = document.createElement('span'); if (/^\s+$/.test(u)) { s.className = 'k-space'; } else { s.className = 'k-unit'; s.textContent = u; spans.push(s); } el.appendChild(s); });
+    return spans;
+  }
+  function splitLines(el) { // Zeilen mit <br>: je Zeile Wörter
+    var html = el.innerHTML.split(/<br\s*\/?>/i); el.innerHTML = ''; var spans = [];
+    html.forEach(function (line, i) { var d = document.createElement('div'); d.textContent = line.replace(/<[^>]+>/g, ''); el.appendChild(d); spans = spans.concat(split(d)); });
+    return spans;
+  }
+  function kinetic(el, at, kind, step, mode) { var fn = kind === 'pop' ? pop : kind === 'blur' ? blurIn : rise; split(el, mode).forEach(function (s, i) { fn(s, at + i * (step || .07)); }); }
+  function scene(id, start, end, f) {
+    var el = $('#' + id), len = end - start, fi = (f || .45) / len;
+    A(el, [{ opacity: 0, offset: 0 }, { opacity: 1, offset: fi }, { opacity: 1, offset: 1 - fi }, { opacity: 0, offset: 1 }], start, len, E.lin);
+  }
+  // Mehrere Phasen auf demselben Element: eine Animation mit absoluten Zeitpunkten (sonst überdeckt fill:both)
+  function seq(el, steps) {
+    var t0 = steps[0].t, t1 = steps[steps.length - 1].t, len = t1 - t0;
+    var frames = steps.map(function (s) { var f = {}; for (var k in s.p) f[k] = s.p[k]; f.offset = (s.t - t0) / len; if (s.e) f.easing = s.e; return f; });
+    return A(el, frames, t0, len, E.lin);
+  }
+  function count(t) { // count-up-Rezept, zeitleistengesteuert
+    $$('[data-count]').forEach(function (el) {
+      var at = +el.getAttribute('data-at'), dur = +el.getAttribute('data-dur') || .9, ziel = +el.getAttribute('data-count');
+      var p = Math.max(0, Math.min(1, (t - at) / dur)); p = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(ziel * p).toLocaleString('de-DE');
+    });
+  }
+
+  // ---- 1 · Cover ----
+  scene('s1', 0, 6, .4);
+  A($('#shieldPath'), [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], .2, 1.4, E.inout);
+  A($('#shieldCheck'), [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], 1.4, .5);
+  A($('#shieldPath'), [{ fillOpacity: 0 }, { fillOpacity: .22 }], 1.6, .6, E.lin);
+  kinetic($('#wordmark'), .9, 'pop', .05, 'letters');
+  kinetic($('#subline'), 2.0, 'blur', .07);
+  $$('#credits .pill').forEach(function (p, i) { rise(p, 3.2 + i * .12, .6, '18px'); });
+
+  // ---- 2 · Der Name ----
+  scene('s2', 6, 13);
+  rise($('#s2eye'), 6.3, .5, '12px');
+  splitLines($('#s2h')).forEach(function (s, i) { rise(s, 6.5 + i * .07); });
+  A($('#s2doc'), [{ opacity: 0, transform: 'translateX(120px) rotate(2deg)' }, { opacity: 1, transform: 'none' }], 7.0, .9, E.spring);
+  $$('#s2doc .pillbg').forEach(function (p, i) { A(p, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], 8.0 + i * .2, .45); });
+  A($('#threadPath'), [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], 8.7, 1.1, E.inout);
+  $$('#s2laws .pill').forEach(function (p, i) { pop(p, 9.6 + i * .14, .55); });
+  rise($('#s2note'), 10.4, .6, '14px');
+
+  // ---- 3 · Erkennen ----
+  scene('s3', 13, 23);
+  rise($('#s3doc'), 13.2, .7, '20px');
+  rise($('#s3t'), 13.4, .5, '12px');
+  $$('#s3legend .card').forEach(function (c, i) { A(c, [{ opacity: 0, transform: 'translateX(26px)' }, { opacity: 1, transform: 'none' }], 14 + i * .5, .5); });
+  $$('#s3doc .mk').forEach(function (m, i) {
+    var hl = 14.0 + i * .5, mo = 18.0 + i * .28, kept = i === 5;
+    A($('.pillbg', m), [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], hl, .45);
+    if (kept) {
+      A($('.pillbg', m), [{ opacity: 1 }, { opacity: 0 }], 20.6, .4, E.lin);
+      A($('.dash', m), [{ opacity: 0 }, { opacity: 1 }], 20.7, .4, E.lin);
+    } else {
+      A($('.txt', m), [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-.35em)' }], mo, .45);
+      A($('.chip', m), [{ opacity: 0, transform: 'translateY(.35em) scale(.9)' }, { opacity: 1, transform: 'none' }], mo + .05, .5);
+    }
+  });
+  $$('#s3tech .pill').forEach(function (p, i) { rise(p, 16.2 + i * .1, .5, '12px'); });
+  rise($('#s3cap'), 13.6, .6, '18px');
+
+  // ---- 4 · Prüfen ----
+  scene('s4', 23, 31);
+  rise($('#s4doc'), 23.2, .7, '20px');
+  rise($('#s4t'), 23.4, .5, '12px');
+  $$('#s4cards .card').forEach(function (c, i) { rise(c, 23.8 + i * .12, .55, '16px'); });
+  // Schalter kippt: Amtsgericht bleibt stehen
+  A($('#s4knob'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-30px)' }], 25.6, .35, E.inout);
+  A($('#s4toggle'), [{ backgroundColor: '#0E9F8A' }, { backgroundColor: '#C3CBD6' }], 25.6, .35, E.lin);
+  A($('#s4gcard'), [{ boxShadow: '0 0 0 0 rgba(14,159,138,0)' }, { boxShadow: '0 0 0 4px rgba(14,159,138,.22)' }], 25.7, .4, E.lin);
+  fade($('#s4gl1'), 25.8, .3, 1, 0); fade($('#s4gl2'), 25.9, .3); fade($('#s4gt1'), 25.8, .3, 1, 0); fade($('#s4gt2'), 25.9, .3);
+  A($('#s4court .pillbg'), [{ opacity: 1 }, { opacity: 0 }], 25.9, .4, E.lin);
+  A($('#s4court .chip'), [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-.35em)' }], 25.9, .4);
+  A($('#s4court .txt'), [{ opacity: 0, transform: 'translateY(.35em)' }, { opacity: 1, transform: 'none' }], 26.0, .45);
+  A($('#s4court .dash'), [{ opacity: 0 }, { opacity: 1 }], 26.2, .4, E.lin);
+  // benennen: [PERSON_1] → [MANDANTIN] überall
+  pop($('#s4ren'), 27.4, .5);
+  $$('#s4 .flip').forEach(function (f, i) {
+    A($('.a', f), [{ transform: 'rotateX(0deg)', opacity: 1 }, { transform: 'rotateX(180deg)', opacity: 0 }], 28.2 + i * .15, .7);
+    A($('.b', f), [{ transform: 'rotateX(-180deg)', opacity: 0 }, { transform: 'rotateX(0deg)', opacity: 1 }], 28.2 + i * .15, .7);
+  });
+  rise($('#s4cap'), 23.6, .6, '18px');
+
+  // ---- 5 · KI ----
+  scene('s5', 31, 43);
+  seq($('#s5chat'), [
+    { t: 31.2, p: { opacity: 0, transform: 'translateX(60px) scale(1)' }, e: E.out },
+    { t: 31.9, p: { opacity: 1, transform: 'translateX(0) scale(1)' }, e: E.lin },
+    { t: 37.4, p: { opacity: 1, transform: 'translateX(0) scale(1)' }, e: E.out },
+    { t: 38.1, p: { opacity: .45, transform: 'translateX(0) scale(.97)' } }
+  ]);
+  A($('#s5doc'), [
+    { opacity: 1, transform: 'translate(0,0) scale(1)', offset: 0 },
+    { opacity: 1, transform: 'translate(0,0) scale(1)', offset: .12 },
+    { opacity: 1, transform: 'translate(1320px, 20px) scale(.2) rotate(6deg)', offset: .88 },
+    { opacity: 0, transform: 'translate(1330px, 30px) scale(.18) rotate(6deg)', offset: 1 }
+  ], 31.6, 1.8, E.inout);
+  A($('#s5me'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], 33.3, .5);
+  A($('#s5typing'), [{ opacity: 0, offset: 0 }, { opacity: 1, offset: .15 }, { opacity: 1, offset: .85 }, { opacity: 0, offset: 1 }], 33.8, 1.6, E.lin);
+  A($('#s5ai'), [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], 35.4, .5);
+  A($('#s5back'), [{ opacity: 0, transform: 'translateX(-30px)' }, { opacity: 1, transform: 'none' }], 37.4, .6);
+  $$('#s5back .flip').forEach(function (f, i) {
+    A($('.a', f), [{ transform: 'rotateX(0deg)', opacity: 1 }, { transform: 'rotateX(180deg)', opacity: 0 }], 38.6 + i * .5, .7);
+    A($('.b', f), [{ transform: 'rotateX(-180deg)', opacity: 0 }, { transform: 'rotateX(0deg)', opacity: 1 }], 38.6 + i * .5, .7);
+  });
+  A($('#s5cap1'), [{ opacity: 0, offset: 0 }, { opacity: 1, offset: .1 }, { opacity: 1, offset: .9 }, { opacity: 0, offset: 1 }], 31.6, 5.6, E.lin);
+  A($('#s5cap2'), [{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], 37.8, .6);
+
+  // ---- 6 · Kennzahlen ----
+  scene('s6', 43, 51);
+  rise($('#s6eye'), 43.3, .5, '12px');
+  kinetic($('#s6h'), 43.5, 'pop', .06);
+  $$('#s6 .kpi').forEach(function (k, i) { rise(k, 43.8 + i * .12, .6, '24px'); });
+  $$('#s6 .fchip').forEach(function (c, i) { rise(c, 46.0 + i * .08, .55, '20px'); });
+  rise($('#s6cap'), 48.0, .6, '18px');
+
+  // ---- 7 · Bildschirme (bounce-cards: Stapel fächert auf, dann Fahrt) ----
+  scene('s7', 51, 60);
+  // Stapel fächert auf (bounce-cards), dann tritt die Mitte (Prüfen) vor und die Außenkarten weichen
+  var fan = [
+    { x: -330, r: -7, ax: -760, ay: 60, ar: -9, ao: .35 },
+    { x: 330, r: 7, ax: 760, ay: 60, ar: 9, ao: .35 },
+    { x: 0, r: 0, ax: 0, ay: 0, ar: 0, ao: 1 }
+  ];
+  $$('#s7 .shot').forEach(function (s, i) {
+    var f = fan[i], mid = i === 2;
+    var pose = 'translate(' + f.x + 'px, 0) scale(.86) rotate(' + f.r + 'deg)';
+    var away = 'translate(' + f.ax + 'px,' + f.ay + 'px) scale(' + (mid ? 1 : .7) + ') rotate(' + f.ar + 'deg)';
+    seq(s, [
+      { t: 51.2 + i * .14, p: { opacity: 0, transform: 'translate(0, 40px) scale(.9)' }, e: E.spring },
+      { t: 52.2 + i * .14, p: { opacity: 1, transform: pose }, e: E.lin },
+      { t: 53.4, p: { opacity: 1, transform: pose }, e: E.inout },
+      { t: 54.3, p: { opacity: f.ao, transform: away } }
+    ]);
+  });
+  A($('#sh3 img'), [{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }], 54.2, 5.4, E.lin);
+  rise($('#s7cap'), 51.6, .6, '18px');
+
+  // ---- 8 · Grenzen (true-focus: ein Wort scharf, der Rest weich) ----
+  scene('s8', 60, 66);
+  rise($('#s8eye'), 60.3, .5, '12px');
+  function focusLine(el, at, end) {
+    var words = split(el); el.querySelectorAll('.k-unit').forEach(function (s) { s.classList.add('w'); });
+    var step = (end - at - .3) / words.length;
+    A(el, [{ opacity: 0, offset: 0 }, { opacity: 1, offset: .08 }, { opacity: 1, offset: .92 }, { opacity: 0, offset: 1 }], at - .2, end - at + .4, E.lin);
+    words.forEach(function (w, i) {
+      var t0 = at + i * step;
+      A(w, [{ filter: 'blur(6px)', opacity: .55, offset: 0 }, { filter: 'blur(0px)', opacity: 1, offset: .25 }, { filter: 'blur(0px)', opacity: 1, offset: .75 }, { filter: 'blur(4px)', opacity: .7, offset: 1 }], t0, step * 1.6, E.inout);
+    });
+  }
+  focusLine($('#s8f1'), 60.6, 63.1);
+  focusLine($('#s8f2'), 63.3, 65.8);
+
+  // ---- 9 · Abspann ----
+  scene('s9', 66, 74, .5);
+  A($('#s9lock'), [{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], 66.4, .8);
+  rise($('#s9claim'), 67.2, .7, '20px');
+  pop($('#s9pill'), 68.2, .6);
+  rise($('#s9sub'), 68.8, .6, '12px');
+
+  // ---- Zeitleiste ----
+  var cssAnims = [];
+  function seek(t) {
+    MA.now = t;
+    var ms = t * 1000;
+    for (var i = 0; i < MA.anims.length; i++) MA.anims[i].currentTime = ms;
+    for (var j = 0; j < cssAnims.length; j++) { try { cssAnims[j].currentTime = ms; } catch (e) {} }
+    var q = MA.queue.splice(0, MA.queue.length); for (var k = 0; k < q.length; k++) q[k](ms);   // Shader-Frames (neue rAF-Aufrufe landen im nächsten Bild)
+    count(t);
+  }
+  var ready = new Promise(function (resolve) {
+    var fonts = document.fonts ? document.fonts.ready : Promise.resolve();
+    var imgs = $$('img').map(function (im) { return im.complete ? Promise.resolve() : new Promise(function (r) { im.onload = im.onerror = r; }); });
+    Promise.all([fonts].concat(imgs)).then(function () {
+      // CSS-Animationen der Rezepte (shiny-text, star-border, Tipp-Punkte) ebenfalls einfrieren
+      cssAnims = document.getAnimations().filter(function (a) { return MA.anims.indexOf(a) < 0; });
+      cssAnims.forEach(function (a) { a.pause(); });
+      var t0 = performance.now(); seek(0);
+      console.log('[ma] bereit: seek(0) ' + Math.round(performance.now() - t0) + ' ms, ' + cssAnims.length + ' CSS-Animationen');
+      resolve();
+    });
+  });
+  window.__maTimeline = { seek: seek, duration: DURATION, ready: ready };
+
+  console.log('[ma] Zeitleiste gebaut: ' + MA.anims.length + ' Animationen, ' + Math.round(performance.now()) + ' ms seit Start');
+  // Direkt im Browser geöffnet: in Echtzeit abspielen (Schleife); ?noloop unterdrückt das
+  if (window.parent === window && !/noloop/.test(location.search)) {
+    ready.then(function () {
+      var t0 = performance.now();
+      (function loop() { seek(((performance.now() - t0) / 1000) % DURATION); MA.native(loop); })();
+    });
+  }
+})();
+</script>
+</body>
+</html>

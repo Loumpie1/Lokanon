@@ -6,6 +6,22 @@ Zwei Kompositionen, beide 1920 × 1080, 30 fps, ohne Ton:
 | --- | --- | --- | --- |
 | `LokanonTeaser` | 30 s | `out/lokanon-teaser.mp4` | `npm run build` |
 | `LokanonVisitenkarte` | 2:06 | `out/lokanon-visitenkarte.mp4` | `npm run build:visitenkarte` |
+| `LokanonMotion` | 1:14 | `out/lokanon-motion.mp4` | `npm run build:motion` |
+
+## Motion-Film mit motion-anything
+
+`LokanonMotion` ist ein Motion-Design-Film, der mit Rezepten aus
+[motion-anything](https://github.com/nexu-io/motion-anything) (nexu-io, Apache-2.0) gebaut ist. Die Seite liegt
+unter `public/ma/index.html` und folgt der „einfrierbaren Zeitleiste“ von motion-anything
+(`window.__maTimeline.seek(t)`): alle Bewegungen sind Web-Animations-Keyframes, Shader und Zähler laufen über eine
+virtuelle Uhr. `src/LokanonMotion.tsx` lädt die Seite in einem iframe, ruft je Bild `seek()` auf und lässt Remotion
+fotografieren; so kommen auch WebGL-Shader bildgenau ins MP4 (Render mit `--gl=angle`).
+
+Verwendete Rezepte (`public/ma/recipes/`): `_fx/shaderbg.js` + `strands` (mit Lokanon-Palette, Datei
+`strands-lokanon.js`), `shiny-text`, `star-border`, `count-up`; als Bewegungsvokabular außerdem `kinetic-headline`
+(rise/pop/blur, Staffelung 40–70 ms), `bounce-cards`, `true-focus`, umgesetzt als Keyframes. Timing und Easing folgen
+`MOTION-SPEC.md` von motion-anything. Öffnet man `public/ma/index.html` direkt im Browser, läuft der Film in Schleife
+(`?noloop` hält ihn an, `?noshader` lässt den Shader weg).
 
 Der Visitenkarten-Film erzählt die Marketing-Geschichte in drei Akten (Ausgangslage, Wende, Auflösung) und zeigt
 danach Funktionen, Ablauf, echte Bildschirme (`public/shots/`), Grenzen und die drei Visitenkarten der Gewerke.
