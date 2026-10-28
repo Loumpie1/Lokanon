@@ -1,0 +1,27 @@
+{
+  "name": "lokanon-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lokanon Produktvideo (30 s) mit Remotion",
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion render LokanonTeaser out/lokanon-teaser.mp4 --codec=h264",
+    "build:hochkant": "remotion render LokanonTeaserHochkant out/lokanon-teaser-9x16.mp4 --codec=h264",
+    "stills": "remotion still LokanonTeaser out/frame-045.png --frame=45 && remotion still LokanonTeaser out/frame-360.png --frame=360 && remotion still LokanonTeaser out/frame-700.png --frame=700"
+  },
+  "dependencies": {
+    "@fontsource/source-sans-3": "^5.3.1",
+    "@fontsource/source-serif-4": "^5.3.1",
+    "@remotion/cli": "4.0.539",
+    "@remotion/fonts": "^4.0.539",
+    "@remotion/layout-utils": "^4.0.539",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "4.0.539"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3"
+  }
+}

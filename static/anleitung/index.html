@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lokanon – Anleitung</title>
+<link rel="stylesheet" href="/ui/fonts.css">
+<style>
+  :root{
+    --blau:#1F5FA8; --navy:#16365C; --blau-hell:#E6EEF9; --tinte:#172033; --grau:#5F6E85; --linie:#D8DFE9; --fond:#F4F6F9;
+    --gruen:#1E7F4C; --gruen-hell:#E1F4E9; --gelb:#9A5A09; --gelb-hell:#FFF3DF; --rot:#B42318; --rot-hell:#FCE9E7; --petrol:#0E9F8A;
+    --mark-person:#FFD9D9; --mark-firma:#D8E4FB; --mark-ort:#D9F2E3; --mark-nr:#FFF1BF; --mark-datum:#FFE6C2;
+    --font:"Source Sans 3","Segoe UI",system-ui,sans-serif; --display:"Source Serif 4",Georgia,serif; --mono:ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:var(--font);color:var(--tinte);background:var(--fond);line-height:1.55;font-size:16px}
+  a{color:var(--blau)}
+  header.hero{background:linear-gradient(135deg,#102A49 0%,#16365C 55%,#1F5FA8 100%);color:#fff;padding:44px 24px 36px}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  .hero h1{font-family:var(--display);font-size:2.3rem;margin:0 0 6px;font-weight:600}
+  .hero p.lead{font-size:1.12rem;max-width:720px;margin:0 0 18px;opacity:.94}
+  .hero .pill{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:4px 12px;font-size:.84rem;margin:0 6px 6px 0}
+  nav.toc{background:#fff;border-bottom:1px solid var(--linie);position:sticky;top:0;z-index:5}
+  nav.toc .wrap{display:flex;flex-wrap:wrap;gap:4px 18px;padding:10px 20px;font-size:.92rem}
+  nav.toc a{text-decoration:none;color:var(--grau)} nav.toc a:hover{color:var(--blau)}
+  main{padding:28px 0 60px}
+  section{margin:0 0 44px}
+  h2{font-family:var(--display);font-size:1.55rem;margin:0 0 14px;padding-top:8px;border-top:3px solid var(--blau);display:inline-block;font-weight:600}
+  h3{font-size:1.1rem;margin:22px 0 8px}
+  p{margin:0 0 12px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:14px 0}
+  .card{background:#fff;border:1px solid var(--linie);border-radius:12px;padding:16px 18px}
+  .card h4{margin:0 0 6px;font-size:1rem}
+  .card.ok{border-top:4px solid var(--gruen)} .card.warn{border-top:4px solid var(--gelb)} .card.no{border-top:4px solid var(--rot)}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  .steps li{position:relative;padding:0 0 18px 54px;counter-increment:s}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:38px;height:38px;border-radius:50%;background:var(--blau);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .steps li strong{display:block;font-size:1.05rem;margin-bottom:2px}
+  .box{border-left:4px solid var(--blau);background:var(--blau-hell);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .box.warn{border-color:var(--gelb);background:var(--gelb-hell)} .box.no{border-color:var(--rot);background:var(--rot-hell)} .box.ok{border-color:var(--gruen);background:var(--gruen-hell)}
+  code,kbd{font-family:var(--mono);font-size:.92em;background:#E9EEF5;padding:1px 5px;border-radius:4px}
+  pre{background:#172033;color:#E6ECF5;padding:14px 16px;border-radius:10px;overflow:auto;font-size:.88rem;line-height:1.45}
+  table{border-collapse:collapse;width:100%;background:#fff;font-size:.93rem;margin:10px 0 16px}
+  th,td{border:1px solid var(--linie);padding:8px 10px;text-align:left;vertical-align:top} th{background:#EDF1F6}
+  .ja{color:var(--gruen);font-weight:600} .nein{color:var(--rot);font-weight:600} .teils{color:var(--gelb);font-weight:600}
+  /* Oberflächen-Skizzen im Stil der App */
+  .ui{background:#F4F6F9;border:1px solid #C6CFDC;border-radius:10px;overflow:hidden;margin:14px 0;box-shadow:0 2px 8px rgba(15,23,42,.08);font-size:.88rem;display:grid;grid-template-columns:150px 1fr}
+  .ui .rail{background:var(--navy);color:#fff;padding:12px 10px;font-size:.8rem}
+  .ui .rail b{display:block;font-family:var(--display);font-size:1rem;margin-bottom:10px}
+  .ui .rail span{display:block;padding:4px 6px;border-radius:4px;opacity:.85} .ui .rail span.on{background:rgba(255,255,255,.14);opacity:1}
+  .ui .body{padding:14px 16px;min-width:0}
+  .ui .ttl{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:0 0 8px}
+  .ui .lbl{color:var(--grau);font-size:.78rem;margin:8px 0 3px}
+  .ui .inp{border:1px solid #C6CFDC;background:#fff;border-radius:6px;padding:6px 10px;color:#334155}
+  .ui .btn{display:inline-block;background:var(--blau);color:#fff;border-radius:6px;padding:6px 14px;font-weight:600;margin-top:8px}
+  .ui .btn.sec{background:#fff;color:var(--tinte);border:1px solid #C6CFDC}
+  .ui .stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px}
+  .ui .stepper div{background:#fff;border:1px solid var(--linie);border-radius:6px;padding:5px 8px;color:var(--grau);font-weight:600}
+  .ui .stepper div.on{border-color:var(--blau);color:var(--tinte);box-shadow:0 0 0 2px var(--blau-hell)} .ui .stepper div.done{color:var(--gruen)}
+  .ui .term{background:#fff;border:1px solid var(--linie);border-left:4px solid #D13B5B;border-radius:8px;padding:8px 10px;margin:6px 0}
+  .ui .term .ph{font-family:var(--mono);background:var(--blau-hell);color:var(--blau);padding:0 6px;border-radius:4px;font-size:.85em}
+  .ui .term .meta{color:var(--grau);font-size:.78rem} .ui .term .snip{font-size:.82rem;margin:3px 0} .ui .term .snip b{background:var(--mark-nr);padding:0 3px;border-radius:3px}
+  .ui .sw{display:inline-block;width:30px;height:16px;border-radius:999px;background:var(--blau);position:relative;vertical-align:middle;margin-right:6px}
+  .ui .sw::after{content:"";position:absolute;top:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#fff}
+  .ui .sw.off{background:#C6CFDC} .ui .sw.off::after{right:auto;left:2px}
+  .ui .note{background:var(--gelb-hell);border:1px solid #F3C977;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:.82rem}
+  .ui .ok{background:var(--gruen-hell);border:1px solid #9ADBB6;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:.82rem}
+  .ui .drop{border:2px dashed #C6CFDC;border-radius:8px;padding:12px;text-align:center;background:#fff}
+  mark{padding:0 3px;border-radius:3px} mark.p{background:var(--mark-person)} mark.f{background:var(--mark-firma)} mark.o{background:var(--mark-ort)} mark.n{background:var(--mark-nr)}
+  mark sup{font-family:var(--mono);font-size:.68em;color:var(--blau);margin-left:2px}
+  .bleibt{border:1px dashed var(--grau);padding:0 3px;border-radius:3px;color:#475569}
+  .tree{font-family:var(--mono);font-size:.88rem;background:#fff;border:1px solid var(--linie);border-radius:8px;padding:12px 16px;white-space:pre;overflow:auto}
+  .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 18px;font-size:.92rem}
+  .check{list-style:none;padding:0;margin:0}
+  .check li{padding:6px 0 6px 30px;position:relative;border-bottom:1px dashed var(--linie)}
+  .check li::before{content:"";position:absolute;left:2px;top:9px;width:16px;height:16px;border:2px solid var(--blau);border-radius:4px}
+  details{background:#fff;border:1px solid var(--linie);border-radius:8px;padding:8px 14px;margin:8px 0}
+  summary{cursor:pointer;font-weight:600}
+  footer{color:var(--grau);font-size:.85rem;border-top:1px solid var(--linie);padding:20px 0}
+  @media print{ nav.toc{display:none} header.hero{background:#16365C !important;-webkit-print-color-adjust:exact;print-color-adjust:exact} body{font-size:11pt}
+    section{break-inside:avoid-page} .ui,.card,table{break-inside:avoid} a{color:inherit;text-decoration:none} details{display:block} details>*{display:block} }
+  @media (max-width:700px){ .ui{grid-template-columns:1fr} .ui .rail{display:none} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Lokanon – Anleitung</h1>
+    <p class="lead">Mandatsunterlagen auf diesem PC pseudonymisieren, dann gefahrlos mit ChatGPT oder Claude arbeiten, und die Antwort wieder zurückübersetzen. Diese Anleitung führt vom ersten Start bis zum fertigen Vorgang.</p>
+    <span class="pill">läuft vollständig auf Ihrem PC</span><span class="pill">kein Internet nötig</span><span class="pill">für Einzelanwälte und kleine Kanzleien</span><span class="pill">Version 2.0-pilot · Stand 28.10.2026</span>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#was">Was Lokanon tut</a><a href="#schnell">Schnellstart</a><a href="#install">Installation</a><a href="#einrichten">Erster Start</a>
+  <a href="#vorgang">Ein Vorgang</a><a href="#ki">Die KI einrichten</a><a href="#recht">Rechtlicher Rahmen</a><a href="#platzhalter">Platzhalter</a><a href="#faq">Fragen</a>
+</div></nav>
+
+<main class="wrap">
+
+<section id="was">
+  <h2>Was Lokanon tut – und was nicht</h2>
+  <div class="cards">
+    <div class="card ok"><h4>✔ Das leistet Lokanon</h4>
+      Findet Namen, Adressen, Telefonnummern, E-Mails, Aktenzeichen, Diktatzeichen, IBANs, Kennzeichen, Ausweis- und Versicherungsnummern, Geburts- und Todesdaten – auch in gescannten PDFs – und ersetzt sie durch Platzhalter wie <code>[PERSON_1]</code> oder nach Ihrem Wunsch <code>[MANDANT]</code>. Erzeugt Kopien für die KI, einen Prüfbericht, ein Protokoll und einen verschlüsselten Schlüssel zum Zurückübersetzen.</div>
+    <div class="card warn"><h4>⚠ Das müssen Sie tun</h4>
+      Die Treffer in Schritt 2 prüfen, Übersehenes nachtragen, Unnötiges ausschalten. Den passenden KI-Tarif wählen und die Anweisung im KI-Projekt hinterlegen. Die KI-Antwort inhaltlich kontrollieren.</div>
+    <div class="card no"><h4>✘ Das kann Lokanon nicht</h4>
+      Keine Garantie auf Vollständigkeit. Indirekte Hinweise („der Prokurist der Spedition in Bassum“) erkennt die Software nicht. Lokanon ersetzt weder den Vertrag mit dem KI-Anbieter noch Ihre berufsrechtliche Prüfung. Handschrift und Stempel auf Scans werden nicht zuverlässig gelesen.</div>
+  </div>
+  <div class="box"><strong>Der Grundgedanke:</strong> Der KI-Anbieter sieht nur Platzhalter. Der Schlüssel, der Platzhalter und Original verbindet, bleibt verschlüsselt auf Ihrem Rechner. Innerhalb eines Vorgangs ist <code>[PERSON_1]</code> immer dieselbe Person, auch über mehrere Dateien, Namensteile und Schreibweisen hinweg. Zwischen Vorgängen beginnt die Zählung neu, damit der Anbieter Vorgänge nicht verknüpfen kann.</div>
+</section>
+
+<section id="schnell">
+  <h2>Schnellstart in fünf Schritten</h2>
+  <ol class="steps">
+    <li><strong>Lokanon starten</strong> Über das Startmenü oder die Desktop-Verknüpfung. Es öffnet sich das Programmfenster; beim ersten Start fragt ein Assistent nach Ihrer Kanzlei.</li>
+    <li><strong>Vorgang anlegen</strong> Namen eingeben (z. B. das Aktenzeichen), Dateien in das Feld ziehen oder „Aktenordner wählen“. Die Analyse startet von selbst.</li>
+    <li><strong>Prüfen</strong> Karten durchsehen, Schalter ausschalten bei Begriffen, die stehen bleiben sollen, bei Bedarf „benennen“ (z. B. Mandant). Den Kasten „Bitte ansehen“ beachten. Übersehenes nachtragen.</li>
+    <li><strong>Fertigstellen</strong> Prüfung bestätigen, „Dateien erzeugen“. Mit „Ordner öffnen“ landen Sie direkt im Ordner <code>Fuer die KI</code>. Passwort eingeben, „Schlüssel speichern“.</li>
+    <li><strong>In die KI geben, Antwort zurückübersetzen</strong> Dateien aus <code>Fuer die KI</code> in Ihr ChatGPT-/Claude-Projekt laden (Anweisung kopieren, siehe unten). Antwort kopieren, in Lokanon unter „Antwort“ einfügen.</li>
+  </ol>
+</section>
+
+<section id="install">
+  <h2>Installation (Windows, einmalig)</h2>
+  <ol class="steps">
+    <li><strong>Setup starten</strong> <code>Lokanon-Setup.exe</code> doppelklicken. Keine Administratorrechte nötig; Lokanon wird in Ihrem Benutzerprofil installiert.</li>
+    <li><strong>SmartScreen-Hinweis</strong> Die Pilotversion ist noch nicht signiert. Erscheint „Der Computer wurde durch Windows geschützt“: „Weitere Informationen“ → „Trotzdem ausführen“.</li>
+    <li><strong>Fertig</strong> Rund 2,5 GB (Sprachmodelle inklusive). Danach braucht Lokanon kein Internet mehr. Test: WLAN aus, Lokanon benutzen.</li>
+  </ol>
+  <div class="box">Ihre Daten liegen nicht im Programmordner, sondern unter <code>Dokumente-Ebene Ihres Benutzerprofils → Lokanon</code> (Vorgänge, Schlüssel, Einstellungen). Eine Deinstallation löscht diese Daten nicht.</div>
+</section>
+
+<section id="einrichten">
+  <h2>Erster Start: Was darf stehen bleiben?</h2>
+  <p>Drei kurze Bildschirme. Lokanon muss wissen, was in <em>Ihren</em> Dokumenten kein Geheimnis ist: Ihre Kanzlei, Ihre Mitarbeiter, Ihre Kontaktdaten. Diese Begriffe werden nie ersetzt, auch nicht in Teilen („Frau Lehmkuhl“ bleibt stehen, wenn „Annette Lehmkuhl“ eingetragen ist).</p>
+  <div class="ui"><div class="rail"><b>Lokanon</b><span class="on">Start</span><span>Antwort zurückübersetzen</span><span>Einstellungen</span><span>Anleitung</span></div><div class="body">
+    <div class="lbl">Willkommen · Schritt 1 von 3</div><div class="ttl">Lokanon einrichten</div>
+    <div class="lbl">Wofür nutzen Sie Lokanon?</div><div>◉ Anwaltskanzlei &nbsp; ◯ Arztpraxis (Vorschau) &nbsp; ◯ Allgemein</div>
+    <div class="lbl">Name Ihrer Kanzlei</div><div class="inp">Lehmkuhl &amp; Partner Rechtsanwälte</div>
+    <div class="lbl">Eigene Personen (eine je Zeile)</div><div class="inp">Dr. Annette Lehmkuhl<br>Max Mustermann (Sekretariat)</div>
+    <div class="lbl">Eigene Kontaktdaten</div><div class="inp">0201 8945120<br>kanzlei@example.de</div>
+    <span class="btn">Weiter</span>
+  </div></div>
+  <table>
+    <tr><th>Bildschirm</th><th>Was Sie eintragen</th><th>Warum</th></tr>
+    <tr><td>1 · Kanzlei</td><td>Name, eigene Personen, eigene Telefon-/Faxnummern, E-Mail, Anschrift</td><td>Sonst behandelt Lokanon Ihre Kanzlei wie einen Mandanten.</td></tr>
+    <tr><td>2 · Verhalten</td><td>Gerichte, Behörden, Versicherer, Kliniken stehen lassen (empfohlen); Ortsnamen ohne Adresse; Datumsangaben</td><td>Das Amtsgericht ist kein Personenbezug. Geburts- und Todesdaten werden ersetzt, Fristen und Vertragsdaten bleiben lesbar.</td></tr>
+    <tr><td>3 · Ordner</td><td>Ordner für Vorgänge und für Schlüsseldateien</td><td>Schlüssel gehören nicht in OneDrive, Dropbox oder andere Cloud-Ordner.</td></tr>
+  </table>
+  <p>Alles lässt sich später unter „Einstellungen“ ändern; dort gibt es auch „Einrichtung erneut starten“.</p>
+</section>
+
+<section id="vorgang">
+  <h2>Ein Vorgang von Anfang bis Ende</h2>
+  <p>Ein <strong>Vorgang</strong> ist eine Akte oder ein Mandat. Alle Dateien eines Vorgangs teilen sich einen Schlüssel und einen Ordner. Oben im Fenster zeigt eine Leiste die vier Schritte; erledigte Schritte können Sie jederzeit wieder anklicken.</p>
+
+  <h3>Schritt 1 · Dateien</h3>
+  <div class="ui"><div class="rail"><b>Lokanon</b><span class="on">Start</span><span>Antwort zurückübersetzen</span><span>Einstellungen</span><span>Anleitung</span></div><div class="body">
+    <div class="ttl">Mandatsunterlagen für die KI vorbereiten</div>
+    <div class="lbl">Neuer Vorgang · Name</div><div class="inp" style="max-width:360px">Müller ./. Autohaus Krause – 3 O 123/26</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div class="drop"><b>Dateien hierher ziehen</b><br><span style="color:var(--grau)">oder klicken · PDF, Word, Excel, Text</span></div><div class="drop"><b>Aktenordner wählen</b><br><span style="color:var(--grau)">alle Dateien eines Ordners</span></div></div>
+    <div class="lbl">Bisherige Vorgänge</div><div class="inp">Erbsache Brinkhoff · 5 Dateien · 61 Platzhalter · 27.10.2026</div>
+  </div></div>
+  <ul>
+    <li><strong>Dateien hierher ziehen</strong> für einzelne Dokumente (PDF, Word, Excel, Text). Hochgeladene Dateien werden sofort im Vorgangsordner unter <code>Originale</code> gesichert.</li>
+    <li><strong>Aktenordner wählen</strong> für eine ganze Akte: Lokanon liest alle unterstützten Dateien des Ordners (nicht die Unterordner) und legt die Ausgabe im Unterordner <code>Lokanon</code> der Akte ab. Die Originale werden nie verändert.</li>
+    <li><strong>Stattdessen Text einfügen</strong> für einen Absatz aus der Zwischenablage, etwa eine E-Mail.</li>
+  </ul>
+  <p>Die Analyse startet automatisch und zeigt den Fortschritt je Datei. Beim ersten Start des Programms dauert das Laden der Sprachmodelle etwa eine halbe Minute; danach braucht eine Seite wenige Sekunden, gescannte Seiten etwas länger (Texterkennung, auch bei quer liegenden Scans).</p>
+
+  <h3>Schritt 2 · Prüfen</h3>
+  <p>Links die Treffer als Karten, sortiert nach Art: Personen, Firmen, Adressen, Kontaktdaten, Akten und Zeichen, Konto und Steuer, Ausweise, Fahrzeug, Datum. Jede Karte zeigt den Begriff, den Platzhalter, wie oft und in wie vielen Dateien er vorkommt, die Sicherheit („sicher / wahrscheinlich / unsicher“), die Quelle und einen Ausschnitt der Fundstelle.</p>
+  <div class="ui"><div class="rail"><b>Lokanon</b><span>Start</span><span class="on">Aktueller Vorgang</span><span>Antwort zurückübersetzen</span><span>Einstellungen</span></div><div class="body">
+    <div class="stepper"><div class="done">✓ Dateien</div><div class="on">2 Prüfen</div><div>3 Fertigstellen</div><div>4 Antwort</div></div>
+    <div class="note">⚠ <b>Bitte ansehen: 2 Begriffe sind nicht eindeutig</b> · <b>Wolle</b> (PERSON): nur über Unterschrift erkannt · <b>Essen</b>: kann Person oder Ort sein</div>
+    <div style="font-weight:700;color:#D13B5B;margin:8px 0 2px">● Personen <span style="color:var(--grau);font-weight:400">· 3 von 3 werden ersetzt</span></div>
+    <div class="term"><b>Sabine Winter</b> → <span class="ph">[MANDANTIN]</span> <a href="#" onclick="return false">ändern</a><div class="meta">PERSON · 4× in 3 Dateien · sicher · Sprachmodell</div><div class="snip">Mandantin: <b>Sabine Winter</b> geb. Brinkhoff, geb. am 09.06.1971…</div><span class="sw"></span><span class="meta">wird ersetzt</span></div>
+    <div class="term" style="border-left-color:#2F62C9"><b>Sparkasse Mülheim</b> → <span style="color:var(--grau)">bleibt stehen</span><div class="meta">FIRMA · 1× in 1 Datei · sicher · Sprachmodell</div><span class="sw off"></span><span class="meta">bleibt stehen</span></div>
+    <div class="lbl">Begriff übersehen? Hier eintragen, mehrere mit Komma</div><div class="inp" style="max-width:360px">Schützenverein Saarn</div>
+  </div></div>
+  <div class="cards">
+    <div class="card"><h4>Schalter „wird ersetzt“</h4>Aus = der Begriff bleibt in allen Dateien des Vorgangs stehen. Die Dokumentansicht rechts zeigt ihn dann gestrichelt umrandet.</div>
+    <div class="card"><h4>„benennen“ – eigene Bezeichnung</h4>Statt <code>[PERSON_1]</code> steht dann überall <code>[MANDANT]</code>, <code>[GEGNER]</code> oder <code>[ZEUGE_GUENTHER]</code>. Vorschläge gibt es per Klick. Die KI versteht das genauso, und die Rückübersetzung auch.</div>
+    <div class="card"><h4>„Bitte ansehen“</h4>Unsichere Treffer in einfachen Worten: nur mittlere Sicherheit, nur über Anrede erkannt, Person oder Ort, einzelnes Wort ohne Vor- oder Nachnamen. Lokanon ersetzt im Zweifel; Sie entscheiden.</div>
+  </div>
+  <p>Rechts das Dokument. Jede Markierung trägt den Platzhalter als Etikett; über die Reiter wechseln Sie zwischen den Dateien und zur anonymisierten Fassung:</p>
+  <div class="ui" style="grid-template-columns:1fr"><div class="body" style="font-size:.95rem;line-height:1.8">
+    Mandantin: <mark class="p">Sabine Winter<sup>[MANDANTIN]</sup></mark> geb. <mark class="p">Brinkhoff<sup>[PERSON_2]</sup></mark>, geb. am <mark class="n">09.06.1971<sup>[DATUM_1]</sup></mark><br>
+    Anschrift: <mark class="o">Eppinghofer Straße 47<sup>[ADRESSE_1]</sup></mark>, <mark class="o">45468 Mülheim an der Ruhr<sup>[ORT_1]</sup></mark><br>
+    Nachlassgericht: Amtsgericht Mülheim an der Ruhr, Aktenzeichen: <mark class="n">14 VI 512/26<sup>[AZ_1]</sup></mark>, Zeichen: <mark class="n">AN/DS<sup>[ZEICHEN_1]</sup></mark><br>
+    Bestatter: <mark class="f">Pietät Kemper GmbH<sup>[FIRMA_1]</sup></mark>, Kontoverbindung bei der <span class="bleibt">Sparkasse Mülheim</span>
+  </div></div>
+  <div class="box"><strong>So prüfen Sie richtig:</strong>
+    <ol style="margin:6px 0 0 18px;padding:0">
+      <li>Erst „Bitte ansehen“, dann die Karten der Gruppe „Personen“.</li>
+      <li>Dann das Dokument überfliegen: Alles, was einen Mandanten erkennbar macht, muss farbig sein – auch Arbeitgeber, Vereine, seltene Umstände.</li>
+      <li>Fehlendes nachtragen (Feld über den Karten). Der Begriff wird in allen Dateien ersetzt.</li>
+      <li>Schalter nur ausschalten, wenn Sie sicher sind, dass der Begriff keinen Rückschluss erlaubt.</li>
+    </ol>
+  </div>
+
+  <h3>Schritt 3 · Fertigstellen</h3>
+  <div class="ui"><div class="rail"><b>Lokanon</b><span>Start</span><span class="on">Aktueller Vorgang</span><span>Antwort zurückübersetzen</span><span>Einstellungen</span></div><div class="body">
+    <div class="stepper"><div class="done">✓ Dateien</div><div class="done">✓ Prüfen</div><div class="on">3 Fertigstellen</div><div>4 Antwort</div></div>
+    <div class="ttl">Dateien für die KI erzeugen</div>
+    <div class="lbl">Ziel-KI (fürs Protokoll)</div><div class="inp" style="max-width:300px">ChatGPT Business / Enterprise</div>
+    <div style="margin:8px 0">☑ PDF-Sichtkopie &nbsp; ☑ Word-Kopie &nbsp; ☑ Excel-Kopie &nbsp;&nbsp; ☑ <b>Ich habe die Begriffe geprüft.</b></div>
+    <span class="btn">Dateien erzeugen</span>
+    <div class="ok">✓ Dateien erzeugt · <code>…\Lokanon\Vorgaenge\Erbsache Brinkhoff\Fuer die KI</code> <span class="btn sec" style="margin:0 0 0 8px;padding:2px 8px">Ordner öffnen</span></div>
+    <div class="lbl">Vorgang abschließen</div><div class="inp" style="max-width:240px;display:inline-block">Passwort ••••••••</div> <span class="btn sec" style="margin:0">Schlüssel speichern</span>
+  </div></div>
+  <p>Der Ergebnisblock zeigt je Datei einen grünen Haken (Leck-Test bestanden) oder einen Hinweis in Klartext. Daneben die Anweisung für die KI mit „Kopieren“ und die drei Schritte für ChatGPT oder Claude.</p>
+  <p>Jeder Vorgang hat einen <strong>Vorgangsordner</strong> mit immer gleicher Struktur:</p>
+  <div class="tree">Lokanon\Vorgaenge\Erbsache Brinkhoff\      ← bei „Aktenordner wählen“: <Akte>\Lokanon\
+├── Originale\                       ← Ihre hochgeladenen Dateien (bei Aktenordner: entfällt)
+├── Anonymisiert\
+│   ├── Mandatsnotiz_Brinkhoff.md    ← anonymisierter Text, Originalname (Ihre Ablage)
+│   └── Mandatsnotiz_Brinkhoff.docx  ← Word-Kopie ohne Namen und Metadaten
+├── Fuer die KI\
+│   ├── Mandatsnotiz_MANDANTIN.md    ← Dateiname ohne Mandantennamen – DIESE Dateien hochladen
+│   └── Einspruch_PERSON_5.pdf       ← geschwärzte PDF-Sichtkopie (mit Gegenprüfung)
+├── Pruefbericht.html                ← Original mit Markierungen: was wo ersetzt wurde (Klartext!)
+├── Uebersicht.csv                   ← Original ↔ KI-Datei ↔ Anzahl Platzhalter
+└── Protokoll.md / Protokoll.json    ← was wann maskiert wurde (ohne Klartext)</div>
+  <div class="cards">
+    <div class="card"><h4>Textfassung (.md) – das Format für die KI</h4>Reiner Text mit Platzhaltern. Keine versteckten Metadaten, Kommentare oder Änderungsverfolgung. Im Zweifel nur diese Dateien hochladen.</div>
+    <div class="card"><h4>PDF-Sichtkopie</h4>Echte Schwärzung: Text aus der Datei entfernt, Metadaten gelöscht. Bei Scans werden die Bildpixel übermalt und die Seite erneut per Texterkennung geprüft; quer liegende Scans kommen aufrecht heraus. Findet die Gegenprüfung noch ein Original, wird die Kopie verworfen und Lokanon sagt es Ihnen.</div>
+    <div class="card"><h4>Schlüssel</h4>Platzhalter → Original, mit Ihrem Passwort verschlüsselt, im Schlüsselordner als <code>&lt;Vorgang&gt;.anon.json</code>. Ohne Schlüssel ist die Ausgabe nicht umkehrbar; mit Schlüssel ist sie pseudonymisiert und die Datei so schützenswert wie die Akte.</div>
+  </div>
+  <div class="box no"><strong>Roter Hinweis „enthält noch Originaltext“?</strong> Diese Datei nicht hochladen. Begriff unter „Prüfen“ nachtragen, erneut erzeugen.</div>
+
+  <h3>Schritt 4 · Antwort</h3>
+  <p>KI-Antwort einfügen, „Zurückübersetzen“, Ergebnis kopieren. Lokanon erkennt auch Varianten, die KI-Antworten gern erzeugen: „Person 1“, „PERSON_1“, „[Person-1]“, „[PERSON_1]s“, „[Mandant]“. Für einen früheren Vorgang nutzen Sie den Menüpunkt „Antwort zurückübersetzen“: Schlüsseldatei aus der Liste wählen, Passwort, Antwort.</p>
+  <div class="box warn"><strong>Die Antwort bleibt zu prüfen.</strong> Die KI kann Inhalte falsch wiedergeben oder Platzhalter vertauschen. Die Rückübersetzung ersetzt nur die Platzhalter, sie prüft nicht den Inhalt.</div>
+</section>
+
+<section id="ki">
+  <h2>Die KI einrichten</h2>
+  <h3>Welcher Tarif?</h3>
+  <p>Der Tarif entscheidet, ob Ihre Eingaben zum Training genutzt werden, wie lange sie gespeichert bleiben und ob ein Auftragsverarbeitungsvertrag (AVV) möglich ist. Stand 28.10.2026, bitte vor Abschluss beim Anbieter prüfen.</p>
+  <table>
+    <tr><th>Tarif</th><th>Training auf Eingaben</th><th>AVV</th><th>Verarbeitung in der EU</th><th>Empfehlung</th></tr>
+    <tr><td>ChatGPT Free / Plus / Pro</td><td class="nein">an (abschaltbar)</td><td class="nein">nein</td><td class="nein">nein</td><td>Nur mit Auflagen (siehe unten)</td></tr>
+    <tr><td>ChatGPT Business (ab 2 Nutzer, ca. 25 $/Platz)</td><td class="ja">aus</td><td class="ja">ja, per Formular</td><td class="teils">Speicherung teilweise, Verarbeitung USA</td><td><strong>Mindeststandard</strong></td></tr>
+    <tr><td>Claude Free / Pro / Max</td><td class="nein">Wahlpflicht, vorbelegt an; gemeldete Chats werden trotz Opt-out ausgewertet</td><td class="nein">nein</td><td class="nein">nein</td><td>Nur mit Auflagen</td></tr>
+    <tr><td>Claude Team (ab 2 Nutzer, ca. 25 $/Platz)</td><td class="ja">aus</td><td class="ja">ja, automatisch Vertragsbestandteil</td><td class="nein">nein (USA)</td><td><strong>Mindeststandard</strong></td></tr>
+    <tr><td>Microsoft 365 Copilot Chat (Arbeitskonto)</td><td class="ja">aus</td><td class="ja">ja</td><td class="ja">ja</td><td>Gut, wenn M365 vorhanden</td></tr>
+    <tr><td>EU-Anbieter (Langdock, innoGPT, Mistral Team; ca. 25 €/Nutzer)</td><td class="ja">aus bzw. abschaltbar</td><td class="ja">ja</td><td class="ja">ja</td><td>Sauberste Lösung ohne US-Transfer</td></tr>
+  </table>
+  <div class="box warn"><strong>Wenn Sie bei einem Consumer-Konto (Plus, Pro, Claude Pro) bleiben:</strong> Training in den Einstellungen abschalten (ChatGPT: „Für alle verbessern“ aus; Claude: „Help improve Claude“ aus), für Mandatstexte den temporären bzw. Inkognito-Chat nutzen, und <em>ausschließlich</em> Dateien aus „Fuer die KI“ eingeben. Ohne AVV ist Lokanon dort nicht Komfort, sondern die einzige Schutzschicht.</div>
+  <h3>Anweisung im KI-Projekt hinterlegen</h3>
+  <ol class="steps">
+    <li><strong>ChatGPT</strong> Neues Projekt → „Anweisungen“ → Text aus Lokanon (Schritt 3, „Kopieren“) einfügen. Alle Chats in diesem Projekt sind Mandatsarbeit. Optional „Projektgedächtnis nur in diesem Projekt“ einschalten.</li>
+    <li><strong>Claude</strong> Neues Projekt → „Set project instructions“ → Text einfügen. Zusätzlich lässt sich die Skill-Datei (Link in Schritt 3) unter Einstellungen → Capabilities → Skills hochladen.</li>
+    <li><strong>Dateien hochladen</strong> Nur aus <code>Fuer die KI</code>. Deren Namen enthalten keine Mandantennamen mehr.</li>
+  </ol>
+</section>
+
+<section id="recht">
+  <h2>Rechtlicher Rahmen – ehrlich zusammengefasst</h2>
+  <p>Dies ist keine Rechtsberatung, sondern der Stand, auf dem Lokanon gebaut ist (28.10.2026). Die Textbausteine im Ordner <code>docs\vorlagen</code> helfen bei der Umsetzung, müssen aber anwaltlich geprüft werden.</p>
+  <div class="cards">
+    <div class="card"><h4>DSGVO</h4>Für Ihre Kanzlei bleiben pseudonymisierte Daten personenbezogen. Der EuGH (C-413/23 P, 04.09.2025) hat entschieden: Für einen Empfänger ohne Schlüssel können dieselben Daten anonym sein. Der KI-Anbieter ist trotzdem als Empfänger in der Mandanteninformation (Art. 13) zu nennen.</div>
+    <div class="card"><h4>§ 203 StGB, § 43e BRAO</h4>Kein „Offenbaren“, wenn der Empfänger die Person nicht erkennen kann – es kommt auf die Qualität der Pseudonymisierung einschließlich des Kontexts an. BRAK (12/2024) und DAV (2025): Bei öffentlichen KI-Tools ist Pseudonymisierung zwingend; KI-Clouddienste fallen unter § 43e BRAO (Vertrag in Textform mit Verschwiegenheitsverpflichtung).</div>
+    <div class="card"><h4>KI-Verordnung</h4>Art. 4 verlangt seit Februar 2025 Maßnahmen zur KI-Kompetenz, auch in Kanzleien. Diese Anleitung kann Teil der Schulungsunterlagen sein. Hochrisiko- und Transparenzpflichten treffen die interne Textarbeit mit anwaltlicher Endkontrolle nicht.</div>
+  </div>
+  <h3>Checkliste vor dem ersten Einsatz</h3>
+  <ul class="check">
+    <li>KI-Tarif mit AVV gewählt (kein Consumer-Konto) oder Consumer-Auflagen umgesetzt</li>
+    <li>Training beim Anbieter abgeschaltet, Aufbewahrungsfristen bekannt</li>
+    <li>Verschwiegenheitsverpflichtung nach § 43e Abs. 3 BRAO in Textform (Belehrung über § 203 StGB) geprüft</li>
+    <li>Verarbeitungsverzeichnis um die KI-Nutzung ergänzt (Vorlage in <code>docs\vorlagen</code>)</li>
+    <li>Mandanteninformation nach Art. 13 ergänzt: KI-Anbieter als Empfänger</li>
+    <li>Prüfung dokumentiert, ob eine Datenschutz-Folgenabschätzung nötig ist</li>
+    <li>Bei Einzelmandatsbezug: Einwilligung nach § 43e Abs. 5 BRAO erwogen</li>
+    <li>Interne Regel: keine Privatkonten, Projekt-Anweisung eingerichtet, jede KI-Ausgabe wird geprüft</li>
+    <li>Schulung dokumentiert (Art. 4 KI-VO)</li>
+  </ul>
+  <div class="box no"><strong>Arztpraxen:</strong> Zusätzlich gelten Art. 9 DSGVO (Gesundheitsdaten) und § 393 SGB V (C5-Testat für Cloud-Dienste). Ob KI-Dienste darunter fallen, ist ungeklärt. Lokanon bietet für Praxen bisher nur eine Vorschau; ein eigenes Praxis-Profil folgt.</div>
+</section>
+
+<section id="platzhalter">
+  <h2>Die Platzhalter</h2>
+  <p>Standardform <code>[TYP_n]</code>; mit eigener Bezeichnung <code>[MANDANT]</code>, <code>[GEGNERFIRMA]</code> oder <code>[ZEUGE_GUENTHER]</code>.</p>
+  <div class="legend">
+    <div><code>[PERSON_n]</code> Person, auch Namensteile</div><div><code>[FIRMA_n]</code> Firma, Organisation</div>
+    <div><code>[ORT_n]</code> Ort, PLZ + Ort</div><div><code>[ADRESSE_n]</code> Straße mit Hausnummer</div>
+    <div><code>[TELEFON_n]</code> <code>[EMAIL_n]</code> <code>[URL_n]</code> Kontakt</div><div><code>[AZ_n]</code> Aktenzeichen · <code>[ZEICHEN_n]</code> Diktatzeichen</div>
+    <div><code>[GRUNDBUCH_n]</code> Grundbuch, Flurstück</div><div><code>[IBAN_n]</code> <code>[KONTO_n]</code> <code>[KARTE_n]</code> Bank</div>
+    <div><code>[VERS_NR_n]</code> Versicherung, Schadennummer</div><div><code>[STEUER_ID_n]</code> <code>[STEUERNR_n]</code> <code>[UST_ID_n]</code> Steuer</div>
+    <div><code>[SV_NR_n]</code> <code>[KVNR_n]</code> Sozial-/Krankenversicherung</div><div><code>[AUSWEIS_n]</code> <code>[PASS_n]</code> <code>[FUEHRERSCHEIN_n]</code> Dokumente</div>
+    <div><code>[KFZ_n]</code> <code>[FIN_n]</code> Fahrzeug</div><div><code>[DATUM_n]</code> Geburts-/Todesdatum</div>
+    <div><code>[INTERN_n]</code> <code>[MANUELL_n]</code> eigene Begriffe</div><div><code>[HRB_n]</code> Handelsregister</div>
+  </div>
+</section>
+
+<section id="faq">
+  <h2>Häufige Fragen</h2>
+  <details><summary>Lokanon hat einen Namen übersehen. Was tun?</summary><p>Im Feld über den Karten eintragen und „Nachtragen“. Der Begriff wird in allen Dateien des Vorgangs ersetzt. Kommt der Begriff öfter vor (Projektname, Kunde), unter „Einstellungen → Immer ersetzen“ dauerhaft eintragen.</p></details>
+  <details><summary>Meine eigene Kanzlei wird ersetzt.</summary><p>„Einstellungen → Nie ersetzen“: Kanzleiname, Mitarbeiter, Telefon, E-Mail eintragen. Namensteile zählen mit.</p></details>
+  <details><summary>Zwei Personen heißen gleich mit Nachnamen.</summary><p>Lokanon ordnet einen alleinstehenden Nachnamen der häufiger genannten Person zu und zeigt ihn unter „Bitte ansehen“ als mehrdeutig. Mit „benennen“ geben Sie beiden eindeutige Bezeichnungen, etwa „Mandant“ und „Gegner“.</p></details>
+  <details><summary>Ein gescanntes PDF liefert „keinen erkennbaren Text“.</summary><p>Lokanon liest Scans per Texterkennung, auch quer liegende. Diese Meldung kommt nur, wenn auch die Texterkennung nichts findet: leere Seiten, sehr schlechte Scanqualität, Handschrift. Scan in besserer Qualität (300 dpi, gerade, kontrastreich) wiederholen oder den Text abtippen.</p></details>
+  <details><summary>Die PDF-Sichtkopie fehlt, nur die Textfassung ist da.</summary><p>Dann hat die Gegenprüfung in der PDF noch ein Original gefunden und die Kopie verworfen. Die Textfassung ist sauber und für die KI die bessere Wahl. Bei Scans hilft oft ein besserer Scan.</p></details>
+  <details><summary>Was passiert mit meinen Daten?</summary><p>Nichts verlässt den Rechner. Lokanon braucht nach der Installation kein Internet. Vorgänge liegen in Ihrem Benutzerprofil unter „Lokanon“, der Schlüssel im Schlüsselordner. Der Prüfbericht enthält Klartext und ist nicht für die KI bestimmt.</p></details>
+  <details><summary>Wie gut ist die Erkennung?</summary><p>Auf fünf fiktiven Kanzleifällen findet Lokanon 98 % der markierten Stellen bei 98 % Treffergenauigkeit; echte Pilot-Akten haben weitere Regeln geschärft. Echte Unterlagen sind vielfältiger: Rechnen Sie mit einzelnen Lücken und prüfen Sie jede Ausgabe. Indirekte Hinweise (Beruf + Einrichtung + Ort) findet die Software nicht.</p></details>
+  <details><summary>Darf ich jetzt „DSGVO-konform“ mit der KI arbeiten?</summary><p>Lokanon ist eine technische Schutzmaßnahme, keine Rechtsgarantie. Ob Ihr Einsatz zulässig ist, hängt vom Tarif, Ihren Verträgen, Ihrer Dokumentation und dem Einzelfall ab. Die Checkliste oben und die Vorlagen helfen; die Bewertung bleibt bei Ihnen oder Ihrem Datenschutzberater.</p></details>
+</section>
+
+</main>
+<footer><div class="wrap">Lokanon · lokaler Anonymisierer · Anleitung Version 2.0-pilot, Stand 28.10.2026 · Diese Seite lässt sich über „Drucken“ als PDF speichern.</div></footer>
+</body>
+</html>

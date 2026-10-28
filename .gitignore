@@ -1,0 +1,31 @@
+# Persönliche Einstellungen (Kanzleiname, Mitarbeiter) – nie veröffentlichen
+config.yaml
+
+# Echte Testdokumente bleiben lokal
+testdaten/Alex Bsp/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+
+# Alte Oberfläche, Werkzeug-Ordner, Protokolle
+.streamlit/
+.claude/
+*.log
+
+# Video: Abhängigkeiten und Einzelbilder (das fertige MP4 bleibt drin)
+video/node_modules/
+video/out/*.png
+video/out/frames/
+
+# Build-Ausgaben entstehen außerhalb des Projekts (%USERPROFILE%\Lokanon\build)
+build/out/
+build/app/
+build/downloads/
+
+# Betriebssystem
+Thumbs.db
+.DS_Store

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lokanon</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/ui/fonts.css">
+<link rel="stylesheet" href="/ui/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="rail" aria-label="Hauptnavigation">
+    <a class="brand" href="#start" title="Lokanon">
+      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M4 9 24 3l20 6v16c0 10-8 17-20 20C12 42 4 35 4 25Z" fill="currentColor"/><rect x="13" y="19" width="22" height="5" rx="2.5" fill="#fff"/><rect x="17" y="27" width="14" height="5" rx="2.5" fill="#0E9F8A"/></svg>
+      <span class="brand-name">Lokanon</span>
+    </a>
+    <nav class="nav">
+      <a href="#start" data-nav="start"><span class="nav-ico">⌂</span>Start</a>
+      <a href="#vorgang" data-nav="vorgang" id="nav-vorgang" hidden><span class="nav-ico">▤</span>Aktueller Vorgang</a>
+      <a href="#zurueck" data-nav="zurueck"><span class="nav-ico">⇄</span>Antwort zurückübersetzen</a>
+      <a href="#einstellungen" data-nav="einstellungen"><span class="nav-ico">⚙</span>Einstellungen</a>
+      <a href="#hilfe" data-nav="hilfe"><span class="nav-ico">?</span>Anleitung</a>
+    </nav>
+    <div class="rail-foot">
+      <div class="local-badge" id="local-badge"><span class="dot"></span><span id="local-text">Läuft lokal auf diesem PC</span></div>
+      <div class="rail-version" id="version"></div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="view" id="view"></div>
+  </main>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="modal-root" id="modal-root" hidden></div>
+
+<script src="/ui/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+# Standardeinstellungen von Lokanon. Die persönlichen Einstellungen liegen unter
+# %USERPROFILE%\Lokanon\einstellungen.yaml und werden beim ersten Start aus dieser Vorlage erzeugt.
+spacy_model: de_core_news_lg
+gliner_model: urchade/gliner_multi_pii-v1
+gliner_threshold: 0.5
+threshold: 0.4
+profil: kanzlei
+eingerichtet: false
+
+# Erkennungsgruppen (siehe anonymizer/engine.py GRUPPEN); die Oberfläche schaltet gruppenweise
+entities:
+- PERSON
+- ORGANIZATION
+- EMAIL_ADDRESS
+- TELEFON
+- ADRESSE
+- PLZ_ORT
+- LOCATION
+- URL
+- IP_ADDRESS
+- AKTENZEICHEN
+- DIKTATZEICHEN
+- GRUNDBUCH
+- VERSICHERUNGSNR
+- DE_HANDELSREGISTER
+- IBAN_CODE
+- KONTONUMMER
+- CREDIT_CARD
+- DE_TAX_ID
+- DE_TAX_NUMBER
+- DE_VAT_ID
+- DE_ID_CARD
+- DE_PASSPORT
+- DE_FUEHRERSCHEIN
+- FUEHRERSCHEIN
+- DE_SOCIAL_SECURITY
+- DE_HEALTH_INSURANCE
+- DE_LANR
+- DE_BSNR
+- DE_KFZ
+- KFZ
+- FIN
+- DATUM
+- EIGENE_BEGRIFFE
+
+propagate_repeats: true
+include_name_parts: true
+mask_locations: false
+keep_institutions: true
+datum_modus: kontext
+
+# Nie maskieren (eigene Kanzlei, Mitarbeiter, Kontaktdaten, Produktnamen) – füllt der Einrichtungsassistent
+allow_list:
+- Claude
+- ChatGPT
+- Copilot
+# Immer maskieren (interne Projektnamen, Kundenkürzel)
+deny_list: []
+
+# Ordner (leer = Standard unter %USERPROFILE%\Lokanon)
+vorgaenge_ordner: ""
+schluessel_ordner: ""
+# Zuletzt verwendete Aktenordner ("Ordner angeben")
+zuletzt_ordner: []

@@ -1,0 +1,85 @@
+# Lokanon – Produktvideo (Remotion)
+
+30-Sekunden-Teaser, 1920 × 1080, 30 fps, ohne Ton. Alles ist Vektorgrafik in React
+(Remotion), es gibt keine Bild- oder Videodateien. Die Schriften Source Sans 3 und
+Source Serif 4 liegen als woff2 in `public/fonts/` (SIL Open Font License), es wird
+nichts aus dem Internet geladen.
+
+## Rendern
+
+Voraussetzung: Node 18+ und npm. Im Ordner `video/`:
+
+```bash
+npm install
+npm run build
+```
+
+Ergebnis: `out/lokanon-teaser.mp4` (H.264, CRF 18). Ein Rendern dauert auf einem
+normalen Laptop etwa zwei bis vier Minuten.
+
+Weitere Befehle:
+
+| Befehl | Zweck |
+| --- | --- |
+| `npm run dev` | Remotion Studio im Browser, Vorschau mit Zeitleiste |
+| `npm run stills` | drei Einzelbilder nach `out/` (Frames 45, 360, 700) |
+| `npx remotion still src/index.ts LokanonTeaser out/bild.png --frame=300` | beliebiges Einzelbild |
+
+Hinweis OneDrive: `node_modules` ist eine Verzeichnisverknüpfung (Junction) nach
+`C:\Users\david\Lokanon\video-node_modules`, damit der Sync nicht bremst. Wird der
+Ordner auf einen anderen Rechner kopiert, die Verknüpfung löschen und `npm install`
+neu ausführen.
+
+## Texte ändern
+
+Alle sichtbaren Texte stehen in **`src/texts.ts`**:
+
+- `texts` – Wortmarke, Unterzeilen, die fünf Bildunterschriften, Claim, Beschriftungen
+  der Prüfkarten und des Chatfensters.
+- `marks` – die erfundenen Beispieldaten im Musterbrief (Name, Adresse, Aktenzeichen)
+  und ihre Platzhalter wie `[PERSON_1]`.
+- `brief` – die Textbausteine des Musterbriefs.
+- `antwort` – die KI-Antwort, zeilenweise.
+
+Nach einer Änderung einfach neu rendern. Längere Bildunterschriften passen bis etwa
+60 Zeichen in eine Zeile; die Schriftgröße steht in `src/theme.ts` (`layout.captionSize`).
+
+## Aufbau
+
+```
+src/
+  index.ts            Einstieg (registerRoot)
+  Root.tsx            Komposition „LokanonTeaser“ (900 Frames)
+  LokanonTeaser.tsx   Szenenfolge, Hintergrundfarbe, Kopfzeile
+  texts.ts            alle Texte und Beispieldaten
+  theme.ts            Farben, Schriften, Easing, Layoutmaße
+  fonts.ts            lädt die Schriften aus public/fonts
+  scenes/
+    Intro.tsx         0–4 s   Schild zeichnet sich, Wortmarke, Unterzeile
+    DocumentScene.tsx 4–15 s  Erkennen (Markierungen) und Prüfen (Chips, Schalter)
+    ChatScene.tsx     15–26 s Dokument fliegt in den Chat, Antwort, Rückübersetzung
+    Outro.tsx         26–30 s Wortmarke, Claim, Unterzeile
+  components/
+    MorphSpan.tsx     Textstück, das sich in einen Platzhalter-Chip verwandelt
+    Document.tsx      stilisierter Musterbrief
+    Icons.tsx         Schild, Schloss, Schlüssel (SVG)
+    Toggle.tsx        Schalter
+    Caption.tsx       Bildunterschrift
+    Header.tsx        Kopfzeile der hellen Szenen
+    Lockup.tsx        Schild + Wortmarke
+```
+
+Zeitpunkte innerhalb einer Szene sind Frame-Konstanten am Anfang der jeweiligen
+Szenendatei (zum Beispiel `HL`, `MO`, `TOGGLE_AT` in `DocumentScene.tsx`). Die
+Szenenstarts stehen in `LokanonTeaser.tsx` (`SCENES`).
+
+Farben: Tiefblau `#16365C`, Aktionsblau `#1F5FA8`, Petrol `#0E9F8A`, Hintergrund
+`#F6F8FB`, Text `#1A2433`; Markierungen Person `#FFD6D6`, Firma `#D6E4FF`,
+Adresse `#D9F2E3`, Nummern `#FFF3C4` (alle in `src/theme.ts`).
+
+## Nicht enthalten
+
+- Kein Ton. Eine lizenzfreie Tonspur lässt sich mit `<Audio src={staticFile("musik.mp3")} />`
+  in `LokanonTeaser.tsx` ergänzen, sobald eine Datei in `public/` liegt.
+- Keine 9:16-Variante. Die Szenen 2–5 sind zweispaltig aufgebaut und bräuchten
+  für Hochkant ein eigenes Layout.

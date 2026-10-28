@@ -1,0 +1,55 @@
+# Konfiguration für evaluate.py und die Tests mit den fiktiven Kanzleifällen.
+# Unabhängig von der persönlichen config.yaml: Die Allow-Liste enthält die fiktive Kanzlei Lehmkuhl & Partner.
+spacy_model: de_core_news_lg
+gliner_model: urchade/gliner_multi_pii-v1
+gliner_threshold: 0.5
+threshold: 0.4
+profil: kanzlei
+entities:
+- PERSON
+- ORGANIZATION
+- EMAIL_ADDRESS
+- TELEFON
+- ADRESSE
+- PLZ_ORT
+- LOCATION
+- AKTENZEICHEN
+- DIKTATZEICHEN
+- GRUNDBUCH
+- VERSICHERUNGSNR
+- IBAN_CODE
+- KONTONUMMER
+- CREDIT_CARD
+- DE_TAX_ID
+- DE_TAX_NUMBER
+- DE_VAT_ID
+- DE_SOCIAL_SECURITY
+- DE_HEALTH_INSURANCE
+- DE_ID_CARD
+- DE_PASSPORT
+- DE_FUEHRERSCHEIN
+- FUEHRERSCHEIN
+- DE_LANR
+- DE_BSNR
+- DE_HANDELSREGISTER
+- DE_KFZ
+- KFZ
+- FIN
+- DATUM
+- IP_ADDRESS
+- URL
+- EIGENE_BEGRIFFE
+propagate_repeats: true
+include_name_parts: true
+mask_locations: false
+keep_institutions: true
+datum_modus: kontext
+allow_list:
+- Lehmkuhl & Partner
+- Annette Lehmkuhl
+- 0201 8945120
+- kanzlei@lehmkuhl-partner.example
+- Claude
+- ChatGPT
+- Copilot
+deny_list: []
