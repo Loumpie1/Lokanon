@@ -4,8 +4,10 @@ Erkennt und ersetzt personenbezogene und vertrauliche Daten **lokal**, bevor Tex
 und übersetzt die KI-Antwort wieder zurück. Kein Cloud-Dienst, keine API: Presidio + spaCy + GLiNER + RapidOCR + eigene
 Regeln, eigene Oberfläche im Programmfenster (FastAPI + pywebview). Version 2.0-pilot.
 
-**Für Endanwender:** Installer aus `build/` (siehe `build/README.md`) und die Anleitung in der App („Anleitung“) bzw.
-unter `static/anleitung/index.html`. Pilot-Hinweis und Rückmeldebogen: `docs/pilot/`.
+**Für Endanwender:** fertiger Installer und Pilot-Paket unter
+[Releases](https://github.com/Loumpie1/Lokanon/releases) (Installer ca. 1,4 GB, enthält alle Sprachmodelle). Anleitung in
+der App („Anleitung“) bzw. unter `static/anleitung/index.html`. Pilot-Hinweis und Rückmeldebogen: `docs/pilot/`,
+Marketing-Deck: `docs/marketing/`. Selbst bauen: `build/README.md`.
 
 ## Entwicklung einrichten (Windows)
 
