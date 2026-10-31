@@ -1,6 +1,6 @@
 # Lokanon – Hinweise zum Pilottest
 
-Stand: 28.10.2026 · Pilotversion 0.1.0
+Stand: 31.10.2026 · Pilotversion 0.2.0
 
 Vielen Dank, dass Sie Lokanon ausprobieren. Dieses Blatt sagt in drei Minuten, was das Programm kann, was es nicht
 kann, und was wir von Ihnen zurückbrauchen.
@@ -29,7 +29,7 @@ Internet braucht Lokanon nur bei der Installation. Danach verlässt nichts den P
 
 ## Installation
 
-1. `Lokanon-Setup-0.1.0.exe` doppelklicken. Windows zeigt eine SmartScreen-Warnung, weil die Pilotversion noch nicht
+1. `Lokanon-Setup-0.2.0.exe` doppelklicken. Windows zeigt eine SmartScreen-Warnung, weil die Pilotversion noch nicht
    signiert ist: „Weitere Informationen“ → „Trotzdem ausführen“.
 2. Die Installation braucht etwa 2,8 GB, keine Administratorrechte und kein Internet. Sie gilt nur für Ihr
    Windows-Benutzerkonto.
@@ -39,7 +39,7 @@ Internet braucht Lokanon nur bei der Installation. Danach verlässt nichts den P
 
 ## Bitte probieren Sie
 
-- einen echten, aber unkritischen Vorgang (oder Testakten) mit mindestens einem gescannten PDF,
+- einen echten, aber unkritischen Fall (oder Testakten) mit mindestens einem gescannten PDF,
 - das Ausschalten eines Begriffs und das Vergeben einer eigenen Bezeichnung,
 - den kompletten Weg bis zur Rückübersetzung einer KI-Antwort,
 - die Anleitung (Menüpunkt „Anleitung“), ob sie Ihre Fragen beantwortet.
@@ -51,7 +51,7 @@ Bitte notieren Sie (Rückmeldebogen liegt bei):
 1. Begriffe, die Lokanon übersehen hat – mit Art (Name, Nummer, Adresse …), ohne die echten Daten.
 2. Begriffe, die fälschlich ersetzt wurden.
 3. Stellen, an denen Sie nicht wussten, was zu tun ist.
-4. Wie lange ein typischer Vorgang gedauert hat und ob das in Ihren Alltag passt.
+4. Wie lange ein typischer Durchlauf gedauert hat und ob das in Ihren Alltag passt.
 5. Was Ihnen für den täglichen Einsatz noch fehlt.
 
 Schicken Sie uns keine Originaldokumente und keine anonymisierten Kopien echter Akten. Der Prüfbericht (nur mit

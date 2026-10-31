@@ -1,6 +1,6 @@
 # Lokanon – Rückmeldebogen Pilottest
 
-Kanzlei / Praxis: ________________________   Datum: ____________   Lokanon-Version: 0.1.0 (Pilot)
+Kanzlei / Praxis: ________________________   Datum: ____________   Lokanon-Version: 0.2.0 (Pilot)
 
 Bitte keine echten Mandanten- oder Patientendaten eintragen. Beispiele gern abstrahiert („ein Nachname“, „eine Handynummer“).
 
@@ -8,9 +8,9 @@ Bitte keine echten Mandanten- oder Patientendaten eintragen. Beispiele gern abst
 
 | Frage | Antwort |
 |---|---|
-| Wie viele Vorgänge haben Sie bearbeitet? | |
-| Wie viele Dateien je Vorgang, welche Arten (PDF, Scan, Word, Excel, Text)? | |
-| Wie lange dauerte ein typischer Vorgang von „Dateien ablegen“ bis „Dateien erzeugt“? | |
+| Wie viele Durchläufe (Dateien oder Ordner) haben Sie bearbeitet? | |
+| Wie viele Dateien je Durchlauf, welche Arten (PDF, Scan, Word, Excel, Text)? | |
+| Wie lange dauerte ein typischer Durchlauf von „Dateien ablegen“ bis „Fertig“? | |
 | Gab es Stellen, an denen Sie nicht wussten, was zu tun ist? Welche? | |
 | Haben Sie die Anleitung benutzt? Hat sie geholfen? | |
 
