@@ -64,6 +64,19 @@ def test_status_und_einstellungen(client):
     client.put("/api/einstellungen", json={"werte": {"deny_list": [], "erweitert": {"ki_anweisung": False}}})
 
 
+def test_produktvorstellung(client):
+    mk = client.get("/api/marketing").json()
+    assert mk["deck"] is True
+    r = client.get(mk["deck_url"])
+    assert r.status_code == 200 and "Lokanon" in r.text
+    assert client.get("/marketing/shots/pruefen.jpg").status_code == 200
+    for f in mk["filme"]:  # Filme gibt es nur, wenn sie gerendert wurden (video/out) bzw. im Installer
+        r = client.get(f["url"], headers={"Range": "bytes=0-99"})
+        assert r.status_code in (200, 206) and r.headers["content-type"] == "video/mp4"
+    assert client.get("/marketing-film/..%2Fconfig.yaml").status_code == 404
+    assert client.get("/marketing-film/geheim.mp4").status_code == 404
+
+
 def test_kompletter_weg(client):
     client.post("/api/leeren")
     r = client.post("/api/dateien", files=[("datei", ("Schreiben Weber.txt", TEXT.encode("utf-8"), "text/plain"))])

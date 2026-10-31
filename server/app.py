@@ -21,7 +21,8 @@ from server.dienst import GRUPPEN_ANZEIGE, Modelle, Sitzung
 
 APP_DIR = Path(__file__).resolve().parents[1]
 UI_DIR = APP_DIR / "ui"
-VERSION = (APP_DIR / "VERSION").read_text(encoding="utf-8").strip() if (APP_DIR / "VERSION").exists() else "0.2.0-dev"
+VERSION = next((p.read_text(encoding="utf-8").strip() for p in (APP_DIR / "VERSION", APP_DIR / "build" / "VERSION")
+                if p.exists()), "0.2.0-dev")
 
 app = FastAPI(title="Lokanon", docs_url=None, redoc_url=None, openapi_url=None)
 _cfg = est.laden()
@@ -258,8 +259,52 @@ def ordner_waehlen():
     return {"pfad": ergebnis["pfad"].replace("/", "\\") if sys.platform == "win32" else ergebnis["pfad"]}
 
 
+# ---------------------------------------------------------------- Produktvorstellung (Deck und Filme)
+
+MARKETING_DIR = APP_DIR / "docs" / "marketing"
+# Im Installer liegen die Filme unter docs/marketing/filme, im Entwicklungsstand unter video/out
+FILM_ORDNER = [MARKETING_DIR / "filme", APP_DIR / "video" / "out"]
+FILME = [
+    ("lokanon-visitenkarte.mp4", "Lokanon in zwei Minuten", "2 Min. · ohne Ton"),
+    ("lokanon-motion.mp4", "Lokanon in Bewegung", "1 Min. · mit Ton"),
+    ("lokanon-teaser.mp4", "Kurzvorstellung", "30 Sek. · ohne Ton"),
+]
+
+
+def _film_pfad(datei: str) -> Path | None:
+    if datei not in {f for f, _, _ in FILME}:
+        return None
+    for ordner in FILM_ORDNER:
+        p = ordner / datei
+        if p.is_file():
+            return p
+    return None
+
+
+@app.get("/api/marketing")
+def marketing():
+    deck = MARKETING_DIR / "lokanon-visitenkarte.html"
+    filme = []
+    for datei, titel, dauer in FILME:
+        p = _film_pfad(datei)
+        if p:
+            filme.append({"datei": datei, "titel": titel, "dauer": dauer, "url": f"/marketing-film/{datei}",
+                          "pfad": str(p)})
+    return {"deck": deck.is_file(), "deck_url": "/marketing/lokanon-visitenkarte.html", "deck_pfad": str(deck),
+            "filme": filme, "ordner": str(MARKETING_DIR) if MARKETING_DIR.is_dir() else ""}
+
+
+@app.get("/marketing-film/{datei}")
+def marketing_film(datei: str):
+    p = _film_pfad(datei)
+    if not p:
+        return JSONResponse({"fehler": "Film nicht gefunden."}, status_code=404)
+    return FileResponse(p, media_type="video/mp4")
+
+
 # ---------------------------------------------------------------- Oberfläche und Anleitung
 
+app.mount("/marketing", StaticFiles(directory=str(MARKETING_DIR), html=True, check_dir=False), name="marketing")
 app.mount("/anleitung", StaticFiles(directory=str(APP_DIR / "static" / "anleitung"), html=True), name="anleitung")
 app.mount("/ui", StaticFiles(directory=str(UI_DIR)), name="ui")
 

@@ -45,6 +45,7 @@ EXTRA_PAKETE = ["fastapi", "uvicorn", "pywebview", "python-multipart"]  # stehen
 
 PROJEKT_DATEIEN = ["anonymizer", "server", "ui", "assets", "static", "docs", "ki-anweisung",
                    "lokanon.py", "config.default.yaml", "README.md"]
+FILME = ["lokanon-visitenkarte.mp4", "lokanon-motion.mp4", "lokanon-teaser.mp4"]
 # Offensichtlich unnötige Teile unterhalb von <app>\python (dist-info bleibt unangetastet)
 PRUNE = ["Lib/site-packages/torch/test", "Lib/site-packages/torch/include",
          "Lib/site-packages/torch/lib/*.lib", "Lib/test", "Lib/idlelib", "Lib/tkinter", "tcl",
@@ -166,6 +167,15 @@ def schritt_projekt(app: Path, version: str, manifest: dict) -> None:
             shutil.copytree(q, z, ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache", "*.pyc"))
         else:
             shutil.copy2(q, z)
+    # Filme der Produktvorstellung (nicht im Git, entstehen mit Remotion unter video/out)
+    filme = app / "docs" / "marketing" / "filme"
+    filme.mkdir(parents=True, exist_ok=True)
+    for name in FILME:
+        q = PROJEKT / "video" / "out" / name
+        if q.exists():
+            shutil.copy2(q, filme / name)
+        else:
+            log(f"HINWEIS: Film {name} fehlt unter video/out; Produktvorstellung ohne diesen Film.")
     (app / "VERSION").write_text(version + "\n", encoding="utf-8")
     (app / "models").mkdir(exist_ok=True)
     (app / "models" / "MANIFEST.json").write_text(

@@ -4,11 +4,11 @@ import { colors, easeInOut, fonts, layout, tween } from "../../theme";
 import { vk } from "../../texts_vk";
 import { SceneHead, THREAD, rise } from "./ui";
 
-/** Ablauf (8 s): Zielgruppen, dann vier Schritte, die eine Linie verbindet. */
+/** Ablauf (8 s): Zielgruppen, dann drei Schritte, die eine Linie verbindet. */
 export const Ablauf: React.FC = () => {
   const f = useCurrentFrame();
   const t = vk.ablauf;
-  const cols = 4;
+  const cols = t.schritte.length;
   const w = (1680 - (cols - 1) * 40) / cols;
   const line = tween(f, [90, 190], [0, 1], easeInOut);
   return (

@@ -49,6 +49,15 @@
     $("#brand").onclick = (e) => { e.preventDefault(); if (S.z && (S.z.ergebnis || S.z.fortschritt.fertig)) neuStart(); };
     if (!S.status.eingerichtet) return renderWizard();
     await laden();
+    direktlink();
+  }
+  // Direktlinks: #einstellungen, #einstellungen/erweitert, #vorstellung, #zurueck, #hilfe
+  function direktlink() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    if (h.startsWith("einstellungen")) einstellungenDialog(h.split("/")[1] || "");
+    else if (h === "vorstellung") vorstellungDialog();
+    else if (h === "zurueck" && (S.cfg.erweitert || {}).rueckuebersetzung) zurueckDialog();
+    else if (h === "hilfe") hilfeDialog();
   }
   function badge() {
     const b = $("#local-badge"); const bereit = S.status.modelle_bereit;
@@ -337,7 +346,7 @@
   }
 
   // ------------------------------------------------------------ Einstellungen
-  async function einstellungenDialog() {
+  async function einstellungenDialog(abschnitt = "") {
     S.cfg = await api("/einstellungen");
     const c = S.cfg; const erw = c.erweitert || {};
     const grp = c._gruppen || {};
@@ -356,14 +365,18 @@
           <div class="two"><div class="field"><label class="lbl">Zusatz im Dateinamen</label><input class="input" id="s-suffix" value="${esc(c.suffix || "_anonymisiert")}"></div>
             <div class="field"><label class="lbl">Ablage bei Drag &amp; Drop</label><div class="row"><input class="input" id="s-out" style="flex:1" value="${esc(c.ausgabe_ordner || "")}" placeholder="${esc(c._ausgabe_ordner_effektiv)}"><button class="btn" id="s-out-pick">Wählen</button></div><span class="muted small">Bei „Ordner wählen“ landen die Kopien neben den Originalen.</span></div></div>
           <label class="checkbox"><input type="checkbox" id="s-md" ${c.ki_textfassung ? "checked" : ""}><span><b>Zusätzlich eine Textfassung (.md) erzeugen</b><br><span class="muted small">Reiner Text ohne Layout, mit dem KI-Assistenten am besten arbeiten.</span></span></label></div>
-        <div class="sect"><h3>Erweitert</h3><p class="desc">Alles hier ist aus, bis Sie es brauchen.</p>
+        <div class="sect" id="s-erweitert"><h3>Erweitert</h3><p class="desc">Alles hier ist aus, bis Sie es brauchen.</p>
           <label class="swrow"><div class="t"><b>Antworten der KI zurückübersetzen</b><span>Lokanon speichert je Durchlauf einen verschlüsselten Schlüssel und zeigt oben „Antwort zurückübersetzen“.</span></div><span class="switch"><input type="checkbox" id="s-rz" ${erw.rueckuebersetzung ? "checked" : ""}><span class="track"></span></span></label>
           <div class="field" id="s-pw-row" ${erw.rueckuebersetzung ? "" : "hidden"}><label class="lbl">Passwort für Schlüsseldateien</label><input class="input" type="password" id="s-pw" value="${esc(c.schluessel_passwort || "")}" placeholder="einmal festlegen"><span class="muted small">Liegt in Ihrer Einstellungsdatei auf diesem PC. Schlüssel: ${esc(c._schluessel_ordner_effektiv)}</span></div>
           <label class="swrow"><div class="t"><b>KI-Anweisung und Claude-Skill anzeigen</b><span>Nach dem Anonymisieren erscheint „KI-Anweisung kopieren“.</span></div><span class="switch"><input type="checkbox" id="s-ki" ${erw.ki_anweisung ? "checked" : ""}><span class="track"></span></span></label>
           <label class="swrow"><div class="t"><b>Vorgangsordner mit Prüfbericht und Protokoll</b><span>Je Durchlauf ein Ordner mit Originalen, Kopien, Prüfbericht (Klartext) und Protokoll unter ${esc(c._vorgaenge_ordner_effektiv)}.</span></div><span class="switch"><input type="checkbox" id="s-vg" ${erw.vorgaenge ? "checked" : ""}><span class="track"></span></span></label>
         </div>
+        <div class="sect" id="s-vorstellung"><h3>Lokanon vorstellen</h3><p class="desc">Produktvorstellung und Filme für Kolleginnen, Kollegen und Mandanten. Läuft ohne Internet.</p>
+          <div class="mkt" id="s-mkt"><span class="muted small">Wird geladen …</span></div></div>
         <div class="row between"><span class="muted small">Lokanon ${esc(S.status.version)} · Einstellungen: ${esc(S.status.daten_ordner)}</span><button class="btn primary" id="s-save">Speichern</button></div>
       </div>`, { wide: true });
+    vorstellungFuellen($("#s-mkt", m));
+    if (abschnitt) { const z = $(`#s-${abschnitt}`, m); if (z) setTimeout(() => z.scrollIntoView({ block: "start" }), 50); }
     $$("#s-datum label", m).forEach((l) => (l.onclick = () => { $$("#s-datum label", m).forEach((x) => x.classList.remove("on")); l.classList.add("on"); }));
     $("#s-rz", m).onchange = (e) => { $("#s-pw-row", m).hidden = !e.target.checked; };
     $("#s-out-pick", m).onclick = async () => { try { const r = await api("/system/ordner-waehlen", { method: "POST" }); if (r.pfad) $("#s-out", m).value = r.pfad; } catch (e) { toast(e.message, "danger"); } };
@@ -377,6 +390,31 @@
       if (werte.erweitert.rueckuebersetzung && !werte.schluessel_passwort) { toast("Bitte ein Passwort für die Schlüsseldateien festlegen.", "danger"); return; }
       try { await api("/einstellungen", { method: "PUT", json: { werte } }); S.cfg = await api("/einstellungen"); badge(); closeModal(); toast("Einstellungen gespeichert", "ok"); await laden(); } catch (e) { toast(e.message, "danger"); }
     };
+  }
+  // ------------------------------------------------------------ Produktvorstellung: Deck und Filme
+  async function vorstellungFuellen(ziel) {
+    let mk;
+    try { mk = await api("/marketing"); } catch { ziel.innerHTML = `<span class="muted small">Die Produktvorstellung ist in dieser Installation nicht enthalten.</span>`; return; }
+    const teile = [];
+    if (mk.deck) teile.push(`<button class="mkt-item" data-deck><span class="mkt-ico" aria-hidden="true">◆</span><span><b>Produktvorstellung</b><small>Interaktive Visitenkarte · zum Durchscrollen</small></span></button>`);
+    mk.filme.forEach((f, i) => teile.push(`<button class="mkt-item" data-film="${i}"><span class="mkt-ico" aria-hidden="true">▶</span><span><b>${esc(f.titel)}</b><small>Film · ${esc(f.dauer)}</small></span></button>`));
+    if (!teile.length) { ziel.innerHTML = `<span class="muted small">Die Produktvorstellung ist in dieser Installation nicht enthalten.</span>`; return; }
+    ziel.innerHTML = `<div class="mkt-grid">${teile.join("")}</div>${mk.ordner ? `<button class="btn ghost small" id="mkt-ordner" style="margin-top:8px">Ordner mit den Dateien öffnen</button>` : ""}`;
+    $$("[data-deck]", ziel).forEach((b) => (b.onclick = () => deckDialog(mk.deck_url)));
+    $$("[data-film]", ziel).forEach((b) => (b.onclick = () => filmDialog(mk.filme[+b.dataset.film])));
+    if ($("#mkt-ordner", ziel)) $("#mkt-ordner", ziel).onclick = () => oeffnen(mk.ordner);
+  }
+  function vorstellungDialog() {
+    const m = modal(`<div class="mhead"><h2>Lokanon vorstellen</h2><button class="x" aria-label="Schließen">✕</button></div>
+      <p class="muted small" style="margin-bottom:12px">Produktvorstellung und Filme, ohne Internet.</p><div class="mkt" id="v-mkt"></div>`, { wide: true });
+    vorstellungFuellen($("#v-mkt", m));
+  }
+  function deckDialog(url) {
+    modal(`<div class="mhead"><h2>Produktvorstellung</h2><button class="x" aria-label="Schließen">✕</button></div><iframe class="help-frame" src="${esc(url)}" title="Produktvorstellung"></iframe>`, { full: true });
+  }
+  function filmDialog(f) {
+    modal(`<div class="mhead"><h2>${esc(f.titel)}</h2><button class="x" aria-label="Schließen">✕</button></div>
+      <video class="mkt-video" src="${esc(f.url)}" controls autoplay playsinline></video>`, { full: true });
   }
   function hilfeDialog() {
     modal(`<div class="mhead"><h2>Anleitung</h2><button class="x" aria-label="Schließen">✕</button></div><iframe class="help-frame" src="/anleitung/" title="Anleitung"></iframe>`, { full: true });

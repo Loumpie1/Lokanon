@@ -254,3 +254,13 @@ pre.anweisung { background: var(--surface-2); border-radius: var(--radius-sm); p
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
   .local-badge .dot { animation: none; }
 }
+
+/* ---------- Produktvorstellung (Einstellungen) ---------- */
+.mkt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.mkt-item { display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink); cursor: pointer; font: inherit; transition: border-color var(--t) var(--ease), background var(--t) var(--ease); }
+.mkt-item:hover { border-color: var(--action); background: var(--action-soft); }
+.mkt-item b { display: block; }
+.mkt-item small { display: block; color: var(--muted); font-size: .84rem; }
+.mkt-ico { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: #fff; font-size: .85rem; }
+.mkt-video { flex: 1; width: 100%; min-height: 0; background: #000; border-radius: var(--radius); }

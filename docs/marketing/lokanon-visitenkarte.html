@@ -7,6 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<link rel="stylesheet" href="../../ui/fonts.css">
 <style>
 /* Layout: ein vertikales Scroll-Deck in drei Akten; links läuft ein roter Faden (die Person) mit dem Scroll mit,
    rechts eine Kapitelleiste. Jede Szene steht für sich und animiert beim Betreten – Bewegung nur über transform/opacity. */
@@ -294,7 +295,7 @@ button { font: inherit; }
 @media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
 .kpi { background: var(--surface); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); display: grid; gap: 4px; }
 .kpi b { font-family: var(--font-display); font-size: clamp(30px, 3.6vw, 44px); line-height: 1; letter-spacing: -.02em; color: var(--action); }
-.kpi span { font-size: 14px; color: var(--muted); }
+.kpi > span { font-size: 14px; color: var(--muted); }
 .feat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 @media (max-width: 1000px) { .feat { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .feat { grid-template-columns: 1fr; } }
@@ -310,8 +311,8 @@ button { font: inherit; }
 /* ---------- Szene 8: Ablauf ---------- */
 .who { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
 .who span { background: var(--surface); box-shadow: var(--shadow); border-radius: 99px; padding: 8px 16px; font-weight: 600; }
-.flow { margin-top: 38px; position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-@media (max-width: 860px) { .flow { grid-template-columns: 1fr 1fr; } }
+.flow { margin-top: 38px; position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 860px) { .flow { grid-template-columns: 1fr; } }
 @media (max-width: 500px) { .flow { grid-template-columns: 1fr; } }
 .flow .line { position: absolute; left: 6%; right: 6%; top: 27px; height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
 .flow .line i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--thread), var(--accent)); transform: scaleX(0); transform-origin: left; transition: transform 2.2s var(--ease-out) .2s; }
@@ -486,7 +487,7 @@ body.locked { overflow: hidden; }
       <span class="word">Lokanon</span>
     </div>
     <h1 id="h1"><span class="w" style="--i:0">Mandatsunterlagen</span> <span class="w" style="--i:1">sicher</span> <span class="w" style="--i:2">mit</span> <span class="w" style="--i:3">KI</span> <span class="w" style="--i:4">bearbeiten.</span></h1>
-    <p class="lede">Lokanon läuft auf dem PC der Kanzlei, ersetzt Namen, Adressen und Aktenzeichen durch Platzhalter und übersetzt die Antwort der KI zurück. Nichts davon verlässt den Rechner.</p>
+    <p class="lede">Lokanon läuft auf dem PC der Kanzlei, ersetzt Namen, Adressen und Aktenzeichen durch Platzhalter und legt zu jeder Datei eine bereinigte Kopie im gleichen Format an. Nichts davon verlässt den Rechner.</p>
     <div class="credits" aria-label="Drei Handschriften">
       <span><b>Motion</b>Bewegung mit Bedeutung</span>
       <span><b>Produkt</b>Funktionen für Kanzleien</span>
@@ -515,12 +516,12 @@ body.locked { overflow: hidden; }
       </div>
       <div class="doc rv-s" style="--d:200ms" aria-label="Musterbrief mit erfundenen Daten">
         <div class="hd"><span>Schriftsatz · Entwurf</span><span>Seite 1 von 42</span></div>
-        <span class="ln"><span class="mk person pulse" data-id="p1"><span class="txt">Sabine Winter</span><span class="chip">[PERSON_1]</span></span></span>
-        <span class="ln"><span class="mk ort" data-id="a1"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[ADRESSE_1]</span></span></span>
-        <span class="ln"><span class="mk ort" data-id="o1"><span class="txt">45468 Mülheim an der Ruhr</span><span class="chip">[ORT_1]</span></span></span>
-        <span class="ln" style="margin-top:10px">Aktenzeichen: <span class="mk nummer" data-id="z1"><span class="txt">14 VI 512/26</span><span class="chip">[AZ_1]</span></span></span>
-        <span class="ln" style="margin-top:10px">Sehr geehrte Frau <span class="mk person" data-id="p1"><span class="txt">Winter</span><span class="chip">[PERSON_1]</span></span>,</span>
-        <span class="ln" style="margin-top:10px">im Verfahren vor dem <span class="mk firma" data-id="g1"><span class="txt">Amtsgericht Mülheim</span><span class="chip">[FIRMA_1]</span></span> haben wir fristgerecht Stellung genommen. Die Gegenseite hat</span>
+        <span class="ln"><span class="mk person pulse" data-id="p1"><span class="txt">Sabine Winter</span><span class="chip">[Person_1]</span></span></span>
+        <span class="ln"><span class="mk ort" data-id="a1"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[Adresse_1]</span></span></span>
+        <span class="ln"><span class="mk ort" data-id="o1"><span class="txt">45468 Mülheim an der Ruhr</span><span class="chip">[Ort_1]</span></span></span>
+        <span class="ln" style="margin-top:10px">Aktenzeichen: <span class="mk nummer" data-id="z1"><span class="txt">14 VI 512/26</span><span class="chip">[Aktenzeichen_1]</span></span></span>
+        <span class="ln" style="margin-top:10px">Sehr geehrte Frau <span class="mk person" data-id="p1"><span class="txt">Winter</span><span class="chip">[Person_1]</span></span>,</span>
+        <span class="ln" style="margin-top:10px">im Verfahren vor dem <span class="mk firma" data-id="g1"><span class="txt">Amtsgericht Mülheim</span><span class="chip">[Firma_1]</span></span> haben wir fristgerecht Stellung genommen. Die Gegenseite hat</span>
         <span class="ph l"></span><span class="ph m"></span><span class="ph s"></span>
         <span class="ln gruss">Mit freundlichen Grüßen</span>
       </div>
@@ -578,12 +579,12 @@ body.locked { overflow: hidden; }
     <div class="stage">
       <div class="doc rv-s" id="docErkennen" aria-label="Musterbrief, Erkennung läuft">
         <div class="hd"><span>Schriftsatz · Entwurf</span><span>Erkennung</span></div>
-        <span class="ln"><span class="mk person" data-id="p1"><span class="txt">Sabine Winter</span><span class="chip">[PERSON_1]</span></span></span>
-        <span class="ln"><span class="mk ort" data-id="a1"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[ADRESSE_1]</span></span></span>
-        <span class="ln"><span class="mk ort" data-id="o1"><span class="txt">45468 Mülheim an der Ruhr</span><span class="chip">[ORT_1]</span></span></span>
-        <span class="ln" style="margin-top:10px">Aktenzeichen: <span class="mk nummer" data-id="z1"><span class="txt">14 VI 512/26</span><span class="chip">[AZ_1]</span></span></span>
-        <span class="ln" style="margin-top:10px">Sehr geehrte Frau <span class="mk person" data-id="p1"><span class="txt">Winter</span><span class="chip">[PERSON_1]</span></span>,</span>
-        <span class="ln" style="margin-top:10px">im Verfahren vor dem <span class="mk firma" data-id="g1"><span class="txt">Amtsgericht Mülheim</span><span class="chip">[FIRMA_1]</span></span> haben wir fristgerecht Stellung genommen. Die Gegenseite hat</span>
+        <span class="ln"><span class="mk person" data-id="p1"><span class="txt">Sabine Winter</span><span class="chip">[Person_1]</span></span></span>
+        <span class="ln"><span class="mk ort" data-id="a1"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[Adresse_1]</span></span></span>
+        <span class="ln"><span class="mk ort" data-id="o1"><span class="txt">45468 Mülheim an der Ruhr</span><span class="chip">[Ort_1]</span></span></span>
+        <span class="ln" style="margin-top:10px">Aktenzeichen: <span class="mk nummer" data-id="z1"><span class="txt">14 VI 512/26</span><span class="chip">[Aktenzeichen_1]</span></span></span>
+        <span class="ln" style="margin-top:10px">Sehr geehrte Frau <span class="mk person" data-id="p1"><span class="txt">Winter</span><span class="chip">[Person_1]</span></span>,</span>
+        <span class="ln" style="margin-top:10px">im Verfahren vor dem <span class="mk firma" data-id="g1"><span class="txt">Amtsgericht Mülheim</span><span class="chip">[Firma_1]</span></span> haben wir fristgerecht Stellung genommen. Die Gegenseite hat</span>
         <span class="ph l"></span><span class="ph m"></span><span class="ph s"></span>
         <span class="ln gruss">Mit freundlichen Grüßen</span>
       </div>
@@ -612,17 +613,17 @@ body.locked { overflow: hidden; }
     <div class="akt">
       <span class="eyebrow thread-c rv">Prüfen</span>
       <h2 class="rv" style="--d:80ms">Entscheiden mit einem Schalter. Probieren Sie es.</h2>
-      <p class="lede rv" style="--d:160ms">Jeder Treffer ist eine Karte: sicher, wahrscheinlich oder unsicher. Ein Schalter lässt einen Begriff stehen. Eine eigene Bezeichnung gilt überall im Vorgang.</p>
+      <p class="lede rv" style="--d:160ms">Jede Person ist eine Karte, mit allen Schreibweisen: „Sabine Winter“ und „Frau Winter“ gehören zusammen. Ein Schalter lässt einen Begriff stehen. Eine eigene Bezeichnung gilt überall, in allen Dateien.</p>
     </div>
     <div class="stage">
       <div class="doc rv-s" id="docPruefen" aria-label="Musterbrief mit Platzhaltern, interaktiv">
         <div class="hd"><span>Schriftsatz · Entwurf</span><span>Für die KI</span></div>
-        <span class="ln"><span class="mk person on" data-id="p1"><span class="txt">Sabine Winter</span><span class="chip">[PERSON_1]</span></span></span>
-        <span class="ln"><span class="mk ort on" data-id="a1"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[ADRESSE_1]</span></span></span>
-        <span class="ln"><span class="mk ort on" data-id="o1"><span class="txt">45468 Mülheim an der Ruhr</span><span class="chip">[ORT_1]</span></span></span>
-        <span class="ln" style="margin-top:10px">Aktenzeichen: <span class="mk nummer on" data-id="z1"><span class="txt">14 VI 512/26</span><span class="chip">[AZ_1]</span></span></span>
-        <span class="ln" style="margin-top:10px">Sehr geehrte Frau <span class="mk person on" data-id="p1"><span class="txt">Winter</span><span class="chip">[PERSON_1]</span></span>,</span>
-        <span class="ln" style="margin-top:10px">im Verfahren vor dem <span class="mk firma off" data-id="g1"><span class="txt">Amtsgericht Mülheim</span><span class="chip">[FIRMA_1]</span></span> haben wir fristgerecht Stellung genommen. Die Gegenseite hat</span>
+        <span class="ln"><span class="mk person on" data-id="p1"><span class="txt">Sabine Winter</span><span class="chip">[Person_1]</span></span></span>
+        <span class="ln"><span class="mk ort on" data-id="a1"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[Adresse_1]</span></span></span>
+        <span class="ln"><span class="mk ort on" data-id="o1"><span class="txt">45468 Mülheim an der Ruhr</span><span class="chip">[Ort_1]</span></span></span>
+        <span class="ln" style="margin-top:10px">Aktenzeichen: <span class="mk nummer on" data-id="z1"><span class="txt">14 VI 512/26</span><span class="chip">[Aktenzeichen_1]</span></span></span>
+        <span class="ln" style="margin-top:10px">Sehr geehrte Frau <span class="mk person on" data-id="p1"><span class="txt">Winter</span><span class="chip">[Person_1]</span></span>,</span>
+        <span class="ln" style="margin-top:10px">im Verfahren vor dem <span class="mk firma off" data-id="g1"><span class="txt">Amtsgericht Mülheim</span><span class="chip">[Firma_1]</span></span> haben wir fristgerecht Stellung genommen. Die Gegenseite hat</span>
         <span class="ph l"></span><span class="ph m"></span><span class="ph s"></span>
         <span class="ln gruss">Mit freundlichen Grüßen</span>
       </div>
@@ -630,17 +631,17 @@ body.locked { overflow: hidden; }
         <div class="checks">
           <div class="check rv" data-id="p1" style="--d:100ms">
             <i class="dot" style="background:var(--thread)"></i>
-            <div class="t"><b>Sabine Winter</b><small>sicher · 2 Stellen · wird <code class="chipname">[PERSON_1]</code></small></div>
+            <div class="t"><b>Sabine Winter</b><small>sicher · auch: Winter · wird <code class="chipname">[Person_1]</code></small></div>
             <div class="r"><button class="sw" type="button" role="switch" aria-checked="true" aria-label="Sabine Winter ersetzen"></button><small>wird ersetzt</small></div>
           </div>
           <div class="check rv" data-id="a1" style="--d:180ms">
             <i class="dot" style="background:#1F9158"></i>
-            <div class="t"><b>Eppinghofer Straße 47</b><small>sicher · 1 Stelle · wird <code class="chipname">[ADRESSE_1]</code></small></div>
+            <div class="t"><b>Eppinghofer Straße 47</b><small>sicher · 1 Stelle · wird <code class="chipname">[Adresse_1]</code></small></div>
             <div class="r"><button class="sw" type="button" role="switch" aria-checked="true" aria-label="Adresse ersetzen"></button><small>wird ersetzt</small></div>
           </div>
           <div class="check rv" data-id="z1" style="--d:260ms">
             <i class="dot" style="background:#C57A00"></i>
-            <div class="t"><b>14 VI 512/26</b><small>sicher · 1 Stelle · wird <code class="chipname">[AZ_1]</code></small></div>
+            <div class="t"><b>14 VI 512/26</b><small>sicher · 1 Stelle · wird <code class="chipname">[Aktenzeichen_1]</code></small></div>
             <div class="r"><button class="sw" type="button" role="switch" aria-checked="true" aria-label="Aktenzeichen ersetzen"></button><small>wird ersetzt</small></div>
           </div>
           <div class="check off rv" data-id="g1" style="--d:340ms">
@@ -651,9 +652,9 @@ body.locked { overflow: hidden; }
         </div>
         <div class="rename rv" style="--d:420ms">
           <span style="color:var(--muted);font-size:14px">Eigene Bezeichnung für Sabine Winter:</span>
-          <button class="btn ghost" type="button" data-name="MANDANTIN">[MANDANTIN]</button>
-          <button class="btn ghost" type="button" data-name="KLAEGERIN">[KLAEGERIN]</button>
-          <button class="btn ghost" type="button" data-name="PERSON_1">zurück</button>
+          <button class="btn ghost" type="button" data-name="Mandantin">[Mandantin]</button>
+          <button class="btn ghost" type="button" data-name="Klaegerin">[Klaegerin]</button>
+          <button class="btn ghost" type="button" data-name="Person_1">zurück</button>
         </div>
         <div class="info-row rv" style="--d:500ms">
           <a class="info-btn" href="#info-app"><i>i</i>So sieht das in Lokanon aus</a>
@@ -669,39 +670,39 @@ body.locked { overflow: hidden; }
     <div class="akt">
       <span class="eyebrow thread-c rv">Akt 3 · Die Auflösung</span>
       <h2 class="rv" style="--d:80ms">Die KI arbeitet. Der Name bleibt zu Hause.</h2>
-      <p class="lede rv" style="--d:160ms">Die bereinigte Kopie geht in ChatGPT oder Claude. Die Antwort kommt mit Platzhaltern zurück. Ein Klick in Lokanon, und aus [PERSON_1] wird wieder Frau Winter.</p>
+      <p class="lede rv" style="--d:160ms">Die bereinigte Kopie, gleiche Datei mit dem Zusatz „_anonymisiert“, geht in ChatGPT oder Claude. Die Antwort kommt mit Platzhaltern zurück. Wer möchte, schaltet die Rückübersetzung ein: ein Klick, und aus [Person_1] wird wieder Frau Winter.</p>
     </div>
     <div class="chatstage" id="chatstage">
       <div class="flyer" id="flyer" aria-hidden="true">
-        <div class="doc"><span class="ln"><b>[PERSON_1]</b></span><span class="ln">[ADRESSE_1]</span><span class="ln">[ORT_1]</span><span class="ln">Az. [AZ_1]</span><span class="ph l"></span><span class="ph m"></span></div>
+        <div class="doc"><span class="ln"><b>[Person_1]</b></span><span class="ln">[Adresse_1]</span><span class="ln">[Ort_1]</span><span class="ln">Az. [Aktenzeichen_1]</span><span class="ph l"></span><span class="ph m"></span></div>
       </div>
       <div class="mini">
         <div class="doc rv-x" id="docMini">
-          <div class="hd"><span>Fuer die KI · Schriftsatz.md</span><span>bereinigt</span></div>
-          <span class="ln"><span class="mk person on"><span class="txt">Sabine Winter</span><span class="chip">[PERSON_1]</span></span></span>
-          <span class="ln"><span class="mk ort on"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[ADRESSE_1]</span></span></span>
-          <span class="ln"><span class="mk ort on"><span class="txt">45468 Mülheim</span><span class="chip">[ORT_1]</span></span></span>
-          <span class="ln">Aktenzeichen: <span class="mk nummer on"><span class="txt">14 VI 512/26</span><span class="chip">[AZ_1]</span></span></span>
+          <div class="hd"><span>Schriftsatz_anonymisiert.docx</span><span>bereinigt</span></div>
+          <span class="ln"><span class="mk person on"><span class="txt">Sabine Winter</span><span class="chip">[Person_1]</span></span></span>
+          <span class="ln"><span class="mk ort on"><span class="txt">Eppinghofer Straße 47</span><span class="chip">[Adresse_1]</span></span></span>
+          <span class="ln"><span class="mk ort on"><span class="txt">45468 Mülheim</span><span class="chip">[Ort_1]</span></span></span>
+          <span class="ln">Aktenzeichen: <span class="mk nummer on"><span class="txt">14 VI 512/26</span><span class="chip">[Aktenzeichen_1]</span></span></span>
           <span class="ph l"></span><span class="ph m"></span>
         </div>
         <div class="back rv" style="--d:300ms" id="backCard">
           <div class="hd2"><h3>Antwort zurückübersetzt</h3>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg>
           </div>
-          <p class="txt-out">Im Verfahren <span class="rev nummer" style="--mk-bg:var(--mark-nummer)"><span class="a">[AZ_1]</span><span class="b">14 VI 512/26</span></span> endet die Frist für <span class="rev" style="--mk-bg:var(--mark-person)"><span class="a">[PERSON_1]</span><span class="b">Sabine Winter</span></span> am 14. April 2026. Die Zustellung an <span class="rev" style="--mk-bg:var(--mark-ort)"><span class="a">[ADRESSE_1]</span><span class="b">Eppinghofer Straße 47</span></span> sollte bis dahin erfolgen.</p>
+          <p class="txt-out">Im Verfahren <span class="rev nummer" style="--mk-bg:var(--mark-nummer)"><span class="a">[Aktenzeichen_1]</span><span class="b">14 VI 512/26</span></span> endet die Frist für <span class="rev" style="--mk-bg:var(--mark-person)"><span class="a">[Person_1]</span><span class="b">Sabine Winter</span></span> am 14. April 2026. Die Zustellung an <span class="rev" style="--mk-bg:var(--mark-ort)"><span class="a">[Adresse_1]</span><span class="b">Eppinghofer Straße 47</span></span> sollte bis dahin erfolgen.</p>
           <div class="toolbar" style="margin-top:4px">
             <button class="btn" id="btnBack" type="button">Zurückübersetzen</button>
             <button class="btn ghost" id="btnReplay" type="button">Szene neu abspielen</button>
           </div>
-          <small>Der Schlüssel liegt verschlüsselt auf diesem PC. Die KI hat ihn nie gesehen.</small>
+          <small>Auf Wunsch, unter Einstellungen → Erweitert. Der Schlüssel liegt verschlüsselt auf diesem PC. Die KI hat ihn nie gesehen.</small>
         </div>
       </div>
       <div class="chat" id="chat" aria-label="Chatfenster eines KI-Assistenten, Beispiel">
         <div class="bar"><i></i><i></i><i></i><span>KI-Assistent</span></div>
         <div class="msgs">
-          <div class="bub me"><span class="att"><i></i>Schriftsatz.md</span><br>Bitte prüfen Sie die Fristen im Verfahren <code>[AZ_1]</code> für <code>[PERSON_1]</code> und schlagen Sie eine Gliederung für die Erwiderung vor.</div>
+          <div class="bub me"><span class="att"><i></i>Schriftsatz_anonymisiert.docx</span><br>Bitte prüfen Sie die Fristen im Verfahren <code>[Aktenzeichen_1]</code> für <code>[Person_1]</code> und schlagen Sie eine Gliederung für die Erwiderung vor.</div>
           <div class="bub ai typ"><span class="typing"><i></i><i></i><i></i></span></div>
-          <div class="bub ai">Im Verfahren <code>[AZ_1]</code> endet die Frist für <code>[PERSON_1]</code> am 14. April 2026. Die Zustellung an <code>[ADRESSE_1]</code> sollte bis dahin erfolgen. Vorschlag für die Gliederung: 1. Zulässigkeit, 2. Sachverhalt, 3. Rechtliche Würdigung …</div>
+          <div class="bub ai">Im Verfahren <code>[Aktenzeichen_1]</code> endet die Frist für <code>[Person_1]</code> am 14. April 2026. Die Zustellung an <code>[Adresse_1]</code> sollte bis dahin erfolgen. Vorschlag für die Gliederung: 1. Zulässigkeit, 2. Sachverhalt, 3. Rechtliche Würdigung …</div>
         </div>
         <div class="in"><span>Nachricht eingeben …</span><i></i></div>
       </div>
@@ -715,17 +716,17 @@ body.locked { overflow: hidden; }
     <div class="akt">
       <span class="eyebrow thread-c rv">Der Schlüssel</span>
       <h2 class="rv" style="--d:80ms">Zwei Sichten auf denselben Fall</h2>
-      <p class="lede rv" style="--d:160ms">Pseudonymisierung ist nur so gut wie der Ort, an dem der Schlüssel liegt. Bei Lokanon liegt er in der Kanzlei, verschlüsselt mit einem Passwort.</p>
+      <p class="lede rv" style="--d:160ms">Pseudonymisierung ist nur so gut wie der Ort, an dem der Schlüssel liegt. Bei Lokanon liegt er in der Kanzlei, verschlüsselt mit einem Passwort, und nur, wenn Sie die Rückübersetzung einschalten.</p>
     </div>
     <div class="split">
       <div class="pane them rv" style="--d:120ms">
         <span class="who">Was der KI-Anbieter sieht</span>
-        <p class="big">„[PERSON_1], [ADRESSE_1], [AZ_1] – ein Verfahren vor dem Amtsgericht Mülheim.“</p>
+        <p class="big">„[Person_1], [Adresse_1], [Aktenzeichen_1] – ein Verfahren vor dem Amtsgericht Mülheim.“</p>
         <ul>
           <li>Sachverhalt und Rechtsfragen, vollständig</li>
           <li>Keine Namen, Anschriften, Kennzeichen, Konten</li>
-          <li>Dateinamen ohne Mandantennamen</li>
-          <li>Metadaten entfernt</li>
+          <li>Gleiche Datei, gleiches Format, Metadaten entfernt</li>
+          <li>PDF echt geschwärzt, mit Leck-Test</li>
         </ul>
       </div>
       <div class="pane you rv" style="--d:240ms">
@@ -739,9 +740,9 @@ body.locked { overflow: hidden; }
           <p class="big">„Sabine Winter, Eppinghofer Straße 47, 14 VI 512/26.“</p>
         </div>
         <ul>
-          <li>Schlüsseldatei je Vorgang, verschlüsselt mit Passwort (PBKDF2 + Fernet)</li>
-          <li>Rückübersetzung versteht auch „Person 1“ oder „[PERSON_1]s“</li>
-          <li>Prüfbericht mit Klartext bleibt im Vorgangsordner der Akte</li>
+          <li>Schlüsseldatei je Durchlauf, verschlüsselt mit Passwort (PBKDF2 + Fernet)</li>
+          <li>Rückübersetzung versteht auch „Person 1“ oder „[Person_1]s“</li>
+          <li>Auf Wunsch Vorgangsordner mit Prüfbericht und Protokoll</li>
           <li>Nichts davon verlässt den PC</li>
         </ul>
       </div>
@@ -760,7 +761,7 @@ body.locked { overflow: hidden; }
       <div class="kpi rv" style="--d:100ms"><b><span class="num" data-count="98">0</span> %</b><span>Erkennungsrate auf Referenzfällen</span></div>
       <div class="kpi rv" style="--d:180ms"><b><span class="num" data-count="98">0</span> %</b><span>Treffergenauigkeit auf Referenzfällen</span></div>
       <div class="kpi rv" style="--d:260ms"><b><span class="num" data-count="0">0</span> Bytes</b><span>die zur Laufzeit ins Netz gehen</span></div>
-      <div class="kpi rv" style="--d:340ms"><b>4</b><span>Schritte vom Dokument zur Antwort</span></div>
+      <div class="kpi rv" style="--d:340ms"><b>3</b><span>Schritte: Ablegen, Prüfen, Fertig</span></div>
     </div>
     <div class="feat">
       <article class="f rv" style="--d:120ms">
@@ -771,9 +772,9 @@ body.locked { overflow: hidden; }
       </article>
       <article class="f rv" style="--d:200ms">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
-        <h3>Vorgangsordner in der Akte</h3>
-        <p>Originale, Anonymisiert, Für die KI, Prüfbericht, Übersicht. Verständliche Namen, keine IT-Sprache.</p>
-        <p class="why"><b>Kanzlei:</b> Fachangestellte finden alles dort, wo die Akte liegt.</p>
+        <h3>Gleiche Datei, gleicher Name</h3>
+        <p>Aus Klage.docx wird Klage_anonymisiert.docx. PDF echt geschwärzt, Word und Excel ohne Metadaten. Beim Ordner liegen die Kopien neben den Originalen.</p>
+        <p class="why"><b>Kanzlei:</b> Kein Umbenennen, kein Suchen. Die Kopie liegt bei der Akte.</p>
       </article>
       <article class="f rv" style="--d:280ms">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><circle cx="15" cy="12" r="3"/></svg></div>
@@ -784,7 +785,7 @@ body.locked { overflow: hidden; }
       <article class="f rv" style="--d:360ms">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div>
         <h3>Eigene Bezeichnungen</h3>
-        <p>[MANDANTIN] statt [PERSON_7], einmal vergeben, überall im Vorgang und in der Antwort.</p>
+        <p>[Mandantin] statt [Person_7], einmal vergeben, überall in allen Dateien und in der Antwort.</p>
         <p class="why"><b>Kanzlei:</b> Der Schriftsatz liest sich wie ein Schriftsatz.</p>
       </article>
       <article class="f rv" style="--d:440ms">
@@ -801,15 +802,15 @@ body.locked { overflow: hidden; }
       </article>
       <article class="f rv" style="--d:600ms">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
-        <h3>Vorgangsweit konsistent</h3>
-        <p>Nachnamen, Genitiv, Wiederholungen über alle Dateien. „Günther“ im Antwortschreiben ist dieselbe Person wie „Moritz Günther“ in der Klage.</p>
+        <h3>Eine Person, eine Karte</h3>
+        <p>„Moritz Günther“, „Herr Günther“ und „Günthers“ sind eine Karte, über alle Dateien. Passt ein Nachname zu zwei Personen, fragt Lokanon nach.</p>
         <p class="why"><b>Kanzlei:</b> Die KI versteht, wer wer ist, ohne zu wissen, wer es ist.</p>
       </article>
       <article class="f rv" style="--d:680ms">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
-        <h3>KI-Anweisung mitgeliefert</h3>
-        <p>Projekt-Anweisung für ChatGPT und Claude plus ein Claude-Skill: Platzhalter stehen lassen, nie raten.</p>
-        <p class="why"><b>Kanzlei:</b> Einrichten dauert fünf Minuten, einmal.</p>
+        <h3>Mehr nur auf Wunsch</h3>
+        <p>Rückübersetzung, KI-Anweisung mit Claude-Skill, Vorgangsordner mit Prüfbericht: unter Einstellungen → Erweitert, standardmäßig aus.</p>
+        <p class="why"><b>Kanzlei:</b> Der Alltag bleibt drei Schritte lang.</p>
       </article>
     </div>
     <div class="info-row rv" style="--d:720ms">
@@ -825,17 +826,16 @@ body.locked { overflow: hidden; }
     <div class="akt">
       <span class="eyebrow rv">Für wen</span>
       <h2 class="rv" style="--d:80ms">Gebaut für den Schreibtisch, nicht für die IT-Abteilung</h2>
-      <p class="lede rv" style="--d:160ms">Einzelanwältinnen und Einzelanwälte, kleine Kanzleien und ihre Fachangestellten. Ein Doppelklick startet alles. Keine Konsole, kein Regler, kein Fachbegriff.</p>
+      <p class="lede rv" style="--d:160ms">Einzelanwältinnen und Einzelanwälte, kleine Kanzleien und ihre Fachangestellten. Ein Bildschirm, drei Zustände. Keine Konsole, kein Regler, kein Fachbegriff.</p>
     </div>
     <div class="who rv" style="--d:240ms">
       <span>Einzelanwälte</span><span>Kanzleien bis 10 Personen</span><span>Rechtsanwaltsfachangestellte</span><span>Syndizi mit sensiblen Vorgängen</span>
     </div>
     <div class="flow rv" style="--d:300ms" id="flow">
       <div class="line"><i></i></div>
-      <div class="step"><div class="n">1</div><h3>Vorgang anlegen</h3><p>Dateien ablegen oder den Aktenordner wählen. Die Analyse startet von selbst, Seite für Seite sichtbar.</p></div>
-      <div class="step"><div class="n">2</div><h3>Prüfen</h3><p>Karten durchsehen, Schalter setzen, Bezeichnungen vergeben, Übersehenes nachtragen.</p></div>
-      <div class="step"><div class="n">3</div><h3>Fertigstellen</h3><p>Dateien für die KI erzeugen, Leck-Test lesen, KI-Anweisung kopieren, Schlüssel mit Passwort sichern.</p></div>
-      <div class="step"><div class="n">4</div><h3>Antwort</h3><p>Antwort der KI einfügen, Platzhalter werden ersetzt, Text in den Schriftsatz übernehmen.</p></div>
+      <div class="step"><div class="n">1</div><h3>Ablegen</h3><p>Dateien auf das Fenster ziehen oder den Aktenordner wählen. Die Erkennung startet von selbst, auch für gescannte PDFs.</p></div>
+      <div class="step"><div class="n">2</div><h3>Prüfen</h3><p>Karten durchsehen, Schalter setzen, eigene Namen wie [Mandantin] vergeben, Übersehenes nachtragen.</p></div>
+      <div class="step"><div class="n">3</div><h3>Fertig</h3><p>Je Datei eine Kopie im gleichen Format mit dem Zusatz „_anonymisiert“, Leck-Test bestanden. Ab damit in die KI.</p></div>
     </div>
   </div>
 </section>
@@ -895,10 +895,10 @@ body.locked { overflow: hidden; }
           <h3>Was wir entschieden haben</h3>
           <ul>
             <li><b>Anwälte zuerst:</b> Berufsrecht und Aktenlogik vor Arztpraxen (kommt als Profil).</li>
-            <li><b>Dateinamen:</b> lokal bleibt der Originalname, die KI-Kopie bekommt bereinigte Namen.</li>
-            <li><b>Markdown für die KI, PDF-Sichtkopie für Menschen</b>, beides mit Leck-Test.</li>
+            <li><b>Gleiche Datei, gleicher Name:</b> die Kopie heißt wie das Original, plus „_anonymisiert“.</li>
+            <li><b>Gleiches Format:</b> PDF echt geschwärzt, Word und Excel ohne Metadaten, alles mit Leck-Test.</li>
             <li><b>Keine Scores in der Oberfläche:</b> sicher, wahrscheinlich, unsicher.</li>
-            <li><b>Schlüssel verschlüsselt, Prüfbericht in Klartext</b>, beides in der Akte.</li>
+            <li><b>Ein Bildschirm, drei Zustände;</b> Rückübersetzung und Vorgangsordner nur auf Wunsch.</li>
             <li><b>Installer ohne Adminrechte,</b> alle Modelle enthalten, 2,8 GB.</li>
           </ul>
           <span class="sig">Verständlich für Fachangestellte, nicht für ITler.</span>
@@ -934,7 +934,7 @@ body.locked { overflow: hidden; }
       <div>
         <span class="eyebrow rv">Epilog</span>
         <h2 class="rv" style="--d:80ms; margin-top:10px">Pilotversion für Kanzleien</h2>
-        <p class="lede rv" style="--d:160ms; margin-top:18px">Lokanon 0.1.0 ist bereit für den ersten Einsatz an echten, unkritischen Vorgängen. Wir brauchen dafür Kanzleien, die genau hinsehen und sagen, was fehlt.</p>
+        <p class="lede rv" style="--d:160ms; margin-top:18px">Lokanon 0.2.0 setzt um, was der erste Pilottest gezeigt hat: ein Bildschirm, lesbare Platzhalter, Kopien im gleichen Format. Wir brauchen Kanzleien, die es an echten, unkritischen Fällen ausprobieren und sagen, was fehlt.</p>
         <div class="cta-row rv" style="--d:240ms">
           <button class="btn light" id="btnNext" type="button">So geht es weiter</button>
           <span class="note">Windows 10/11 · pro Benutzer · ohne Adminrechte · ca. 2,8 GB</span>
@@ -946,16 +946,16 @@ body.locked { overflow: hidden; }
         </div>
         <div class="next" id="next">
           <div class="st"><b>1</b><span>Installer erhalten und per Doppelklick installieren. Beim SmartScreen-Hinweis: „Weitere Informationen“, „Trotzdem ausführen“.</span></div>
-          <div class="st"><b>2</b><span>Einen echten, unkritischen Vorgang durchspielen, mindestens ein gescanntes PDF dabei.</span></div>
+          <div class="st"><b>2</b><span>Einen echten, unkritischen Fall durchspielen, mindestens ein gescanntes PDF dabei.</span></div>
           <div class="st"><b>3</b><span>Rückmeldebogen ausfüllen: Übersehenes, Fehlalarme, Stolperstellen, Dauer. Keine Originaldokumente mitschicken.</span></div>
         </div>
       </div>
       <div class="pack rv-x" style="--d:200ms">
-        <div class="it"><i>exe</i><span>Lokanon-Setup-0.1.0.exe<small>Installer mit allen Sprachmodellen, läuft danach offline</small></span></div>
+        <div class="it"><i>exe</i><span>Lokanon-Setup-0.2.0.exe<small>Installer mit allen Sprachmodellen, läuft danach offline</small></span></div>
         <div class="it"><i>html</i><span>Anleitung<small>In der App und als Datei, für Fachangestellte geschrieben</small></span></div>
         <div class="it"><i>doc</i><span>Pilot-Hinweis und Rückmeldebogen<small>Was es kann, was nicht, was wir zurückbrauchen</small></span></div>
         <div class="it"><i>txt</i><span>KI-Anweisung und Claude-Skill<small>Einmal in ChatGPT oder Claude einrichten</small></span></div>
-        <div class="it"><i>mp4</i><span>Produktvideo, 30 Sekunden<small>Für die Vorstellung in der Kanzlei</small></span></div>
+        <div class="it"><i>mp4</i><span>Filme und diese Vorstellung<small>Auch in Lokanon: Einstellungen → Lokanon vorstellen</small></span></div>
       </div>
     </div>
   </div>
@@ -1054,7 +1054,7 @@ body.locked { overflow: hidden; }
       </div>
       <h3>Was Lokanon übernimmt, und was bei der Kanzlei bleibt</h3>
       <div class="split" style="margin-top:0">
-        <div class="pane you"><span class="who">Lokanon übernimmt</span><ul><li>Erkennen und Ersetzen von Personendaten, lokal, offline</li><li>Konsistente Platzhalter über alle Dateien eines Vorgangs</li><li>Prüfbericht, Protokoll und Übersicht je Vorgang (Nachweis der Maßnahme)</li><li>Verschlüsselte Schlüsseldatei, Rückübersetzung</li><li>KI-Anweisung, damit das Modell Platzhalter stehen lässt</li><li>Textbausteine: Art.-13-Information, Verzeichniseintrag, Anbieter-Checkliste</li></ul></div>
+        <div class="pane you"><span class="who">Lokanon übernimmt</span><ul><li>Erkennen und Ersetzen von Personendaten, lokal, offline</li><li>Konsistente Platzhalter über alle Dateien eines Durchlaufs</li><li>Auf Wunsch Prüfbericht, Protokoll und Übersicht je Vorgang (Nachweis der Maßnahme)</li><li>Auf Wunsch verschlüsselte Schlüsseldatei und Rückübersetzung</li><li>KI-Anweisung, damit das Modell Platzhalter stehen lässt</li><li>Textbausteine: Art.-13-Information, Verzeichniseintrag, Anbieter-Checkliste</li></ul></div>
         <div class="pane them"><span class="who">Bei der Kanzlei bleibt</span><ul><li>Wahl eines Geschäftstarifs mit AVV und Verschwiegenheitsverpflichtung (§ 43e BRAO)</li><li>Prüfung jedes Treffers vor dem Versand (kein Werkzeug ist vollständig)</li><li>Prüfung der KI-Antwort auf Richtigkeit, bevor sie in einen Schriftsatz geht</li><li>Entscheidung, ob ein Fall trotz Platzhaltern erkennbar bleibt (seltene Sachverhalte)</li><li>Maßnahmen zur KI-Kompetenz im Team (Art. 4 KI-VO)</li><li>Urheberrecht beim Hochladen fremder Werke</li></ul></div>
       </div>
       <h4>Quellen</h4>
@@ -1076,27 +1076,23 @@ body.locked { overflow: hidden; }
   <div class="pn">
     <div class="hd"><div><span class="eyebrow">Detailseite</span><h2 id="t-app">So funktioniert Lokanon: die Bildschirme</h2></div><button class="x" type="button" data-close aria-label="Schließen">×</button></div>
     <div class="bo">
-      <span class="stand">Aufnahmen aus Lokanon 2.0 (Pilot) mit einem erfundenen Vorgang · Bild anklicken zum Vergrößern</span>
+      <span class="stand">Aufnahmen aus Lokanon 0.2.0 (Pilot) mit einem erfundenen Fall · Bild anklicken zum Vergrößern</span>
       <div class="shots">
         <div class="shot">
-          <figure><img src="shots/start.jpg" alt="Startseite von Lokanon: Name des Vorgangs, Dateien hierher ziehen, Aktenordner wählen, Liste bisheriger Vorgänge" loading="lazy" width="1600" height="1000"></figure>
-          <div class="cap"><span class="n">1</span><h3>Vorgang anlegen</h3><ul><li>Name vergeben, Dateien ablegen oder den Aktenordner wählen. Die Ausgabe landet dann als Unterordner „Lokanon“ in der Akte.</li><li>Alternativ Text einfügen, etwa eine E-Mail.</li><li>Die Analyse startet von selbst; unten links steht immer: „Läuft lokal auf diesem PC“.</li></ul></div>
+          <figure><img src="shots/ablegen.jpg" alt="Startbildschirm von Lokanon: große Ablagefläche für Dateien, darunter Ordner wählen und Text einfügen" loading="lazy" width="1600" height="1000"></figure>
+          <div class="cap"><span class="n">1</span><h3>Ablegen</h3><ul><li>Dateien auf die Fläche ziehen oder „Ordner wählen“. PDF (auch Scans), Word, Excel und Text.</li><li>Alternativ „Text einfügen“, etwa eine E-Mail.</li><li>Die Erkennung startet sofort; oben steht immer: „Läuft lokal auf diesem PC“.</li></ul></div>
         </div>
         <div class="shot">
-          <figure><img src="shots/pruefen.jpg" alt="Prüfen-Schritt: links Karten je Begriff mit Schalter, rechts das Original mit farbigen Markierungen und Platzhalter-Etiketten" loading="lazy" width="1600" height="1000"></figure>
-          <div class="cap"><span class="n">2</span><h3>Prüfen</h3><ul><li>Jeder Treffer ist eine Karte: Art, Fundstelle, Sicherheit, Schalter. „Bitte ansehen“ listet oben, was unsicher ist, in einfachen Worten.</li><li>Rechts das Original mit Markierungen. Jedes Etikett zeigt den Platzhalter; „Anonymisiert“ zeigt die Fassung für die KI.</li><li>„benennen“ vergibt eigene Bezeichnungen wie [MANDANTIN]. Übersehenes wird nachgetragen.</li></ul></div>
+          <figure><img src="shots/pruefen.jpg" alt="Prüfen: links eine Karte je Person mit Schreibweisen, Schalter und Platzhalter Mandantin, rechts das Dokument mit farbigen Markierungen" loading="lazy" width="1600" height="1000"></figure>
+          <div class="cap"><span class="n">2</span><h3>Prüfen</h3><ul><li>Eine Karte je Person oder Angabe, alle Schreibweisen zusammen („auch: Winter“). Schalter: ersetzen oder stehen lassen.</li><li>Platzhalter anklicken und eigenen Namen vergeben, etwa [Mandantin]. Passt ein Nachname zu zwei Personen, fragt Lokanon nach.</li><li>Rechts das Dokument mit Markierungen oder die anonymisierte Fassung. Unten ein Knopf: „Geprüft, jetzt anonymisieren“.</li></ul></div>
         </div>
         <div class="shot">
-          <figure><img src="shots/fertigstellen.jpg" alt="Fertigstellen-Schritt: Ziel-KI wählen, PDF-, Word- und Excel-Kopien, Bestätigung der Prüfung, erzeugte Dateien mit Ordner öffnen, daneben die KI-Anweisung zum Kopieren" loading="lazy" width="1600" height="1000"></figure>
-          <div class="cap"><span class="n">3</span><h3>Fertigstellen</h3><ul><li>Ziel-KI fürs Protokoll wählen; bei Privatkonten warnt Lokanon.</li><li>Zusätzlich zur Textfassung: PDF-Sichtkopie mit echter Schwärzung und Gegenprüfung, Word- und Excel-Kopie ohne Metadaten.</li><li>Erst nach dem Haken „Ich habe die Begriffe geprüft“ entstehen die Dateien. Rechts die KI-Anweisung zum Kopieren und die drei Schritte in ChatGPT oder Claude.</li></ul></div>
+          <figure><img src="shots/fertig.jpg" alt="Fertig: drei Dateien anonymisiert, je Datei eine Kopie mit dem Zusatz _anonymisiert, Knopf Ordner öffnen" loading="lazy" width="1600" height="1000"></figure>
+          <div class="cap"><span class="n">3</span><h3>Fertig</h3><ul><li>Je Datei eine Kopie im gleichen Format: Klageerwiderung.docx wird Klageerwiderung_anonymisiert.docx, PDFs echt geschwärzt.</li><li>Bei „Ordner wählen“ liegen die Kopien neben den Originalen, sonst unter Dokumente\Lokanon\Anonymisiert.</li><li>Jede Kopie hat den Leck-Test bestanden, sonst steht hier ein Hinweis in Klartext.</li></ul></div>
         </div>
         <div class="shot">
-          <figure><img src="shots/antwort.jpg" alt="Antwort-Schritt: Textfeld zum Einfügen der KI-Antwort und Knopf Zurückübersetzen" loading="lazy" width="1600" height="1000"></figure>
-          <div class="cap"><span class="n">4</span><h3>Antwort zurückübersetzen</h3><ul><li>Die Antwort der KI einfügen, Platzhalter werden durch die Originale ersetzt, auch wenn die KI sie leicht verändert hat („Person 1“, „[PERSON_1]s“).</li><li>Für frühere Vorgänge: Schlüsseldatei wählen und Passwort eingeben.</li></ul></div>
-        </div>
-        <div class="shot">
-          <figure><img src="shots/einstellungen.jpg" alt="Einstellungen: Liste nie zu ersetzender Begriffe der Kanzlei, Verhalten bei Einrichtungen und Ortsnamen, Datumsregel, Erkennungsgruppen" loading="lazy" width="1600" height="1000"></figure>
-          <div class="cap"><span class="n">5</span><h3>Einstellungen</h3><ul><li>„Nie ersetzen“: Kanzleiname, Mitarbeitende, eigene Kontaktdaten. „Immer ersetzen“: interne Kürzel.</li><li>Gerichte, Behörden, Versicherer bleiben standardmäßig stehen, damit die KI den Kontext behält; einzelne lassen sich beim Prüfen trotzdem ersetzen.</li><li>Datumsregel und Erkennungsgruppen in Alltagssprache, ohne Schwellenwerte.</li></ul></div>
+          <figure><img src="shots/einstellungen.jpg" alt="Einstellungen: Bereich Erweitert mit drei ausgeschalteten Schaltern und Bereich Lokanon vorstellen mit Produktvorstellung und Filmen" loading="lazy" width="1600" height="1000"></figure>
+          <div class="cap"><span class="n">4</span><h3>Einstellungen</h3><ul><li>Kanzlei (nie ersetzen), Erkennung, Ausgabe mit Zusatz und Ablageordner.</li><li>Erweitert, standardmäßig aus: Rückübersetzung mit verschlüsseltem Schlüssel, KI-Anweisung und Claude-Skill, Vorgangsordner mit Prüfbericht.</li><li>„Lokanon vorstellen“: diese Produktvorstellung und die Filme, ohne Internet.</li></ul></div>
         </div>
       </div>
     </div>
@@ -1106,7 +1102,7 @@ body.locked { overflow: hidden; }
 
 <footer>
   <div class="wrap">
-    <span>Lokanon · Version 0.1.0 · Stand 28. Oktober 2026</span>
+    <span>Lokanon · Version 0.2.0 · Stand 31. Oktober 2026</span>
     <span>Alle Namen, Adressen und Aktenzeichen in diesem Deck sind erfunden.</span>
     <span>Tastatur: ↓ ↑ oder Leertaste blättern.</span>
   </div>
@@ -1214,7 +1210,7 @@ body.locked { overflow: hidden; }
         var c = $('.chip', m); c.textContent = name; m.classList.remove('flip'); void m.offsetWidth; m.classList.add('flip');
       });
       $('.check[data-id="p1"] .chipname').textContent = name;
-      $$('.rename .btn').forEach(function (x) { x.classList.toggle('ghost', x !== b || b.dataset.name === 'PERSON_1'); });
+      $$('.rename .btn').forEach(function (x) { x.classList.toggle('ghost', x !== b || b.dataset.name === 'Person_1'); });
     });
   });
 

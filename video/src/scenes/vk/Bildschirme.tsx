@@ -19,7 +19,7 @@ export const Bildschirme: React.FC = () => {
         if (l < -16 || l > PER + 16) return null;
         const vis = inOut(l, 0, PER, 14);
         const zoom = tween(l, [0, PER], [1, 1.07], (x) => x);
-        const ox = ["20% 15%", "70% 30%", "30% 75%"][i];
+        const ox = ["50% 45%", "30% 40%", "50% 40%"][i];
         return (
           <div key={s.datei} style={{ position: "absolute", inset: 0, opacity: vis }}>
             <div style={{ position: "absolute", left: FRAME.x, top: FRAME.y, width: FRAME.w, height: FRAME.h, borderRadius: 16, overflow: "hidden", background: colors.card, border: `1px solid ${colors.bar}`, boxShadow: "0 18px 50px rgba(22,54,92,0.18)" }}>

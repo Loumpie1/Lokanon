@@ -13,7 +13,7 @@ export const texts = {
   caption2: "Personendaten erkennen – lokal, ohne Internet",
   caption3: "Prüfen und entscheiden – mit einem Schalter",
   caption4: "Mit ChatGPT oder Claude arbeiten – ohne Namen preiszugeben",
-  caption5: "Antwort zurückübersetzen – der Schlüssel bleibt bei Ihnen",
+  caption5: "Auf Wunsch zurückübersetzen – der Schlüssel bleibt bei Ihnen",
 
   // Szene 6 (26–30 s)
   claim: "Lokanon. Läuft auf Ihrem PC.",
@@ -39,12 +39,12 @@ export type MarkKind = "person" | "firma" | "adresse" | "nummer";
 export type MarkId = "name" | "adresse" | "ort" | "az" | "anrede" | "gericht";
 
 export const marks: Record<MarkId, { text: string; ph: string; kind: MarkKind }> = {
-  name: { text: "Sabine Winter", ph: "[PERSON_1]", kind: "person" },
-  adresse: { text: "Eppinghofer Straße 47", ph: "[ADRESSE_1]", kind: "adresse" },
-  ort: { text: "45468 Mülheim an der Ruhr", ph: "[ORT_1]", kind: "adresse" },
-  az: { text: "14 VI 512/26", ph: "[AZ_1]", kind: "nummer" },
-  anrede: { text: "Winter", ph: "[PERSON_1]", kind: "person" },
-  gericht: { text: "Amtsgericht Mülheim", ph: "[FIRMA_1]", kind: "firma" },
+  name: { text: "Sabine Winter", ph: "[Person_1]", kind: "person" },
+  adresse: { text: "Eppinghofer Straße 47", ph: "[Adresse_1]", kind: "adresse" },
+  ort: { text: "45468 Mülheim an der Ruhr", ph: "[Ort_1]", kind: "adresse" },
+  az: { text: "14 VI 512/26", ph: "[Aktenzeichen_1]", kind: "nummer" },
+  anrede: { text: "Winter", ph: "[Person_1]", kind: "person" },
+  gericht: { text: "Amtsgericht Mülheim", ph: "[Firma_1]", kind: "firma" },
 };
 
 export const brief = {
