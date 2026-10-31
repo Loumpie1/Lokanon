@@ -48,7 +48,15 @@ Rauchtest allein: `python build\smoke_test.py C:\Users\david\Lokanon\build\app` 
 - Installer: `C:\Users\david\Lokanon\build\out\Lokanon-Setup-<version>.exe`
 - Modellliste: `<app>\models\MANIFEST.json`
 
-Nach Änderungen an der Oberfläche oder am Code den Build wiederholen: `python build\build.py --installer` (Python, Pakete und Modelle bleiben erhalten und werden nicht neu geladen).
+Nach Änderungen an der Oberfläche oder am Code den Build wiederholen: `python build\build.py --nur-schritt projekt --installer` (Python, Pakete und Modelle bleiben erhalten und werden nicht neu geladen).
+
+Pilot-Paket (Ordner `%USERPROFILE%\Lokanon\Pilot` und `build\out\Lokanon-Pilot-Paket-<version>.zip`, ohne Installer):
+`python build\pilot_paket.py` – nimmt den Installer aus `build\out`, übersetzt die Markdown-Unterlagen aus `docs/` nach Word
+und legt die Anleitung offline ab.
+
+## Stand 31.10.2026
+
+Lokanon 0.2.0: Build mit `--nur-schritt projekt --installer` wiederholt, Pilot-Paket per `pilot_paket.py`.
 
 ## Stand 28.10.2026
 
