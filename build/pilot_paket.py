@@ -14,6 +14,7 @@ import hashlib
 import os
 import re
 import shutil
+import stat
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -205,12 +206,19 @@ GRENZEN DER PILOTVERSION
 """
 
 
+def _schreibbar(func, pfad, _exc) -> None:
+    """Dateien aus OneDrive kommen mit Schreibschutz-Attribut an (copystat); vor dem Löschen aufheben."""
+    os.chmod(pfad, stat.S_IWRITE)
+    func(pfad)
+
+
 def _leeren(p: Path) -> None:
     if p.exists():
         for kind in p.iterdir():
             if kind.is_dir():
-                shutil.rmtree(kind)
+                shutil.rmtree(kind, onexc=_schreibbar)
             else:
+                os.chmod(kind, stat.S_IWRITE)
                 kind.unlink()
     p.mkdir(parents=True, exist_ok=True)
 
