@@ -45,17 +45,17 @@ def _detect(analyzer, cfg, text, **kw):
 # ---------------------------------------------------------------- Rückübersetzung
 
 def test_deanonymize_varianten():
-    m = {"PERSON_1": "Hans Müller", "FIRMA_2": "Muster GmbH"}
-    assert deanonymize("Hallo [PERSON_1] von [FIRMA_2].", m) == "Hallo Hans Müller von Muster GmbH."
-    assert deanonymize("PERSON_1 und Person 1 und [Person-1]s Auto", m) == "Hans Müller und Hans Müller und Hans Müllers Auto"
-    assert deanonymize("«PERSON_1» · [ FIRMA_2 ]", m) == "Hans Müller · Muster GmbH"
-    assert deanonymize("PERSON_1s Anspruch", m) == "Hans Müllers Anspruch"
-    assert deanonymize("[PERSON_9] bleibt", m) == "[PERSON_9] bleibt"
+    m = {"Person_1": "Hans Müller", "Firma_2": "Muster GmbH"}
+    assert deanonymize("Hallo [Person_1] von [Firma_2].", m) == "Hallo Hans Müller von Muster GmbH."
+    assert deanonymize("Person_1 und Person 1 und [Person-1]s Auto", m) == "Hans Müller und Hans Müller und Hans Müllers Auto"
+    assert deanonymize("«Person_1» · [ Firma_2 ]", m) == "Hans Müller · Muster GmbH"
+    assert deanonymize("Person_1s Anspruch", m) == "Hans Müllers Anspruch"
+    assert deanonymize("[Person_9] bleibt", m) == "[Person_9] bleibt"
     assert deanonymize("nichts", {}) == "nichts"
 
 
 def test_vault_roundtrip():
-    m = {"PERSON_1": "Hans Müller", "ORT_1": "45468 Mülheim an der Ruhr"}
+    m = {"Person_1": "Hans Müller", "Ort_1": "45468 Mülheim an der Ruhr"}
     blob = encrypt_mapping(m, "geheim")
     assert decrypt_mapping(blob, "geheim") == m
     with pytest.raises(ValueError):
@@ -71,18 +71,18 @@ def test_pseudonymize_namensteile_und_genitiv():
     fs = [Finding(0, 11, "PERSON", 0.9, "Hans Müller"), Finding(17, 23, "PERSON", 0.01, "Müller"),
           Finding(30, 37, "PERSON", 0.01, "Müllers"), Finding(50, 54, "PERSON", 0.01, "Hans")]
     res = pseudonymize(t, fs)
-    assert res.mapping == {"PERSON_1": "Hans Müller"}
-    assert res.anonymized == "[PERSON_1] kam. [PERSON_1] ging. [PERSON_1] Auto blieb. [PERSON_1] auch."
+    assert res.mapping == {"Person_1": "Hans Müller"}
+    assert res.anonymized == "[Person_1] kam. [Person_1] ging. [Person_1] Auto blieb. [Person_1] auch."
 
 
 def test_pseudonymize_fortsetzung_mapping():
     """Zweites Dokument im selben Vorgang: bekannte Person behält Nummer, neue Person zählt weiter."""
-    m = {"PERSON_1": "Hans Müller"}
+    m = {"Person_1": "Hans Müller"}
     t = "Müller traf Petra Schmidt."
     fs = [Finding(0, 6, "PERSON", 0.5, "Müller"), Finding(12, 25, "PERSON", 0.9, "Petra Schmidt")]
     res = pseudonymize(t, fs, m)
-    assert res.anonymized == "[PERSON_1] traf [PERSON_2]."
-    assert res.mapping["PERSON_2"] == "Petra Schmidt"
+    assert res.anonymized == "[Person_1] traf [Person_2]."
+    assert res.mapping["Person_2"] == "Petra Schmidt"
 
 
 def test_replacement_pairs_namensteil():
@@ -90,7 +90,7 @@ def test_replacement_pairs_namensteil():
     fs = [Finding(0, 11, "PERSON", 0.9, "Hans Müller"), Finding(16, 22, "PERSON", 0.01, "Müller")]
     res = pseudonymize(t, fs)
     pairs = replacement_pairs(t, fs, res.mapping)
-    assert pairs == [("Hans Müller", "[PERSON_1]"), ("Müller", "[PERSON_1]")]
+    assert pairs == [("Hans Müller", "[Person_1]"), ("Müller", "[Person_1]")]
 
 
 # ---------------------------------------------------------------- Allow-Liste
@@ -189,10 +189,10 @@ def test_leck_test_markdown(analyzer, cfg):
 # ---------------------------------------------------------------- Vorgang
 
 def test_ki_dateiname():
-    pairs = [("Gerhard Brinkhoff", "[PERSON_2]"), ("Brinkhoff", "[PERSON_2]"), ("Person", "[PERSON_26]")]
-    assert ki_dateiname("Fall1_Erbrecht_Brinkhoff.docx", pairs) == "Fall1_Erbrecht_PERSON_2"
-    assert ki_dateiname("Mandat Hans Müller 2026.pdf", [("Hans Müller", "[PERSON_1]")]) == "Mandat PERSON_1 2026"
-    assert ki_dateiname("HansMueller_Unfall.pdf", [("Hans Mueller", "[PERSON_1]")]) == "PERSON_1_Unfall"
+    pairs = [("Gerhard Brinkhoff", "[Person_2]"), ("Brinkhoff", "[Person_2]"), ("Person", "[Person_26]")]
+    assert ki_dateiname("Fall1_Erbrecht_Brinkhoff.docx", pairs) == "Fall1_Erbrecht_Person_2"
+    assert ki_dateiname("Mandat Hans Müller 2026.pdf", [("Hans Müller", "[Person_1]")]) == "Mandat Person_1 2026"
+    assert ki_dateiname("HansMueller_Unfall.pdf", [("Hans Mueller", "[Person_1]")]) == "Person_1_Unfall"
     assert ki_dateiname("Rechnung.pdf", pairs) == "Rechnung"
 
 
@@ -203,22 +203,22 @@ def test_vorgang_ablage():
     assert [p.name for p in dateien_im_ordner(tmp)] == ["a.txt"]
     assert ist_cloud_pfad(r"C:\Users\x\OneDrive\Akten") and not ist_cloud_pfad(str(tmp))
     # Ordner-Modus: Vorgangsordner = <Akte>/Lokanon
-    v = Vorgang(name="Akte 1", ordner=str(tmp), mapping={"PERSON_1": "Hans Müller"})
+    v = Vorgang(name="Akte 1", ordner=str(tmp), mapping={"Person_1": "Hans Müller"})
     assert v.lege_basis_fest() == tmp / "Lokanon"
-    v.schreibe("a.txt", b"Hallo [PERSON_1]", "md", "a")
+    v.schreibe("a.txt", b"Hallo [Person_1]", "md", "a")
     f = Finding(6, 17, "PERSON", 0.9, "Hans Müller")
     v.notiere_treffer("a.txt", [f], 16, True)
     v.schreibe_uebersicht()
     v.schreibe_protokoll()
     bericht = v.schreibe_pruefbericht(pruefbericht_html(v, [{"name": "a.txt", "text": "Hallo Hans Müller", "findings": [f],
-                                                             "platzhalter": {(6, 17): "[PERSON_1]"}}]))
+                                                             "platzhalter": {(6, 17): "[Person_1]"}}]))
     k = v.speichere_schluessel("pw", tmp / "keys")
-    assert (tmp / "Lokanon/Anonymisiert/a.md").read_bytes() == b"Hallo [PERSON_1]"
+    assert (tmp / "Lokanon/Anonymisiert/a.md").read_bytes() == b"Hallo [Person_1]"
     assert (tmp / "Lokanon/Fuer die KI/a.md").exists()
-    assert "Hans Müller" in bericht.read_text(encoding="utf-8") and "[PERSON_1]" in bericht.read_text(encoding="utf-8")
+    assert "Hans Müller" in bericht.read_text(encoding="utf-8") and "[Person_1]" in bericht.read_text(encoding="utf-8")
     prot = json.loads((tmp / "Lokanon/Protokoll.json").read_text(encoding="utf-8"))
-    assert prot["dateien"][0]["treffer"] == {"PERSON": 1} and "Hans" not in json.dumps(prot)
-    assert mapping_aus_schluessel(decrypt_mapping(k.read_bytes(), "pw")) == {"PERSON_1": "Hans Müller"}
+    assert prot["dateien"][0]["treffer"] == {"Person": 1} and "Hans" not in json.dumps(prot)
+    assert mapping_aus_schluessel(decrypt_mapping(k.read_bytes(), "pw")) == {"Person_1": "Hans Müller"}
     v.leere_ausgabe()
     assert not (tmp / "Lokanon/Anonymisiert/a.md").exists() and (tmp / "Lokanon/Fuer die KI").is_dir()
     # Upload-Modus: Vorgangsordner = <Vorgaenge>/<Name>, Originale werden gesichert

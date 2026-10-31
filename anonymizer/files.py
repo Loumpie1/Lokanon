@@ -189,7 +189,7 @@ def _pdf_leak_regex(orig: str):
 
 
 def _pdf_short_placeholder(ph: str) -> str:
-    """[PERSON_12] -> [P12]; alles andere wird nur abgeschnitten."""
+    """Kürzeste Form: [Person_12] -> [P12]; alles andere wird nur abgeschnitten."""
     import re
 
     m = re.fullmatch(r"\[([A-Za-z])[A-Za-z_]*?_?(\d+)\]", ph)
@@ -197,6 +197,23 @@ def _pdf_short_placeholder(ph: str) -> str:
         return f"[{m.group(1).upper()}{m.group(2)}]"
     inner = ph.strip("[]")
     return f"[{inner[:3].upper()}]" if inner else ph
+
+
+def _pdf_placeholder_stufen(ph: str) -> list[str]:
+    """Vom vollen Platzhalter schrittweise zu kürzeren Formen, die lesbar bleiben:
+    [Kennzeichen_1] -> [Kennzeich_1] -> ... -> [Kenn_1] -> [K1]."""
+    import re
+
+    stufen = [ph]
+    m = re.fullmatch(r"\[([A-Za-z][A-Za-z]*)_(\d+)\]", ph)
+    if m:
+        wort, nr = m.group(1), m.group(2)
+        for n in range(len(wort) - 1, 3, -1):
+            stufen.append(f"[{wort[:n]}_{nr}]")
+    kurz = _pdf_short_placeholder(ph)
+    if kurz not in stufen:
+        stufen.append(kurz)
+    return stufen
 
 
 def _pdf_page_chars(page):
@@ -268,12 +285,13 @@ def _pdf_find_hits(page, pairs):
 
 def _pdf_draw_placeholder(page, rect, ph: str, size: float) -> tuple:
     """Schreibt den Platzhalter in das Rechteck. Erst Schrift verkleinern (bis 5 pt),
-    dann Kurzform, zuletzt ungeachtet der Breite einfügen - nie stillschweigend weglassen.
+    dann schrittweise kürzen ([Kennzeichen_1] -> [Kennz_1] -> [K1]), zuletzt ungeachtet
+    der Breite einfügen - nie stillschweigend weglassen.
     Gibt (geschriebener Text, Rechteck, Schriftgröße) zurück."""
     import pymupdf
 
     size = max(min(size, rect.height / 1.15), _PDF_MIN_FONTSIZE)
-    for text in (ph, _pdf_short_placeholder(ph)):
+    for text in _pdf_placeholder_stufen(ph):
         fs = size
         while fs >= _PDF_MIN_FONTSIZE:
             width = pymupdf.get_text_length(text, "helv", fs)

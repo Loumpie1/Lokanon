@@ -21,42 +21,42 @@ DATUM_KONTEXT_KURZ = ["geb", "geburt", "verstorb", "versterb", "gestorb", "sterb
 
 # Entity -> Platzhalter-Label
 LABELS = {
-    "PERSON": "PERSON",
-    "ORGANIZATION": "FIRMA",
-    "LOCATION": "ORT",
-    "EMAIL_ADDRESS": "EMAIL",
-    "TELEFON": "TELEFON",
-    "ADRESSE": "ADRESSE",
-    "PLZ_ORT": "ORT",
-    "AKTENZEICHEN": "AZ",
-    "DIKTATZEICHEN": "ZEICHEN",
-    "GRUNDBUCH": "GRUNDBUCH",
+    "PERSON": "Person",
+    "ORGANIZATION": "Firma",
+    "LOCATION": "Ort",
+    "EMAIL_ADDRESS": "Email",
+    "TELEFON": "Telefon",
+    "ADRESSE": "Adresse",
+    "PLZ_ORT": "Ort",
+    "AKTENZEICHEN": "Aktenzeichen",
+    "DIKTATZEICHEN": "Zeichen",
+    "GRUNDBUCH": "Grundbuch",
     "IBAN_CODE": "IBAN",
-    "KONTONUMMER": "KONTO",
-    "CREDIT_CARD": "KARTE",
-    "VERSICHERUNGSNR": "VERS_NR",
-    "DE_TAX_ID": "STEUER_ID",
-    "DE_TAX_NUMBER": "STEUERNR",
-    "DE_VAT_ID": "UST_ID",
-    "DE_SOCIAL_SECURITY": "SV_NR",
-    "DE_HEALTH_INSURANCE": "KVNR",
-    "DE_ID_CARD": "AUSWEIS",
-    "DE_PASSPORT": "PASS",
-    "DE_FUEHRERSCHEIN": "FUEHRERSCHEIN",
-    "FUEHRERSCHEIN": "FUEHRERSCHEIN",
+    "KONTONUMMER": "Konto",
+    "CREDIT_CARD": "Karte",
+    "VERSICHERUNGSNR": "VersNr",
+    "DE_TAX_ID": "SteuerID",
+    "DE_TAX_NUMBER": "Steuernr",
+    "DE_VAT_ID": "UStID",
+    "DE_SOCIAL_SECURITY": "SVNr",
+    "DE_HEALTH_INSURANCE": "KVNr",
+    "DE_ID_CARD": "Ausweis",
+    "DE_PASSPORT": "Pass",
+    "DE_FUEHRERSCHEIN": "Fuehrerschein",
+    "FUEHRERSCHEIN": "Fuehrerschein",
     "DE_LANR": "LANR",
     "DE_BSNR": "BSNR",
     "DE_HANDELSREGISTER": "HRB",
-    "DE_KFZ": "KFZ",
-    "KFZ": "KFZ",
+    "DE_KFZ": "Kennzeichen",
+    "KFZ": "Kennzeichen",
     "FIN": "FIN",
-    "DATUM": "DATUM",
+    "DATUM": "Datum",
     "IP_ADDRESS": "IP",
     "URL": "URL",
-    "BERUF": "BERUF",
-    "DIAGNOSE": "DIAGNOSE",
-    "EIGENE_BEGRIFFE": "INTERN",
-    "MANUELL": "MANUELL",
+    "BERUF": "Beruf",
+    "DIAGNOSE": "Diagnose",
+    "EIGENE_BEGRIFFE": "Begriff",
+    "MANUELL": "Begriff",
 }
 
 # Gruppen für die Oberfläche (Reihenfolge = Anzeige)
@@ -198,6 +198,7 @@ class Result:
     findings: list[Finding]
     anonymized: str = ""
     mapping: dict[str, str] = field(default_factory=dict)  # Platzhalter -> Original
+    zuordnung: dict[str, str] = field(default_factory=dict)  # Treffer-Text (klein) -> Platzhalter-Schlüssel
 
 
 # Labels des GLiNER-PII-Modells (englisch, so wurde es trainiert) -> unsere Entitäten
@@ -284,11 +285,15 @@ def _norm_tokens(s: str) -> list[str]:
     return toks
 
 
+# Produktnamen, die in Kanzleitexten vorkommen und nie eine Person sind (immer erlaubt)
+PRODUKTNAMEN = ("Claude", "ChatGPT", "Copilot", "Gemini", "Lokanon")
+
+
 def make_allow_matcher(allow_list: list[str] | None):
     """Liefert eine Funktion text -> bool. Ein Begriff ist erlaubt, wenn er einem Allow-Eintrag
     entspricht, darin enthalten ist (Namensteil) oder ihn enthält (längere Schreibweise)."""
     entries = []
-    for a in allow_list or []:
+    for a in [*PRODUKTNAMEN, *(allow_list or [])]:
         a = a.strip()
         if a:
             entries.append((a.lower(), set(_norm_tokens(a))))
@@ -657,30 +662,51 @@ def propagate_vorgang(texte: list[str], findings_list: list[list[Finding]], allo
 # ---------------------------------------------------------------------------
 
 def anzeige_platzhalter(ph: str, bezeichnungen: dict[str, str] | None = None) -> str:
-    """Platzhalter-Text, wie er in den Ausgaben steht: "[PERSON_1]" oder mit eigener Bezeichnung "[MANDANT]"."""
+    """Platzhalter-Text, wie er in den Ausgaben steht: "[Person_1]" oder mit eigener Bezeichnung "[Mandant]"."""
     if bezeichnungen and ph in bezeichnungen and bezeichnungen[ph].strip():
         return f"[{bezeichnung_normieren(bezeichnungen[ph])}]"
     return f"[{ph}]"
 
 
 def bezeichnung_normieren(s: str) -> str:
-    """Eigene Bezeichnung -> Platzhalter-Form: Großbuchstaben, Umlaute ersetzt, Leerzeichen zu Unterstrich.
-    "Mandant" -> "MANDANT", "Zeuge Günther" -> "ZEUGE_GUENTHER"."""
+    """Eigene Bezeichnung -> Platzhalter-Form: Umlaute ersetzt, Leerzeichen zu Unterstrich, Schreibweise bleibt.
+    "Mandant" -> "Mandant", "Zeuge Günther" -> "Zeuge_Guenther"."""
     s = s.strip()
-    for a, b in (("ä", "ae"), ("ö", "oe"), ("ü", "ue"), ("Ä", "AE"), ("Ö", "OE"), ("Ü", "UE"), ("ß", "ss")):
+    for a, b in (("ä", "ae"), ("ö", "oe"), ("ü", "ue"), ("Ä", "Ae"), ("Ö", "Oe"), ("Ü", "Ue"), ("ß", "ss")):
         s = s.replace(a, b)
-    s = re.sub(r"[^A-Za-z0-9]+", "_", s).strip("_").upper()
-    return s or "BEGRIFF"
+    s = re.sub(r"[^A-Za-z0-9]+", "_", s).strip("_")
+    return s or "Begriff"
+
+
+def _ph_fuer(text: str, entity: str, reverse: dict[str, str], aliases: dict[str, str] | None = None) -> str | None:
+    """Platzhalter-Schlüssel (z. B. "Person_1") für einen Treffer-Text, über Zuordnung, Genitiv und Namensteile."""
+    key = text.lower()
+    if aliases and key in aliases:
+        return reverse.get(aliases[key].lower())
+    ph = reverse.get(key)
+    if ph is None and entity == "PERSON":
+        for suffix in ("s", "es"):  # Genitiv
+            if key.endswith(suffix) and key[: -len(suffix)] in reverse:
+                return reverse[key[: -len(suffix)]]
+        for full_lower, p in reverse.items():  # Namensteil über den vollen Namen
+            if key in [w.strip(".,") for w in full_lower.split()]:
+                return p
+    return ph
 
 
 def pseudonymize(text: str, findings: list[Finding], mapping: dict[str, str] | None = None,
-                 bezeichnungen: dict[str, str] | None = None) -> Result:
-    """Ersetzt aktive Treffer durch [LABEL_n] bzw. die eigene Bezeichnung. Gleiches Original -> gleicher Platzhalter.
+                 bezeichnungen: dict[str, str] | None = None, aliases: dict[str, str] | None = None,
+                 getrennt: set[str] | None = None) -> Result:
+    """Ersetzt aktive Treffer durch [Label_n] bzw. die eigene Bezeichnung. Gleiches Original -> gleicher Platzhalter.
 
     Namensteile ("Müller" aus "Hans Müller") bekommen denselben Platzhalter wie der volle Name.
-    Ein vorhandenes mapping (aus demselben Vorgang) wird fortgeführt. bezeichnungen: {"PERSON_1": "Mandant"}.
+    Ein vorhandenes mapping (aus demselben Vorgang) wird fortgeführt. bezeichnungen: {"Person_1": "Mandant"}.
+    aliases: vom Nutzer zugeordnete Schreibweisen {"günther": "Cornelia Günther"} (klein -> Hauptname).
+    getrennt: Schreibweisen (klein), die eine eigene Identität bleiben sollen.
     """
     mapping = dict(mapping or {})
+    aliases = {k.lower(): v for k, v in (aliases or {}).items()}
+    getrennt = {g.lower() for g in (getrennt or set())}
     reverse = {v.lower(): k for k, v in mapping.items()}
     counters: dict[str, int] = {}
     for ph in mapping:
@@ -693,34 +719,45 @@ def pseudonymize(text: str, findings: list[Finding], mapping: dict[str, str] | N
     # Nachname zur häufiger genannten Person.
     from collections import Counter
 
+    person_label = LABELS["PERSON"] + "_"
     haeufigkeit: Counter = Counter(f.text for f in active if f.entity == "PERSON")
     for k, v in mapping.items():
-        if k.startswith("PERSON_"):
+        if k.startswith(person_label):
             haeufigkeit[v] += 1
     persons = sorted(haeufigkeit, key=lambda p: (-len(p.split()), -haeufigkeit[p], -len(p)))
     part_owner = {}
     for full in persons:
+        if full.lower() in getrennt and " " not in full:
+            continue
         for part in full.split():
             part_owner.setdefault(part.lower().strip(".,"), full)
 
     def placeholder(f: Finding) -> str:
         key = f.text.lower()
-        owner = part_owner.get(key)
-        if f.entity == "PERSON" and (owner is None or owner.lower() == key) and key not in reverse:
-            # Genitiv: "Brinkhoffs" -> "Brinkhoff", "Hans Müllers" -> "Hans Müller"
-            for suffix in ("s", "es"):
-                base = key[: -len(suffix)]
-                if key.endswith(suffix) and base and (base in reverse or
-                                                      (base in part_owner and part_owner[base].lower() != base)):
-                    key = base
-                    break
-        if f.entity == "PERSON" and key in part_owner and part_owner[key].lower() != key:
-            orig = part_owner[key]
+        orig = f.text
+        if key in aliases:  # vom Nutzer zugeordnet ("gehört zu …")
+            orig = aliases[key]
             key = orig.lower()
-        elif key in reverse:
-            orig = mapping[reverse[key]]
+            if key in reverse:
+                return reverse[key]
+        elif key in getrennt:  # vom Nutzer getrennt: eigene Identität
+            if key in reverse:
+                return reverse[key]
         else:
-            orig = f.text
+            owner = part_owner.get(key)
+            if f.entity == "PERSON" and (owner is None or owner.lower() == key) and key not in reverse:
+                # Genitiv: "Brinkhoffs" -> "Brinkhoff", "Hans Müllers" -> "Hans Müller"
+                for suffix in ("s", "es"):
+                    base = key[: -len(suffix)]
+                    if key.endswith(suffix) and base and (base in reverse or
+                                                          (base in part_owner and part_owner[base].lower() != base)):
+                        key = base
+                        break
+            if f.entity == "PERSON" and key in part_owner and part_owner[key].lower() != key:
+                orig = part_owner[key]
+                key = orig.lower()
+            elif key in reverse:
+                orig = mapping[reverse[key]]
         if key in reverse:
             return reverse[key]
         lab = LABELS.get(f.entity, f.entity)
@@ -732,15 +769,16 @@ def pseudonymize(text: str, findings: list[Finding], mapping: dict[str, str] | N
 
     # Platzhalter in Textreihenfolge vergeben, dann von hinten ersetzen
     phs = [(f, placeholder(f)) for f in active]
+    zuordnung = {f.text.lower(): ph for f, ph in phs}
     out = text
     for f, ph in sorted(phs, key=lambda x: x[0].start, reverse=True):
         out = out[: f.start] + anzeige_platzhalter(ph, bezeichnungen) + out[f.end :]
-    return Result(original=text, findings=findings, anonymized=out, mapping=mapping)
+    return Result(original=text, findings=findings, anonymized=out, mapping=mapping, zuordnung=zuordnung)
 
 
 def deanonymize(text: str, mapping: dict[str, str], bezeichnungen: dict[str, str] | None = None) -> str:
     """Setzt Platzhalter zurück. Tolerant gegenüber Varianten, die KI-Antworten erzeugen:
-    [PERSON_1], PERSON_1, Person 1, [Person-1], «PERSON_1», [PERSON_1]s (Genitiv bleibt erhalten).
+    [Person_1], PERSON_1, Person 1, [Person-1], «Person_1», [Person_1]s (Genitiv bleibt erhalten).
     Eigene Bezeichnungen ([MANDANT], Mandant in Klammern) werden ebenfalls erkannt."""
     if not mapping:
         return text
@@ -759,34 +797,39 @@ def deanonymize(text: str, mapping: dict[str, str], bezeichnungen: dict[str, str
         re.IGNORECASE,
     )
 
+    gross = {k.upper(): k for k in mapping}  # Schlüssel sind "Person_1"; die KI schreibt auch PERSON_1 / person 1
+
     def repl(m: re.Match) -> str:
-        key = f"{m.group('lab').upper()}_{m.group('num')}"
-        return mapping.get(key, m.group(0))
+        key = gross.get(f"{m.group('lab').upper()}_{m.group('num')}")
+        return mapping[key] if key else m.group(0)
 
     return rx.sub(repl, text)
 
 
+def platzhalter_schluessel(findings: list[Finding], mapping: dict[str, str],
+                           zuordnung: dict[str, str] | None = None) -> dict[int, str]:
+    """Je Treffer (Index in findings) der Platzhalter-Schlüssel ("Person_1"), auch für inaktive Treffer.
+    `zuordnung` stammt aus pseudonymize() und hat Vorrang (dieselbe Entscheidung wie in der Ausgabe)."""
+    reverse = {v.lower(): k for k, v in mapping.items()}
+    out = {}
+    for i, f in enumerate(findings):
+        ph = (zuordnung or {}).get(f.text.lower()) or _ph_fuer(f.text, f.entity, reverse)
+        if ph:
+            out[i] = ph
+    return out
+
+
 def replacement_pairs(text: str, findings: list[Finding], mapping: dict[str, str],
-                      bezeichnungen: dict[str, str] | None = None) -> list[tuple[str, str]]:
-    """Original-Strings -> Platzhalter (für das Ersetzen in DOCX/XLSX/PDF), längste zuerst."""
+                      bezeichnungen: dict[str, str] | None = None,
+                      zuordnung: dict[str, str] | None = None) -> list[tuple[str, str]]:
+    """Original-Strings -> Platzhalter (für das Ersetzen in DOCX/XLSX/PDF), längste zuerst.
+    `zuordnung` aus pseudonymize() hat Vorrang, damit Ausgabe und Anzeige dieselbe Person meinen."""
     reverse = {v.lower(): k for k, v in mapping.items()}
     pairs = {}
     for f in findings:
         if not f.active or len(f.text.strip()) < 3:
             continue
-        key = f.text.lower()
-        ph = reverse.get(key)
-        if ph is None and f.entity == "PERSON":
-            for suffix in ("s", "es"):  # Genitiv
-                if key.endswith(suffix) and key[: -len(suffix)] in reverse:
-                    ph = reverse[key[: -len(suffix)]]
-                    break
-        if ph is None:
-            # Namensteil: über den Platzhalter des vollen Namens herausfinden
-            for full_lower, p in reverse.items():
-                if key in [w.strip(".,") for w in full_lower.split()]:
-                    ph = p
-                    break
+        ph = (zuordnung or {}).get(f.text.lower()) or _ph_fuer(f.text, f.entity, reverse)
         if ph:
             pairs[f.text] = anzeige_platzhalter(ph, bezeichnungen)
     return sorted(pairs.items(), key=lambda kv: len(kv[0]), reverse=True)

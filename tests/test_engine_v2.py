@@ -117,7 +117,7 @@ def test_propagation_ueber_dateien(analyzer, cfg):
     for t, fs in ((a, fa2), (b, fb2)):
         res = pseudonymize(t, fs, mapping)
         mapping = res.mapping
-    assert "Günther" not in res.anonymized and res.anonymized.count("[PERSON_1]") == 2
+    assert "Günther" not in res.anonymized and res.anonymized.count("[Person_1]") == 2
 
 
 def test_nachname_gehoert_zur_haeufigeren_person():
@@ -125,8 +125,8 @@ def test_nachname_gehoert_zur_haeufigeren_person():
     fs = [Finding(0, 14, "PERSON", 0.9, "Moritz Günther"), Finding(20, 34, "PERSON", 0.9, "Moritz Günther"),
           Finding(41, 57, "PERSON", 0.9, "Cornelia Günther"), Finding(70, 77, "PERSON", 0.01, "Günther")]
     res = pseudonymize(t, fs)
-    assert res.mapping == {"PERSON_1": "Moritz Günther", "PERSON_2": "Cornelia Günther"}
-    assert res.anonymized.endswith("Herr [PERSON_1] zahlte.")
+    assert res.mapping == {"Person_1": "Moritz Günther", "Person_2": "Cornelia Günther"}
+    assert res.anonymized.endswith("Herr [Person_1] zahlte.")
 
 
 # ---------------------------------------------------------------- B10: eigene Bezeichnungen
@@ -135,13 +135,13 @@ def test_eigene_bezeichnungen_ueberall():
     t = "Hans Müller traf Petra Schmidt. Müller lachte."
     fs = [Finding(0, 11, "PERSON", 0.9, "Hans Müller"), Finding(17, 30, "PERSON", 0.9, "Petra Schmidt"),
           Finding(32, 38, "PERSON", 0.01, "Müller")]
-    res = pseudonymize(t, fs, bezeichnungen={"PERSON_1": "Mandant", "PERSON_2": "Zeugin Schmidt"})
-    assert res.anonymized == "[MANDANT] traf [ZEUGIN_SCHMIDT]. [MANDANT] lachte."
-    assert bezeichnung_normieren("Zeuge Günther") == "ZEUGE_GUENTHER"
-    pairs = dict(replacement_pairs(t, fs, res.mapping, {"PERSON_1": "Mandant"}))
-    assert pairs["Hans Müller"] == "[MANDANT]" and pairs["Müller"] == "[MANDANT]" and pairs["Petra Schmidt"] == "[PERSON_2]"
-    back = deanonymize("Der [MANDANT] und [Zeugin Schmidt] sowie Mandant und [PERSON_2].", res.mapping,
-                       {"PERSON_1": "Mandant", "PERSON_2": "Zeugin Schmidt"})
+    res = pseudonymize(t, fs, bezeichnungen={"Person_1": "Mandant", "Person_2": "Zeugin Schmidt"})
+    assert res.anonymized == "[Mandant] traf [Zeugin_Schmidt]. [Mandant] lachte."
+    assert bezeichnung_normieren("Zeuge Günther") == "Zeuge_Guenther"
+    pairs = dict(replacement_pairs(t, fs, res.mapping, {"Person_1": "Mandant"}))
+    assert pairs["Hans Müller"] == "[Mandant]" and pairs["Müller"] == "[Mandant]" and pairs["Petra Schmidt"] == "[Person_2]"
+    back = deanonymize("Der [Mandant] und [Zeugin Schmidt] sowie Mandant und [Person_2].", res.mapping,
+                       {"Person_1": "Mandant", "Person_2": "Zeugin Schmidt"})
     assert back == "Der Hans Müller und Petra Schmidt sowie Hans Müller und Petra Schmidt."
 
 
@@ -170,8 +170,8 @@ def test_ausrichtung_erkannt(gedrehter_scan):
 def test_gedrehter_scan_wird_aufrecht_geschwaerzt(gedrehter_scan):
     text, info = fio.read_document("gedreht.pdf", gedrehter_scan)
     assert info["ocr_seiten"] == 1 and "Dr. Claudia Engel" in text
-    pairs = [("Dr. Claudia Engel", "[PERSON_1]"), ("Engel", "[PERSON_1]"), ("J010B7XY351", "[FUEHRERSCHEIN_1]"),
-             ("Moltkestraße 15", "[ADRESSE_1]"), ("45138 Essen", "[ORT_1]")]
+    pairs = [("Dr. Claudia Engel", "[Person_1]"), ("Engel", "[Person_1]"), ("J010B7XY351", "[Fuehrerschein_1]"),
+             ("Moltkestraße 15", "[Adresse_1]"), ("45138 Essen", "[Ort_1]")]
     out = fio.write_pdf(gedrehter_scan, pairs)
     d = pymupdf.open(stream=out, filetype="pdf")
     assert d[0].rect.width < d[0].rect.height  # wieder hochkant

@@ -49,16 +49,28 @@ mask_locations: false
 keep_institutions: true
 datum_modus: kontext
 
-# Nie maskieren (eigene Kanzlei, Mitarbeiter, Kontaktdaten, Produktnamen) – füllt der Einrichtungsassistent
-allow_list:
-- Claude
-- ChatGPT
-- Copilot
+# Nie maskieren (eigene Kanzlei, Mitarbeiter, Kontaktdaten) – füllt der Einrichtungsassistent
+allow_list: []
 # Immer maskieren (interne Projektnamen, Kundenkürzel)
 deny_list: []
+
+# Ausgabe: gleiche Datei, gleiches Format, Zusatz im Namen ("Klage_anonymisiert.docx")
+suffix: "_anonymisiert"
+# Ablage bei Drag & Drop (leer = Dokumente\Lokanon\Anonymisiert); bei "Ordner wählen" neben den Originalen
+ausgabe_ordner: ""
+# Zusätzlich eine reine Textfassung (.md) für die KI erzeugen
+ki_textfassung: false
+
+# Erweiterte Funktionen (alle aus, einschaltbar in den Einstellungen)
+erweitert:
+  rueckuebersetzung: false   # Schlüssel speichern und KI-Antworten zurückübersetzen
+  ki_anweisung: false        # KI-Anweisung und Claude-Skill anzeigen
+  vorgaenge: false           # je Durchlauf einen Vorgangsordner mit Prüfbericht und Protokoll anlegen
+# Passwort für Schlüsseldateien (nur bei Rückübersetzung; liegt lokal in dieser Datei)
+schluessel_passwort: ""
 
 # Ordner (leer = Standard unter %USERPROFILE%\Lokanon)
 vorgaenge_ordner: ""
 schluessel_ordner: ""
-# Zuletzt verwendete Aktenordner ("Ordner angeben")
+# Zuletzt verwendete Ordner
 zuletzt_ordner: []

@@ -289,9 +289,9 @@ def ki_dateiname(original: str, pairs: list[tuple[str, str]]) -> str:
     Eckige Klammern lassen wir im Dateinamen weg (Upload-Masken mögen sie nicht)."""
     stamm = Path(original).stem
     neu = stamm
-    labels = {v for v in LABELS.values()}
+    labels = {v.lower() for v in LABELS.values()}
     for orig, ph in pairs:  # pairs sind längste zuerst
-        if len(orig) < 3 or orig.upper() in labels:  # "Person" als Treffer darf PERSON_2 nicht zerlegen
+        if len(orig) < 3 or orig.lower() in labels:  # "Person" als Treffer darf Person_2 nicht zerlegen
             continue
         # Wortgrenze ohne "_" (in Dateinamen trennt der Unterstrich Wörter)
         neu = re.sub(rf"(?<![A-Za-zÄÖÜäöüß0-9]){re.escape(orig)}(?![A-Za-zÄÖÜäöüß0-9])", ph.strip("[]"), neu,

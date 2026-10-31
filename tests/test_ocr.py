@@ -16,10 +16,10 @@ from anonymizer.ocr import erkenne_seite, finde_treffer, ist_scan
 ROOT = Path(__file__).resolve().parents[1]
 SCAN = ROOT / "testdaten/scan/Fall4_scan.pdf"
 TEXT_PDF = ROOT / "testdaten/kanzlei/Fall4_Verkehrsrecht_Einspruch_Bussgeld_Engel.pdf"
-PAIRS = [("Dr. Claudia Engel", "[PERSON_1]"), ("Claudia Engel", "[PERSON_1]"), ("Engel", "[PERSON_1]"),
-         ("Markus Engel", "[PERSON_2]"), ("J010B7XY351", "[FUEHRERSCHEIN_1]"), ("E-CE 511", "[KFZ_1]"),
-         ("Moltkestraße 15", "[ADRESSE_1]"), ("45138 Essen", "[ORT_1]"), ("05.11.1979", "[DATUM_1]"),
-         ("7.1-552318/26", "[AZ_1]")]
+PAIRS = [("Dr. Claudia Engel", "[Person_1]"), ("Claudia Engel", "[Person_1]"), ("Engel", "[Person_1]"),
+         ("Markus Engel", "[Person_2]"), ("J010B7XY351", "[Fuehrerschein_1]"), ("E-CE 511", "[Kennzeichen_1]"),
+         ("Moltkestraße 15", "[Adresse_1]"), ("45138 Essen", "[Ort_1]"), ("05.11.1979", "[Datum_1]"),
+         ("7.1-552318/26", "[Aktenzeichen_1]")]
 
 
 @pytest.fixture(scope="module")
@@ -52,7 +52,7 @@ def test_wortboxen_treffer(scan_pdf):
     seite = erkenne_seite(pymupdf.open(stream=scan_pdf, filetype="pdf")[0])
     hits = finde_treffer(seite, PAIRS)
     phs = {ph for ph, _ in hits}
-    assert {"[PERSON_1]", "[FUEHRERSCHEIN_1]", "[KFZ_1]", "[ADRESSE_1]", "[ORT_1]", "[DATUM_1]", "[AZ_1]"} <= phs
+    assert {"[Person_1]", "[Fuehrerschein_1]", "[Kennzeichen_1]", "[Adresse_1]", "[Ort_1]", "[Datum_1]", "[Aktenzeichen_1]"} <= phs
     for _, (x0, y0, x1, y1) in hits:
         assert 0 <= x0 < x1 <= 600 and 0 <= y0 < y1 <= 850
 
@@ -62,7 +62,7 @@ def test_scan_schwaerzen_und_gegenpruefung(scan_pdf):
     doc = pymupdf.open(stream=out, filetype="pdf")
     assert doc.metadata.get("author", "") == ""
     textebene = doc[0].get_text()
-    for ph in ("[PERSON_1]", "[FUEHRERSCHEIN_1]", "[KFZ_1]", "[ADRESSE_1]", "[AZ_1]"):
+    for ph in ("[Person_1]", "[Fuehrerschein_1]", "[Kennzeichen_1]", "[Adresse_1]", "[Aktenzeichen_1]"):
         assert ph in textebene, ph
     # Was das Auge sieht: erneut per OCR lesen – kein Original mehr, Platzhalter erkennbar
     seite = erkenne_seite(doc[0])

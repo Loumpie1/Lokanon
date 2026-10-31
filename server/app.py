@@ -1,7 +1,7 @@
 """HTTP-Schnittstelle der Oberfläche. Läuft nur auf 127.0.0.1; es gibt keine Netzwerkfreigabe.
 
 Alle Antworten sind JSON; Fehler kommen als {"fehler": "…"} mit Status 400/500 und einem Satz, den ein
-Nutzer versteht. Die eigentliche Arbeit macht server/dienst.py.
+Nutzer versteht. Die eigentliche Arbeit macht server/dienst.py (Sitzung).
 """
 from __future__ import annotations
 
@@ -11,22 +11,22 @@ import sys
 import threading
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from server import einstellungen as est
-from server.dienst import KARTEN_GRUPPEN, Modelle, VorgangDienst, vorgaenge_liste
+from server.dienst import GRUPPEN_ANZEIGE, Modelle, Sitzung
 
 APP_DIR = Path(__file__).resolve().parents[1]
 UI_DIR = APP_DIR / "ui"
-VERSION = (APP_DIR / "VERSION").read_text(encoding="utf-8").strip() if (APP_DIR / "VERSION").exists() else "2.0-pilot"
+VERSION = (APP_DIR / "VERSION").read_text(encoding="utf-8").strip() if (APP_DIR / "VERSION").exists() else "0.2.0-dev"
 
 app = FastAPI(title="Lokanon", docs_url=None, redoc_url=None, openapi_url=None)
 _cfg = est.laden()
 modelle = Modelle(_cfg)
-dienst = VorgangDienst(est.laden, est.speichern, modelle)
+sitzung = Sitzung(est.laden, est.speichern, modelle)
 fenster = {"webview": None}  # wird vom Launcher gesetzt (pywebview-Fenster für native Dialoge)
 
 
@@ -44,17 +44,21 @@ async def _any_error(_: Request, exc: Exception):
 
 @app.get("/api/status")
 def status():
+    cfg = est.laden()
     return {"version": VERSION, "modelle_bereit": modelle.bereit, "modelle_fehler": modelle.fehler,
-            "eingerichtet": bool(est.laden().get("eingerichtet")), "daten_ordner": str(est.daten_ordner()),
-            "fenster": fenster["webview"] is not None}
+            "eingerichtet": bool(cfg.get("eingerichtet")), "daten_ordner": str(est.daten_ordner()),
+            "erweitert": cfg.get("erweitert", {}), "fenster": fenster["webview"] is not None}
 
 
 @app.get("/api/einstellungen")
 def einstellungen_lesen():
     cfg = est.laden()
-    cfg["_vorgaenge_ordner_effektiv"] = str(est.vorgaenge_ordner(cfg))
+    cfg["_ausgabe_ordner_effektiv"] = str(est.ausgabe_ordner(cfg))
     cfg["_schluessel_ordner_effektiv"] = str(est.schluessel_ordner(cfg))
-    cfg["_gruppen"] = {g: [e for e in ents] for g, ents in _erkennungsgruppen().items()}
+    cfg["_vorgaenge_ordner_effektiv"] = str(est.vorgaenge_ordner(cfg))
+    from anonymizer.engine import GRUPPEN
+
+    cfg["_gruppen"] = {g: list(ents) for g, ents in GRUPPEN.items()}
     return cfg
 
 
@@ -62,167 +66,120 @@ class EinstellungenBody(BaseModel):
     werte: dict
 
 
+ERLAUBT = {"profil", "eingerichtet", "allow_list", "deny_list", "keep_institutions", "mask_locations", "datum_modus",
+           "vorgaenge_ordner", "schluessel_ordner", "ausgabe_ordner", "suffix", "ki_textfassung", "erweitert",
+           "schluessel_passwort", "entities", "threshold", "propagate_repeats", "include_name_parts", "zuletzt_ordner"}
+
+
 @app.put("/api/einstellungen")
 def einstellungen_schreiben(body: EinstellungenBody):
     cfg = est.laden()
-    erlaubt = {"profil", "eingerichtet", "allow_list", "deny_list", "keep_institutions", "mask_locations", "datum_modus",
-               "vorgaenge_ordner", "schluessel_ordner", "entities", "threshold", "gliner_model", "propagate_repeats",
-               "include_name_parts", "zuletzt_ordner"}
     for k, v in body.werte.items():
-        if k in erlaubt:
+        if k == "erweitert" and isinstance(v, dict):
+            cfg["erweitert"] = {**cfg.get("erweitert", {}), **{kk: bool(vv) for kk, vv in v.items()}}
+        elif k == "suffix":
+            s = str(v).strip()
+            cfg["suffix"] = s if s and "/" not in s and "\\" not in s else "_anonymisiert"
+        elif k in ERLAUBT:
             cfg[k] = v
     est.speichern(cfg)
     return {"ok": True}
 
 
-def _erkennungsgruppen():
-    from anonymizer.engine import GRUPPEN
+# ---------------------------------------------------------------- Sitzung: Dateien, Analyse, Prüfen, Anonymisieren
 
-    return GRUPPEN
-
-
-# ---------------------------------------------------------------- Vorgänge
-
-@app.get("/api/vorgaenge")
-def vorgaenge():
-    cfg = est.laden()
-    return {"vorgaenge": vorgaenge_liste(est.vorgaenge_ordner(cfg)), "zuletzt_ordner": cfg.get("zuletzt_ordner", [])}
+@app.get("/api/zustand")
+def zustand():
+    return sitzung.zustand()
 
 
-class NeuBody(BaseModel):
-    name: str
-    ordner: str = ""
+@app.post("/api/leeren")
+def leeren():
+    return sitzung.leeren()
 
 
-@app.post("/api/vorgang")
-def vorgang_neu(body: NeuBody):
-    if body.ordner.strip() and not Path(body.ordner.strip()).is_dir():
-        raise ValueError("Der angegebene Ordner wurde nicht gefunden.")
-    z = dienst.neu(body.name, body.ordner)
-    if body.ordner.strip():
-        z["dateien"] = dienst.ordner_dateien()
-    return z
+@app.post("/api/dateien")
+async def dateien(datei: list[UploadFile] = File(...)):
+    out = []
+    for f in datei:
+        data = await f.read()
+        if len(data) > 60 * 1024 * 1024:
+            raise ValueError(f"{f.filename}: Datei ist größer als 60 MB.")
+        out.append(sitzung.datei_hinzufuegen(f.filename or "datei", data))
+    return {"dateien": out}
 
 
-@app.get("/api/vorgang")
-def vorgang_zustand(kurz: bool = False):
-    if dienst.vorgang is None:
-        return {"id": ""}
-    return dienst.zustand_kurz() if kurz else dienst.zustand()
+class PfadBody(BaseModel):
+    pfad: str
 
 
-@app.post("/api/vorgang/datei")
-async def datei_hochladen(datei: UploadFile = File(...)):
-    data = await datei.read()
-    if len(data) > 60 * 1024 * 1024:
-        raise ValueError(f"{datei.filename}: Datei ist größer als 60 MB.")
-    return dienst.datei_hinzufuegen(datei.filename or "datei", data)
+@app.post("/api/ordner")
+def ordner(body: PfadBody):
+    return sitzung.ordner_setzen(body.pfad)
 
 
 class TextBody(BaseModel):
     text: str
 
 
-@app.post("/api/vorgang/text")
-def text_setzen(body: TextBody):
-    if not body.text.strip():
-        raise ValueError("Der Text ist leer.")
-    return dienst.text_setzen(body.text)
+@app.post("/api/text")
+def text(body: TextBody):
+    return sitzung.text_setzen(body.text)
 
 
 class NameBody(BaseModel):
     name: str
 
 
-@app.post("/api/vorgang/datei-entfernen")
+@app.post("/api/datei-entfernen")
 def datei_entfernen(body: NameBody):
-    dienst.datei_entfernen(body.name)
-    return {"ok": True}
+    return sitzung.datei_entfernen(body.name)
 
 
-class AnalyseBody(BaseModel):
+class BegriffeBody(BaseModel):
     begriffe: list[str] = []
 
 
-@app.post("/api/vorgang/analysieren")
-def analysieren(body: AnalyseBody):
+@app.post("/api/analyse")
+def analyse(body: BegriffeBody):
     if not modelle.bereit and not modelle.fehler:
         modelle.starten()
-    dienst.analysieren(body.begriffe)
-    return dienst.fortschritt.__dict__
+    sitzung.analysieren(body.begriffe)
+    return sitzung.fortschritt.__dict__
 
 
-@app.get("/api/vorgang/fortschritt")
+@app.get("/api/fortschritt")
 def fortschritt():
-    return dienst.fortschritt.__dict__
+    return sitzung.fortschritt.__dict__
 
 
-class SchaltBody(BaseModel):
-    key: str
-    aktiv: bool
+class IdentitaetBody(BaseModel):
+    ph: str
+    aktiv: bool | None = None
+    bezeichnung: str | None = None
+    gehoert_zu: str | None = None
+    trennen: str | None = None
+    zuordnen: dict | None = None
 
 
-@app.post("/api/vorgang/begriff")
-def begriff(body: SchaltBody):
-    return dienst.begriff_schalten(body.key, body.aktiv)
+@app.post("/api/identitaet")
+def identitaet(body: IdentitaetBody):
+    return sitzung.identitaet(body.ph, body.aktiv, body.bezeichnung, body.gehoert_zu, body.trennen, body.zuordnen)
 
 
-class BezeichnungBody(BaseModel):
-    platzhalter: str
-    bezeichnung: str
+@app.post("/api/nachtragen")
+def nachtragen(body: BegriffeBody):
+    sitzung.nachtragen(body.begriffe)
+    return sitzung.fortschritt.__dict__
 
 
-@app.post("/api/vorgang/bezeichnung")
-def bezeichnung(body: BezeichnungBody):
-    return dienst.bezeichnung_setzen(body.platzhalter, body.bezeichnung)
+@app.post("/api/anonymisieren")
+def anonymisieren():
+    sitzung.anonymisieren()
+    return sitzung.fortschritt.__dict__
 
 
-@app.post("/api/vorgang/nachtragen")
-def nachtragen(body: AnalyseBody):
-    dienst.nachtragen(body.begriffe)
-    return dienst.fortschritt.__dict__
-
-
-class AusgabeBody(BaseModel):
-    formate: list[str] = ["pdf", "docx", "xlsx"]
-    anbieter: str = ""
-
-
-@app.post("/api/vorgang/ausgabe")
-def ausgabe(body: AusgabeBody):
-    return dienst.ausgabe(body.formate, body.anbieter)
-
-
-@app.get("/api/vorgang/ki.zip")
-def ki_zip():
-    v = dienst.vorgang
-    name = (v.name if v else "lokanon").replace('"', "")
-    return Response(dienst.ki_zip(), media_type="application/zip",
-                    headers={"Content-Disposition": f'attachment; filename="{name} - fuer die KI.zip"'})
-
-
-class AbschlussBody(BaseModel):
-    passwort: str
-    ordner: str = ""
-
-
-@app.post("/api/vorgang/abschliessen")
-def abschliessen(body: AbschlussBody):
-    return dienst.abschliessen(body.passwort, body.ordner or None)
-
-
-@app.get("/api/vorgang/schluessel")
-def schluessel_download(passwort: str):
-    v = dienst.vorgang
-    if v is None:
-        raise ValueError("Kein Vorgang geöffnet.")
-    if not passwort:
-        raise ValueError("Bitte ein Passwort eingeben.")
-    from anonymizer.vorgang import sicherer_name
-
-    return Response(v.schluessel_bytes(passwort), media_type="application/json",
-                    headers={"Content-Disposition": f'attachment; filename="{sicherer_name(v.name)}.anon.json"'})
-
+# ---------------------------------------------------------------- Erweitert: Rückübersetzung, KI-Anweisung
 
 class ZurueckBody(BaseModel):
     text: str
@@ -232,52 +189,30 @@ class ZurueckBody(BaseModel):
 
 @app.post("/api/zurueck")
 def zurueck(body: ZurueckBody):
-    if body.schluessel_pfad:
-        p = Path(body.schluessel_pfad)
-        if not p.exists():
-            raise ValueError("Schlüsseldatei nicht gefunden.")
-        mapping, bez, name = dienst.schluessel_laden(p.read_bytes(), body.passwort)
-        return {"text": dienst.zurueck(body.text, mapping, bez), "vorgang": name, "platzhalter": len(mapping)}
-    if dienst.vorgang is None or not dienst.vorgang.mapping:
-        raise ValueError("Kein offener Vorgang mit Schlüssel. Bitte Schlüsseldatei wählen.")
-    return {"text": dienst.zurueck(body.text), "vorgang": dienst.vorgang.name, "platzhalter": len(dienst.vorgang.mapping)}
-
-
-@app.post("/api/zurueck/datei")
-async def zurueck_datei(text: str, passwort: str, datei: UploadFile = File(...)):
-    mapping, bez, name = dienst.schluessel_laden(await datei.read(), passwort)
-    return {"text": dienst.zurueck(text, mapping, bez), "vorgang": name, "platzhalter": len(mapping)}
+    return sitzung.zurueck(body.text, body.schluessel_pfad, body.passwort)
 
 
 @app.get("/api/schluessel")
 def schluessel_liste():
     cfg = est.laden()
     ordner = est.schluessel_ordner(cfg)
-    out = []
-    for p in sorted(ordner.glob("*.anon.json"), key=lambda p: p.stat().st_mtime, reverse=True):
-        out.append({"name": p.name[:-len(".anon.json")], "pfad": str(p),
-                    "geaendert": p.stat().st_mtime})
-    return {"schluessel": out, "ordner": str(ordner)}
+    out = [{"name": p.name[:-len(".anon.json")], "pfad": str(p), "geaendert": p.stat().st_mtime}
+           for p in sorted(ordner.glob("*.anon.json"), key=lambda p: p.stat().st_mtime, reverse=True)]
+    return {"schluessel": out, "ordner": str(ordner), "aktuell": sitzung.schluessel_pfad}
 
-
-# ---------------------------------------------------------------- KI-Anweisung
 
 @app.get("/api/anweisung")
 def anweisung():
-    return {"text": dienst.anweisung()}
+    return {"text": sitzung.anweisung()}
 
 
 @app.get("/api/skill.zip")
 def skill_zip():
-    return Response(dienst.skill_zip(), media_type="application/zip",
+    return Response(sitzung.skill_zip(), media_type="application/zip",
                     headers={"Content-Disposition": 'attachment; filename="lokanon-pseudonyme.zip"'})
 
 
 # ---------------------------------------------------------------- System: Ordner öffnen, Dialoge
-
-class PfadBody(BaseModel):
-    pfad: str
-
 
 @app.post("/api/system/oeffnen")
 def oeffnen(body: PfadBody):
@@ -310,7 +245,7 @@ def ordner_waehlen():
             root = tk.Tk()
             root.withdraw()
             root.attributes("-topmost", True)
-            ergebnis["pfad"] = filedialog.askdirectory(title="Aktenordner wählen") or ""
+            ergebnis["pfad"] = filedialog.askdirectory(title="Ordner wählen") or ""
             root.destroy()
         except Exception as e:  # pragma: no cover
             ergebnis["fehler"] = str(e)
@@ -337,3 +272,6 @@ def index():
 @app.get("/favicon.ico")
 def favicon():
     return FileResponse(APP_DIR / "assets" / "lokanon.ico")
+
+
+__all__ = ["app", "modelle", "sitzung", "fenster", "GRUPPEN_ANZEIGE"]

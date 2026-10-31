@@ -10,8 +10,9 @@ kann, und was wir von Ihnen zurückbrauchen.
 Lokanon läuft auf Ihrem PC und ersetzt in Mandatsunterlagen alles, was eine Person erkennbar macht, durch Platzhalter:
 Namen, Adressen, Telefonnummern, E-Mail-Adressen, Aktenzeichen, Diktatzeichen, IBANs, Kennzeichen, Ausweis- und
 Versicherungsnummern, Geburts- und Todesdaten. Sie prüfen die Treffer, schalten einzelne Begriffe aus oder geben ihnen
-eigene Bezeichnungen („Mandant“, „Gegner“). Dann entstehen Kopien, die Sie in ChatGPT oder Claude geben können. Die
-Antwort der KI übersetzt Lokanon zurück. Der Schlüssel dafür bleibt verschlüsselt auf Ihrem Rechner.
+eigene Bezeichnungen („Mandant“, „Gegner“). Dann entsteht zu jeder Datei eine Kopie im gleichen Format mit dem Zusatz
+„_anonymisiert“ im Namen, die Sie in ChatGPT oder Claude geben können. Auf Wunsch (Einstellungen → Erweitert) übersetzt
+Lokanon die Antwort der KI zurück; der Schlüssel dafür bleibt verschlüsselt auf Ihrem Rechner.
 
 Internet braucht Lokanon nur bei der Installation. Danach verlässt nichts den PC.
 
@@ -53,4 +54,5 @@ Bitte notieren Sie (Rückmeldebogen liegt bei):
 4. Wie lange ein typischer Vorgang gedauert hat und ob das in Ihren Alltag passt.
 5. Was Ihnen für den täglichen Einsatz noch fehlt.
 
-Schicken Sie uns keine Originaldokumente. Der Prüfbericht in jedem Vorgangsordner enthält Klartext und bleibt bei Ihnen.
+Schicken Sie uns keine Originaldokumente und keine anonymisierten Kopien echter Akten. Der Prüfbericht (nur mit
+eingeschaltetem Vorgangsordner) enthält Klartext und bleibt bei Ihnen.

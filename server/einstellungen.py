@@ -38,6 +38,8 @@ def _gruppen_auffuellen(cfg: dict) -> dict:
     # doppelte Allow-Einträge entfernen, Reihenfolge behalten
     gesehen, allow = set(), []
     for a in cfg.get("allow_list") or []:
+        if a in ("Claude", "ChatGPT", "Copilot"):
+            continue  # frühere Vorgabe, jetzt im Engine eingebaut
         if a and a not in gesehen:
             gesehen.add(a)
             allow.append(a)
@@ -84,4 +86,37 @@ def schluessel_ordner(cfg: dict) -> Path:
 
     p = Path(cfg.get("schluessel_ordner") or standard_schluessel_ordner())
     p.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def dokumente_ordner() -> Path:
+    """Der Windows-Ordner „Dokumente“ (auch wenn er auf OneDrive umgeleitet ist), sonst das Benutzerprofil."""
+    if os.name == "nt":
+        try:
+            import ctypes
+            from ctypes import wintypes
+
+            class GUID(ctypes.Structure):
+                _fields_ = [("Data1", wintypes.DWORD), ("Data2", wintypes.WORD), ("Data3", wintypes.WORD),
+                            ("Data4", wintypes.BYTE * 8)]
+
+            fid = GUID(0xFDD39AD0, 0x238F, 0x46AF, (wintypes.BYTE * 8)(0xAD, 0xB4, 0x6D, 0x80, 0xC2, 0x9F, 0x7B, 0x9A))
+            out = ctypes.c_wchar_p()
+            if ctypes.windll.shell32.SHGetKnownFolderPath(ctypes.byref(fid), 0, None, ctypes.byref(out)) == 0:
+                p = Path(out.value)
+                ctypes.windll.ole32.CoTaskMemFree(out)
+                if p.is_dir():
+                    return p
+        except Exception:
+            pass
+    for name in ("Dokumente", "Documents"):
+        p = Path.home() / name
+        if p.is_dir():
+            return p
+    return Path.home()
+
+
+def ausgabe_ordner(cfg: dict) -> Path:
+    """Ablage für Drag & Drop: Einstellung oder Dokumente\\Lokanon\\Anonymisiert."""
+    p = Path(cfg.get("ausgabe_ordner") or dokumente_ordner() / "Lokanon" / "Anonymisiert")
     return p

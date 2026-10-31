@@ -1,499 +1,400 @@
-/* Lokanon – Oberfläche. Ein geführter Weg in vier Schritten; alle Daten kommen vom lokalen Server (127.0.0.1). */
+/* Lokanon – Oberfläche, Version 3: ein Bildschirm, drei Zustände (Ablegen → Prüfen → Fertig).
+   Alles Weitere (Rückübersetzung, KI-Anweisung, Vorgangsordner) hängt an Schaltern in den Einstellungen. */
 (() => {
   "use strict";
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const $ = (s, c = document) => c.querySelector(s);
+  const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
   const view = $("#view");
+  const S = { status: null, cfg: null, z: null, docIndex: 0, docMode: "markiert", filter: "alle", poll: null, pollStatus: null, laufText: "" };
+  const GRUPPEN_FARBE = { "Personen": "var(--g-person)", "Firmen und Einrichtungen": "var(--g-firma)", "Adressen und Kontakt": "var(--g-adresse)",
+    "Nummern und Kennzeichen": "var(--g-nummer)", "Daten und Sonstiges": "var(--g-sonst)" };
 
-  const S = {                       // Zustand der Oberfläche
-    status: null, cfg: null, vorgang: null, schritt: 1, pollTimer: null, docIndex: 0, docMode: "markiert",
-    filter: "", busy: false, route: "start", einrichtSeite: 1, einricht: {},
-  };
-  const GRUPPEN_FARBE = {
-    "Personen": "var(--g-person)", "Firmen und Einrichtungen": "var(--g-firma)", "Adressen und Orte": "var(--g-ort)",
-    "Kontaktdaten": "var(--g-kontakt)", "Akten, Zeichen, Verträge": "var(--g-akten)", "Konto und Steuer": "var(--g-konto)",
-    "Ausweise und Nummern": "var(--g-ausweis)", "Fahrzeug": "var(--g-fahrzeug)", "Datum": "var(--g-datum)",
-    "Beruf und Gesundheit": "var(--g-beruf)", "Eigene Begriffe": "var(--g-eigene)",
-  };
-  const ANBIETER = ["ChatGPT Business / Enterprise", "Claude Team / Enterprise", "Microsoft 365 Copilot Chat",
-    "EU-Anbieter (Langdock, innoGPT, Mistral Team)", "ChatGPT Plus/Pro (Consumer, ohne AVV)", "Claude Pro/Max (Consumer, ohne AVV)",
-    "Lokale KI (Ollama)", "Sonstiges"];
-
-  // ------------------------------------------------------------ Server
-  async function api(path, opts = {}) {
-    const o = { headers: {}, ...opts };
-    if (o.json !== undefined) { o.method = o.method || "POST"; o.headers["Content-Type"] = "application/json"; o.body = JSON.stringify(o.json); }
-    const r = await fetch("/api" + path, o);
-    let data = null;
-    try { data = await r.json(); } catch { data = null; }
-    if (!r.ok) throw new Error((data && data.fehler) || `Fehler ${r.status}`);
+  // ------------------------------------------------------------ API, Toasts, Dialoge
+  async function api(path, opt = {}) {
+    const init = { method: opt.method || (opt.json || opt.form ? "POST" : "GET") };
+    if (opt.json) { init.headers = { "Content-Type": "application/json" }; init.body = JSON.stringify(opt.json); }
+    if (opt.form) init.body = opt.form;
+    const r = await fetch("/api" + path, init);
+    const ct = r.headers.get("content-type") || "";
+    const data = ct.includes("json") ? await r.json() : await r.text();
+    if (!r.ok) throw new Error((data && data.fehler) || r.statusText);
     return data;
   }
   function toast(msg, kind = "") {
     const t = document.createElement("div"); t.className = "toast " + kind; t.textContent = msg;
-    $("#toasts").appendChild(t); setTimeout(() => t.remove(), kind === "danger" ? 7000 : 3500);
+    $("#toasts").appendChild(t); setTimeout(() => t.remove(), kind === "danger" ? 6500 : 3200);
   }
-  function modal(html, actions = []) {
-    const root = $("#modal-root"); root.hidden = false;
-    root.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${html}<div class="row" style="justify-content:flex-end;margin-top:16px" id="modal-actions"></div></div>`;
-    const box = $("#modal-actions");
-    actions.forEach(([label, fn, cls]) => { const b = document.createElement("button"); b.className = "btn " + (cls || ""); b.textContent = label;
-      b.onclick = async () => { if (await fn() !== false) { root.hidden = true; } }; box.appendChild(b); });
-    return root;
+  function modal(html, { wide = false, full = false } = {}) {
+    const root = $("#modal-root"); root.innerHTML = `<div class="modal ${wide ? "wide" : ""} ${full ? "full" : ""}" role="dialog" aria-modal="true">${html}</div>`;
+    root.hidden = false;
+    root.onclick = (e) => { if (e.target === root) closeModal(); };
+    $$(".x", root).forEach((b) => (b.onclick = closeModal));
+    return root.firstElementChild;
   }
-  async function copy(text) {
-    try { await navigator.clipboard.writeText(text); toast("Kopiert", "ok"); }
-    catch { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); toast("Kopiert", "ok"); }
-  }
-  function bytes(n) { return n > 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
-  function datum(iso) { if (!iso) return ""; const d = new Date(iso); return isNaN(d) ? iso : d.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" }); }
+  function closeModal() { const root = $("#modal-root"); root.hidden = true; root.innerHTML = ""; }
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#modal-root").hidden) closeModal(); });
+  const copy = async (text, ok = "Kopiert") => { try { await navigator.clipboard.writeText(text); toast(ok, "ok"); } catch { toast("Kopieren nicht möglich, bitte markieren und kopieren.", "danger"); } };
+  const oeffnen = (pfad) => api("/system/oeffnen", { json: { pfad } }).catch((e) => toast(e.message, "danger"));
+  const kb = (n) => (n > 1024 * 1024 ? (n / 1024 / 1024).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
 
-  // ------------------------------------------------------------ Router
-  window.addEventListener("hashchange", render);
-  async function render() {
-    let hash = (location.hash || "#start").slice(1);
-    const tief = hash.match(/^vorgang\/([1-4])$/);  // Direktlink auf einen Schritt, z. B. #vorgang/3
-    if (tief) { S.schritt = +tief[1]; hash = "vorgang"; }
-    S.route = hash;
-    document.querySelectorAll(".nav a").forEach((a) => a.classList.toggle("active", a.dataset.nav === hash));
+  // ------------------------------------------------------------ Start und Zustand
+  async function boot() {
+    S.status = await api("/status");
+    S.cfg = await api("/einstellungen");
+    badge();
+    $("#btn-einstellungen").onclick = einstellungenDialog;
+    $("#btn-hilfe").onclick = hilfeDialog;
+    $("#btn-zurueck").onclick = zurueckDialog;
+    $("#brand").onclick = (e) => { e.preventDefault(); if (S.z && (S.z.ergebnis || S.z.fortschritt.fertig)) neuStart(); };
+    if (!S.status.eingerichtet) return renderWizard();
+    await laden();
+  }
+  function badge() {
+    const b = $("#local-badge"); const bereit = S.status.modelle_bereit;
+    b.classList.toggle("laden", !bereit);
+    $("#local-text").textContent = bereit ? "Läuft lokal auf diesem PC" : "Sprachmodelle werden geladen …";
+    $("#btn-zurueck").hidden = !(S.cfg && S.cfg.erweitert && S.cfg.erweitert.rueckuebersetzung);
+    if (!bereit && !S.pollStatus) S.pollStatus = setInterval(async () => { S.status = await api("/status"); if (S.status.modelle_bereit) { clearInterval(S.pollStatus); S.pollStatus = null; badge(); } }, 1500);
+  }
+  async function laden() { S.z = await api("/zustand"); render(); }
+  function render() {
+    const z = S.z; const f = z.fortschritt;
+    if (f.laeuft) return renderLaeuft();
+    if (z.ergebnis) return renderFertig();
+    if (f.fertig) return renderPruefen();
+    return renderAblegen();
+  }
+  async function neuStart() { S.z = await api("/leeren", { method: "POST" }); S.docIndex = 0; S.filter = "alle"; render(); }
+
+  // ------------------------------------------------------------ Zustand 1: Ablegen
+  function renderAblegen() {
+    const z = S.z; const f = z.fortschritt;
+    view.innerHTML = `
+      <section class="ablegen">
+        <h1>Dateien anonymisieren</h1>
+        <p class="sub">Legen Sie Dateien ab oder wählen Sie den Ordner, in dem sie liegen. Lokanon zeigt, was es erkannt hat, Sie prüfen, dann entstehen Kopien ohne Namen. Alles auf diesem PC.</p>
+        <div class="dropzone" id="drop" tabindex="0" role="button" aria-label="Dateien auswählen">
+          <svg class="big-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <b>Dateien hierher ziehen</b>
+          <span>oder klicken und auswählen · PDF, Word, Excel, Text</span>
+          <input type="file" id="fileinput" multiple accept=".pdf,.docx,.xlsx,.csv,.txt,.md" hidden>
+        </div>
+        <div class="or">oder</div>
+        <div class="alt">
+          <button class="btn big" id="btn-ordner">Ordner wählen</button>
+          <button class="btn ghost" id="btn-text">Text einfügen</button>
+        </div>
+        ${f.fehler ? `<div class="notice danger" style="margin-top:16px;text-align:left"><b>Das hat nicht geklappt.</b> ${esc(f.fehler)}</div>` : ""}
+        ${z.dateien.length ? `<div class="filelist">${z.dateien.map((d) => `<div class="file"><span class="ext">${esc(d.name.split(".").pop())}</span><span class="name">${esc(d.name)}</span><span class="muted small">${kb(d.groesse)}</span><button class="iconbtn" data-del="${esc(d.name)}" title="Entfernen">✕</button></div>`).join("")}</div>
+          <div class="row" style="justify-content:center;margin-top:14px"><button class="btn primary big" id="btn-start">Erkennen und prüfen</button></div>` : ""}
+        <div class="facts">
+          <div class="fact"><b>Nichts verlässt den Rechner</b><span>Erkennung, Texterkennung und Schwärzung laufen hier. Internet ist nicht nötig.</span></div>
+          <div class="fact"><b>Sie entscheiden</b><span>Jede Person, jede Angabe hat einen Schalter. Platzhalter bekommen auf Wunsch eigene Namen wie „Mandant“.</span></div>
+          <div class="fact"><b>Gleiche Datei, gleicher Name</b><span>Aus <code>Klage.docx</code> wird <code>Klage${esc(S.cfg.suffix || "_anonymisiert")}.docx</code>, aus einem PDF eine geschwärzte PDF.</span></div>
+        </div>
+      </section>`;
+    const drop = $("#drop"), input = $("#fileinput");
+    drop.onclick = () => input.click();
+    drop.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } };
+    input.onchange = () => hochladen(input.files);
+    ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+    ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+    drop.addEventListener("drop", (e) => hochladen(e.dataTransfer.files));
+    $("#btn-ordner").onclick = ordnerWaehlen;
+    $("#btn-text").onclick = textDialog;
+    $$("[data-del]").forEach((b) => (b.onclick = async () => { S.z = await api("/datei-entfernen", { json: { name: b.dataset.del } }); render(); }));
+    if ($("#btn-start")) $("#btn-start").onclick = analyseStarten;
+  }
+  async function hochladen(files) {
+    if (!files || !files.length) return;
+    const form = new FormData();
+    for (const f of files) form.append("datei", f, f.name);
+    try { await api("/dateien", { form }); await analyseStarten(); } catch (e) { toast(e.message, "danger"); }
+  }
+  async function ordnerWaehlen() {
+    let pfad = "";
     try {
-      S.status = await api("/status");
-      $("#version").textContent = "Version " + S.status.version;
-      const badge = $("#local-badge");
-      badge.classList.toggle("laden", !S.status.modelle_bereit);
-      $("#local-text").textContent = S.status.modelle_bereit ? "Läuft lokal auf diesem PC" : "Sprachmodelle werden geladen …";
-      if (!S.status.modelle_bereit && !S.pollStatus) { S.pollStatus = setInterval(async () => { const st = await api("/status"); if (st.modelle_bereit) { clearInterval(S.pollStatus); S.pollStatus = null; badge.classList.remove("laden"); $("#local-text").textContent = "Läuft lokal auf diesem PC"; } }, 1500); }
-      if (!S.status.eingerichtet && hash !== "einrichten") { location.hash = "#einrichten"; return; }
-    } catch (e) { view.innerHTML = `<div class="notice danger">Der lokale Server antwortet nicht. Bitte Lokanon neu starten.</div>`; return; }
-    const routes = { start: renderStart, vorgang: renderVorgang, zurueck: renderZurueck, einstellungen: renderEinstellungen, hilfe: renderHilfe, einrichten: renderEinrichten };
-    (routes[hash] || renderStart)();
+      const r = await api("/system/ordner-waehlen", { method: "POST" });
+      pfad = r.pfad;
+    } catch (e) {
+      // Kein Systemdialog (z. B. im Browser-Fallback): Pfad eintippen lassen
+      pfad = await pfadDialog();
+    }
+    if (!pfad) return;
+    try { await api("/ordner", { json: { pfad } }); await analyseStarten(); } catch (e) { toast(e.message, "danger"); }
   }
-
-  // ------------------------------------------------------------ Start
-  async function renderStart() {
-    const [liste, cfg] = await Promise.all([api("/vorgaenge"), api("/einstellungen")]);
-    S.cfg = cfg;
-    const offen = await api("/vorgang?kurz=1");
-    $("#nav-vorgang").hidden = !offen.id;
-    const zuletzt = (liste.zuletzt_ordner || []).slice(0, 4);
-    view.innerHTML = `
-      <div class="page-head"><div><h1>Mandatsunterlagen für die KI vorbereiten</h1>
-        <p class="sub">Legen Sie Dateien ab oder wählen Sie einen Aktenordner. Lokanon erkennt Personendaten, Sie prüfen und entscheiden, dann entstehen Kopien, die Sie gefahrlos in ChatGPT oder Claude geben können.</p></div></div>
-      <div class="hero">
-        <section class="card raised">
-          <div class="eyebrow">Neuer Vorgang</div>
-          <h2 style="margin:4px 0 14px">Was möchten Sie vorbereiten?</h2>
-          <label class="field" style="margin-bottom:14px"><span>Name des Vorgangs <span class="hint">(Akte, Mandat, Aktenzeichen – wird auch der Ordnername)</span></span>
-            <input class="input" id="v-name" value="" placeholder="z. B. Müller ./. Autohaus Krause – 3 O 123/26"></label>
-          <div class="choice">
-            <div class="dropzone" id="dz" tabindex="0" role="button" aria-label="Dateien ablegen oder auswählen">
-              <div class="big-ico">⤓</div><b>Dateien hierher ziehen</b><div class="muted small">oder klicken und auswählen · PDF, Word, Excel, Text</div>
-              <input type="file" id="dz-input" multiple accept=".pdf,.docx,.xlsx,.txt,.md,.csv" hidden></div>
-            <div class="dropzone" id="dz-folder" tabindex="0" role="button" aria-label="Aktenordner wählen">
-              <div class="big-ico">▤</div><b>Aktenordner wählen</b><div class="muted small">alle Dateien eines Ordners; die Ausgabe landet im Unterordner „Lokanon“</div></div>
-          </div>
-          <div id="dz-files" class="filelist"></div>
-          <div class="row" style="margin-top:14px"><button class="btn ghost" id="text-btn">Stattdessen Text einfügen</button>
-            ${zuletzt.length ? `<span class="muted small">Zuletzt:</span>${zuletzt.map((p) => `<button class="linkbtn" data-ordner="${esc(p)}" title="${esc(p)}">${esc(p.split(/[\\/]/).filter(Boolean).pop())}</button>`).join(" · ")}` : ""}
-          </div>
-        </section>
-        <section class="card">
-          <div class="eyebrow">Bisherige Vorgänge</div>
-          <div class="vlist" style="margin-top:10px" id="vlist">
-            ${liste.vorgaenge.length ? liste.vorgaenge.slice(0, 8).map((v) => `<div class="vitem"><div class="t"><b>${esc(v.name)}</b><span>${v.dateien} Datei(en) · ${v.platzhalter} Platzhalter · ${esc(datum(v.angelegt))}${v.abgeschlossen ? " · abgeschlossen" : ""}</span></div>
-                <button class="btn" data-open="${esc(v.basis)}" title="Vorgangsordner öffnen">Ordner</button></div>`).join("")
-              : `<p class="muted">Noch keine Vorgänge. Der erste entsteht links.</p>`}
-          </div>
-          ${liste.vorgaenge.length ? `<p class="muted small" style="margin-top:10px">Antworten zu früheren Vorgängen übersetzen Sie unter „Antwort zurückübersetzen“ mit der zugehörigen Schlüsseldatei zurück.</p>` : ""}
-        </section>
-      </div>
-      <div class="facts">
-        <div class="fact"><b>Nichts verlässt den Rechner</b><span>Erkennung, Texterkennung und Schwärzung laufen hier. Internet ist nicht nötig.</span></div>
-        <div class="fact"><b>Sie entscheiden</b><span>Jeder erkannte Begriff hat einen Schalter. Platzhalter bekommen auf Wunsch eigene Namen wie „Mandant“.</span></div>
-        <div class="fact"><b>Nachvollziehbar</b><span>Je Vorgang ein Ordner mit Originalen, Kopien, Prüfbericht und Protokoll. Der Schlüssel bleibt verschlüsselt bei Ihnen.</span></div>
-      </div>`;
-    const pending = [];
-    const dz = $("#dz"), inp = $("#dz-input");
-    const renderPending = () => { $("#dz-files").innerHTML = pending.map((f, i) => `<div class="file"><span class="ext">${esc(f.name.split(".").pop())}</span><span class="name">${esc(f.name)}</span><span class="muted small">${bytes(f.size)}</span><button class="iconbtn" data-rm="${i}" title="Entfernen">✕</button></div>`).join("") + (pending.length ? `<div class="row" style="margin-top:6px"><button class="btn primary big" id="start-upload">Vorgang anlegen und analysieren</button></div>` : "");
-      document.querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { pending.splice(+b.dataset.rm, 1); renderPending(); });
-      const sb = $("#start-upload"); if (sb) sb.onclick = () => startMitDateien(pending); };
-    const addFiles = (files) => { for (const f of files) if (!pending.some((p) => p.name === f.name)) pending.push(f); renderPending(); };
-    dz.onclick = () => inp.click(); dz.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") inp.click(); };
-    inp.onchange = () => addFiles(inp.files);
-    ["dragenter", "dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add("over"); }));
-    ["dragleave", "drop"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove("over"); }));
-    dz.addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
-    $("#dz-folder").onclick = async () => { try { const r = await api("/system/ordner-waehlen", { method: "POST" }); if (r.pfad) startMitOrdner(r.pfad); } catch (e) { toast(e.message, "danger"); } };
-    document.querySelectorAll("[data-ordner]").forEach((b) => b.onclick = () => startMitOrdner(b.dataset.ordner));
-    document.querySelectorAll("[data-open]").forEach((b) => b.onclick = () => oeffnen(b.dataset.open));
-    $("#text-btn").onclick = () => modal(`<h2>Text einfügen</h2><p class="muted small" style="margin:6px 0 10px">Zum Beispiel eine E-Mail oder einen Absatz aus einem Schriftsatz.</p><textarea class="input" id="m-text" rows="10"></textarea>`,
-      [["Abbrechen", () => true], ["Analysieren", async () => { const t = $("#m-text").value; if (!t.trim()) return false; await startMitText(t); }, "primary"]]);
+  function pfadDialog() {
+    return new Promise((resolve) => {
+      const m = modal(`<div class="mhead"><h2>Ordner eintippen</h2><button class="x" aria-label="Schließen">✕</button></div>
+        <p class="muted">Der Ordnerdialog steht hier nicht zur Verfügung. Bitte den Pfad des Ordners mit den Dateien eingeben.</p>
+        <input class="input" id="pf-in" placeholder="z. B. C:\\Akten\\Mandant Müller" style="width:100%">
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn primary" id="pf-ok">Übernehmen</button></div>`);
+      const fertig = (v) => { closeModal(); resolve(v); };
+      $("#pf-ok", m).onclick = () => fertig($("#pf-in", m).value.trim());
+      $("#pf-in", m).onkeydown = (e) => { if (e.key === "Enter") fertig($("#pf-in", m).value.trim()); };
+      $$(".x", m).forEach((b) => (b.onclick = () => fertig("")));
+      $("#pf-in", m).focus();
+    });
   }
-  async function neuerVorgang(ordner = "") {
-    const name = ($("#v-name") && $("#v-name").value.trim()) || "";
-    const z = await api("/vorgang", { json: { name, ordner } });
-    S.vorgang = z; S.schritt = 1; $("#nav-vorgang").hidden = false; return z;
+  function textDialog() {
+    const m = modal(`<div class="mhead"><h2>Text einfügen</h2><button class="x" aria-label="Schließen">✕</button></div>
+      <p class="muted small" style="margin-bottom:10px">Zum Beispiel eine E-Mail oder einen Absatz aus einem Schriftsatz. Der Text wird wie eine Datei behandelt.</p>
+      <textarea class="input" id="txt" rows="10" placeholder="Text hier einfügen …"></textarea>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn primary" id="txt-ok">Erkennen und prüfen</button></div>`);
+    $("#txt", m).focus();
+    $("#txt-ok", m).onclick = async () => { try { await api("/text", { json: { text: $("#txt", m).value } }); closeModal(); await analyseStarten(); } catch (e) { toast(e.message, "danger"); } };
   }
-  async function startMitDateien(files) {
-    try { await neuerVorgang(); for (const f of files) { const fd = new FormData(); fd.append("datei", f, f.name); await api("/vorgang/datei", { method: "POST", body: fd }); }
-      location.hash = "#vorgang"; await analyseStarten(); } catch (e) { toast(e.message, "danger"); }
-  }
-  async function startMitOrdner(pfad) { try { await neuerVorgang(pfad); location.hash = "#vorgang"; await analyseStarten(); } catch (e) { toast(e.message, "danger"); } }
-  async function startMitText(text) { try { await neuerVorgang(); await api("/vorgang/text", { json: { text } }); location.hash = "#vorgang"; await analyseStarten(); } catch (e) { toast(e.message, "danger"); } }
-  async function oeffnen(pfad) { try { await api("/system/oeffnen", { json: { pfad } }); } catch (e) { toast(e.message, "danger"); } }
-
-  // ------------------------------------------------------------ Vorgang: Rahmen und Schritte
-  async function renderVorgang() {
-    const z = await api("/vorgang?kurz=1");
-    if (!z.id) { location.hash = "#start"; return; }
-    S.vorgang = z;
-    if (z.fortschritt.laeuft) { renderFortschritt(); pollFortschritt(); return; }
-    if (z.fortschritt.fertig && S.schritt < 2) S.schritt = 2;
-    if (!z.fortschritt.fertig) S.schritt = 1;
-    const full = z.fortschritt.fertig ? await api("/vorgang") : z;
-    S.vorgang = full;
-    const steps = ["Dateien", "Prüfen", "Fertigstellen", "Antwort"];
-    const maxStep = full.fortschritt && full.fortschritt.fertig ? (full.ausgaben && full.ausgaben.length ? 4 : 3) : 1;
-    if (S.schritt > maxStep) S.schritt = maxStep;
-    view.innerHTML = `
-      <div class="page-head"><div><div class="eyebrow">Vorgang</div><h1>${esc(full.name)}</h1></div>
-        <div class="row"><button class="btn" id="open-basis">Vorgangsordner öffnen</button><button class="btn ghost" id="neu-btn">Neuer Vorgang</button></div></div>
-      <div class="stepper">${steps.map((s, i) => { const n = i + 1; const cls = n === S.schritt ? "current" : n < S.schritt || n <= maxStep ? "done" : ""; return `<div class="step ${cls}" data-step="${n}"><span class="n">${n < S.schritt ? "✓" : n}</span>${s}</div>`; }).join("")}</div>
-      <div id="step-body"></div>`;
-    $("#open-basis").onclick = () => oeffnen(full.basis);
-    $("#neu-btn").onclick = () => { location.hash = "#start"; };
-    document.querySelectorAll(".step.done").forEach((el) => el.onclick = () => { S.schritt = +el.dataset.step; renderVorgang(); });
-    const body = $("#step-body");
-    ({ 1: renderSchritt1, 2: renderSchritt2, 3: renderSchritt3, 4: renderSchritt4 }[S.schritt])(body, full);
-  }
-
-  function renderSchritt1(body, z) {
-    const files = z.dateien || [];
-    body.innerHTML = `<section class="card">
-      <h2>Dateien dieses Vorgangs</h2>
-      <p class="muted" style="margin:4px 0 12px">${z.ordner ? `Aktenordner: <code>${esc(z.ordner)}</code>` : `Ihre Dateien liegen gesichert unter <code>${esc(z.originale)}</code>.`}</p>
-      <div class="filelist">${files.map((f) => `<div class="file"><span class="ext">${esc(f.name.split(".").pop())}</span><span class="name">${esc(f.name)}</span><span class="muted small">${bytes(f.groesse || 0)}</span>${z.ordner ? "" : `<button class="iconbtn" data-rm="${esc(f.name)}" title="Entfernen">✕</button>`}</div>`).join("") || `<p class="muted">Noch keine Dateien.</p>`}</div>
-      ${z.ordner ? "" : `<div class="row" style="margin-top:12px"><button class="btn" id="more-btn">Weitere Dateien hinzufügen</button><input type="file" id="more-input" multiple accept=".pdf,.docx,.xlsx,.txt,.md,.csv" hidden></div>`}
-      <div class="row" style="margin-top:18px"><button class="btn primary big" id="analyse-btn" ${files.length ? "" : "disabled"}>Analyse starten</button>
-        <span class="muted small">Dauert je Seite wenige Sekunden; gescannte Seiten brauchen Texterkennung und etwas länger.</span></div>
-    </section>`;
-    document.querySelectorAll("[data-rm]").forEach((b) => b.onclick = async () => { await api("/vorgang/datei-entfernen", { json: { name: b.dataset.rm } }); renderVorgang(); });
-    const mi = $("#more-input"); if (mi) { $("#more-btn").onclick = () => mi.click(); mi.onchange = async () => { for (const f of mi.files) { const fd = new FormData(); fd.append("datei", f, f.name); await api("/vorgang/datei", { method: "POST", body: fd }); } renderVorgang(); }; }
-    $("#analyse-btn").onclick = analyseStarten;
-  }
-
   async function analyseStarten(begriffe = []) {
-    try { await api("/vorgang/analysieren", { json: { begriffe } }); renderFortschritt(); pollFortschritt(); } catch (e) { toast(e.message, "danger"); }
+    try { await api("/analyse", { json: { begriffe } }); S.docIndex = 0; await laden(); pollen(); } catch (e) { toast(e.message, "danger"); }
   }
-  function renderFortschritt() {
-    view.innerHTML = `<div class="card raised progress-panel" style="max-width:720px;margin:60px auto">
-      <div class="eyebrow">Analyse läuft</div><h2 id="p-schritt" style="margin-top:6px">Modelle laden …</h2>
-      <p class="muted" id="p-datei">&nbsp;</p>
-      <div class="bar indeterminate" id="p-bar"><i></i></div>
-      <p class="muted small">Alles passiert auf diesem PC. Beim ersten Start dauert das Laden der Sprachmodelle etwa eine halbe Minute.</p></div>`;
-  }
-  function pollFortschritt() {
-    clearInterval(S.pollTimer);
-    S.pollTimer = setInterval(async () => {
+  function pollen() {
+    clearInterval(S.poll);
+    S.poll = setInterval(async () => {
       try {
-        const f = await api("/vorgang/fortschritt");
-        const bar = $("#p-bar");
+        const f = await api("/fortschritt");
+        const bar = $("#pbar");
         if (bar) { bar.classList.toggle("indeterminate", f.prozent < 5); bar.firstElementChild.style.width = f.prozent + "%"; $("#p-schritt").textContent = f.schritt || "…"; $("#p-datei").textContent = f.datei || " "; }
-        if (!f.laeuft) { clearInterval(S.pollTimer); if (f.fehler) { toast(f.fehler, "danger"); S.schritt = 1; } else { S.schritt = 2; S.docIndex = 0; } renderVorgang(); }
-      } catch (e) { clearInterval(S.pollTimer); toast(e.message, "danger"); }
-    }, 600);
+        if (!f.laeuft) { clearInterval(S.poll); if (f.fehler) toast(f.fehler, "danger"); await laden(); }
+      } catch (e) { clearInterval(S.poll); toast(e.message, "danger"); }
+    }, 500);
+  }
+  function renderLaeuft() {
+    const f = S.z.fortschritt; const anonym = f.fertig && !S.z.ergebnis && f.schritt === "Anonymisiere";
+    view.innerHTML = `<section class="progress-panel">
+      <div class="eyebrow">${anonym ? "Dateien werden erzeugt" : "Lokanon liest und erkennt"}</div>
+      <h2 id="p-schritt">${esc(f.schritt || "Modelle laden …")}</h2>
+      <p class="muted" id="p-datei">${esc(f.datei || " ")}</p>
+      <div class="bar ${f.prozent < 5 ? "indeterminate" : ""}" id="pbar"><i style="width:${f.prozent}%"></i></div>
+      <p class="muted small">${S.status.modelle_bereit ? "Gescannte Seiten brauchen etwas länger (Texterkennung)." : "Beim ersten Start werden die Sprachmodelle geladen, das dauert ein bis zwei Minuten."}</p>
+    </section>`;
+    pollen();
   }
 
-  // ------------------------------------------------------------ Schritt 2: Prüfen
-  function renderSchritt2(body, z) {
-    const begriffe = z.begriffe || [];
-    const unsicher = begriffe.filter((g) => g.unsicher && g.aktiv);
-    const gruppen = [...new Set(begriffe.map((g) => g.gruppe))];
-    const aktiv = begriffe.filter((g) => g.aktiv).length;
-    body.innerHTML = `
+  // ------------------------------------------------------------ Zustand 2: Prüfen
+  function renderPruefen() {
+    const z = S.z; const ids = z.identitaeten;
+    const ersetzt = ids.filter((i) => i.aktiv).length, unsicher = ids.filter((i) => i.unsicher && i.aktiv).length;
+    const gruppen = [...new Set(ids.map((i) => i.gruppe))];
+    view.innerHTML = `
       <div class="pruefen">
         <section>
-          <div class="toolbar">
-            <div><h2 style="display:inline">${begriffe.length} Begriffe gefunden</h2> <span class="muted">· ${aktiv} werden ersetzt · ${z.platzhalter_anzahl} Platzhalter</span></div>
+          <div class="summary"><h1>${ids.length} ${ids.length === 1 ? "Angabe" : "Angaben"} gefunden</h1><span class="muted">${ersetzt} werden ersetzt · ${z.dateien.length} ${z.dateien.length === 1 ? "Datei" : "Dateien"}</span></div>
+          ${unsicher ? `<div class="notice warn unsure" id="unsure" title="Nur unsichere anzeigen"><b>${unsicher} ${unsicher === 1 ? "Angabe" : "Angaben"} bitte ansehen.</b> Lokanon ersetzt im Zweifel. Was kein Personenbezug ist, schalten Sie aus.</div>` : `<div class="notice ok"><b>Alles eindeutig.</b> Prüfen Sie die Liste und das Dokument rechts, dann anonymisieren.</div>`}
+          <div class="toolbar" style="margin-top:12px">
+            <input class="input" id="nachtrag" placeholder="Fehlt etwas? Begriff eintragen, mehrere mit Komma">
+            <button class="btn" id="btn-nachtrag">Nachtragen</button>
           </div>
-          ${unsicher.length ? `<details class="card unsure" open style="padding:12px 16px;margin-bottom:12px"><summary>Bitte ansehen: ${unsicher.length} ${unsicher.length === 1 ? "Begriff ist" : "Begriffe sind"} nicht eindeutig</summary>
-            <ul>${unsicher.map((g) => `<li><b>${esc(g.begriff)}</b> (${esc(g.typ)}): ${esc(g.gruende.join("; "))}</li>`).join("")}</ul>
-            <p class="muted small" style="margin-top:8px">Lokanon ersetzt im Zweifel. Wenn ein Begriff kein Personenbezug ist, schalten Sie ihn unten aus.</p></details>` : ""}
-          <div class="toolbar">
-            <div class="filter"><button class="${S.filter ? "" : "on"}" data-f="">Alle</button>${gruppen.map((g) => `<button class="${S.filter === g ? "on" : ""}" data-f="${esc(g)}">${esc(g)}</button>`).join("")}</div>
-          </div>
-          <div class="row" style="margin-bottom:6px"><input class="input" id="nachtrag" placeholder="Begriff übersehen? Hier eintragen, mehrere mit Komma" style="max-width:420px"><button class="btn" id="nachtrag-btn">Nachtragen</button></div>
-          <div id="groups"></div>
+          <div class="filter" id="filter">${["alle", ...gruppen, "unsicher"].map((g) => `<button class="${S.filter === g ? "on" : ""}" data-f="${esc(g)}">${g === "alle" ? "Alle" : g === "unsicher" ? "Bitte ansehen" : esc(g)}</button>`).join("")}</div>
+          <div id="liste"></div>
         </section>
         <aside class="docpanel">
-          <div class="row between"><h3>Dokumente</h3>
-            <div class="filter"><button class="${S.docMode === "markiert" ? "on" : ""}" data-m="markiert">Original mit Markierungen</button><button class="${S.docMode === "anonym" ? "on" : ""}" data-m="anonym">Anonymisiert</button></div></div>
-          <div class="doctabs" id="doctabs"></div>
+          <div class="row between" style="margin-bottom:8px"><b>Dokument</b><div class="filter" style="margin:0"><button id="m-orig" class="${S.docMode === "markiert" ? "on" : ""}">Original mit Markierungen</button><button id="m-anon" class="${S.docMode === "anonym" ? "on" : ""}">Anonymisiert</button></div></div>
+          <div class="doctabs" id="doctabs">${z.dokumente.map((d, i) => `<button class="${i === S.docIndex ? "on" : ""}" data-i="${i}" title="${esc(d.name)}">${esc(d.name)}</button>`).join("")}</div>
           <div class="docview" id="docview"></div>
-          <div class="legend"><span><i style="background:var(--mark-person)"></i>Person</span><span><i style="background:var(--mark-firma)"></i>Firma</span><span><i style="background:var(--mark-ort)"></i>Adresse/Ort</span><span><i style="background:var(--mark-nummer)"></i>Nummern</span><span><i style="background:var(--mark-datum)"></i>Datum</span><span><i style="border:1px dashed var(--muted)"></i>bleibt stehen</span></div>
-          <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn primary big" id="weiter3">Weiter zu „Fertigstellen“ →</button></div>
+          <div class="legend"><span><i style="background:var(--mark-person)"></i>Person</span><span><i style="background:var(--mark-firma)"></i>Firma</span><span><i style="background:var(--mark-ort)"></i>Adresse/Ort</span><span><i style="background:var(--mark-nummer)"></i>Nummer</span><span><i style="border:1px dashed var(--muted)"></i>bleibt stehen</span></div>
         </aside>
-      </div>`;
-    document.querySelectorAll("[data-f]").forEach((b) => b.onclick = () => { S.filter = b.dataset.f; renderSchritt2(body, z); });
-    document.querySelectorAll("[data-m]").forEach((b) => b.onclick = () => { S.docMode = b.dataset.m; renderDoc(z); document.querySelectorAll("[data-m]").forEach((x) => x.classList.toggle("on", x.dataset.m === S.docMode)); });
-    $("#weiter3").onclick = () => { S.schritt = 3; renderVorgang(); };
-    $("#nachtrag-btn").onclick = async () => { const t = $("#nachtrag").value.split(",").map((s) => s.trim()).filter(Boolean); if (!t.length) return; try { await api("/vorgang/nachtragen", { json: { begriffe: t } }); renderFortschritt(); pollFortschritt(); } catch (e) { toast(e.message, "danger"); } };
-    $("#nachtrag").onkeydown = (e) => { if (e.key === "Enter") $("#nachtrag-btn").click(); };
-    renderGroups(z); renderDoc(z);
+      </div>
+      <div class="actionbar"><div class="inner">
+        <span class="hint">${esc(z.ordner ? "Die anonymisierten Dateien kommen neben die Originale in " + z.ordner : "Die anonymisierten Dateien kommen nach " + z.ausgabe_ordner)}</span>
+        <button class="btn ghost" id="btn-neu">Neue Dateien</button>
+        <button class="btn primary big" id="btn-anon">Geprüft, jetzt anonymisieren</button>
+      </div></div>`;
+    renderListe();
+    renderDoc();
+    $$("#filter button").forEach((b) => (b.onclick = () => { S.filter = b.dataset.f; renderPruefen(); }));
+    if ($("#unsure")) $("#unsure").onclick = () => { S.filter = "unsicher"; renderPruefen(); };
+    $("#btn-nachtrag").onclick = () => { const t = $("#nachtrag").value.split(",").map((s) => s.trim()).filter(Boolean); if (t.length) analyseStarten(t); };
+    $("#nachtrag").onkeydown = (e) => { if (e.key === "Enter") $("#btn-nachtrag").click(); };
+    $("#m-orig").onclick = () => { S.docMode = "markiert"; renderPruefen(); };
+    $("#m-anon").onclick = () => { S.docMode = "anonym"; renderPruefen(); };
+    $$("#doctabs button").forEach((b) => (b.onclick = () => { S.docIndex = +b.dataset.i; renderPruefen(); }));
+    $("#btn-neu").onclick = () => bestaetigen("Neue Dateien ablegen? Die aktuelle Prüfung wird verworfen.", neuStart);
+    $("#btn-anon").onclick = anonymisieren;
   }
-  function renderGroups(z) {
-    const begriffe = (z.begriffe || []).filter((g) => !S.filter || g.gruppe === S.filter);
-    const byG = {}; begriffe.forEach((g) => (byG[g.gruppe] = byG[g.gruppe] || []).push(g));
-    let i = 0;
-    $("#groups").innerHTML = Object.entries(byG).map(([gruppe, items]) => `
-      <div class="group-title"><span class="dot" style="background:${GRUPPEN_FARBE[gruppe] || "var(--muted)"}"></span>${esc(gruppe)} <span class="count">· ${items.filter((g) => g.aktiv).length} von ${items.length} werden ersetzt</span></div>
-      <div class="cards">${items.map((g) => `
-        <div class="term ${g.aktiv ? "" : "aus"}" style="--g:${GRUPPEN_FARBE[gruppe] || "var(--line-2)"};--i:${i++}" data-key="${esc(g.key)}">
-          <div class="head"><span class="word">${esc(g.begriff)}</span><span class="arrow">→</span>
-            ${g.aktiv ? `<span class="ph-edit" data-ph="${esc(g.ph_basis)}"><span class="ph">${esc(g.platzhalter || "[" + g.typ + "]")}</span>${g.ph_basis ? `<button class="linkbtn" data-rename="${esc(g.ph_basis)}" title="Eigene Bezeichnung vergeben, z. B. Mandant">${g.bezeichnung ? "ändern" : "benennen"}</button>` : ""}</span>` : `<span class="muted">bleibt stehen</span>`}
-            ${g.unsicher && g.aktiv ? `<span class="chip warn" title="${esc(g.gruende.join("; "))}">prüfen</span>` : ""}</div>
-          <div class="meta">${esc(g.typ)} · ${g.anzahl}× in ${g.dateien.length} Datei${g.dateien.length === 1 ? "" : "en"} · ${g.sicherheit} · ${esc(g.quellen.join(", "))}</div>
-          <div class="snip">${g.beispiel}</div>
-          <div class="foot"><label class="switch-label"><span class="switch"><input type="checkbox" ${g.aktiv ? "checked" : ""} data-toggle="${esc(g.key)}" aria-label="${esc(g.begriff)} ersetzen"><span class="track"></span></span>${g.aktiv ? "wird ersetzt" : "bleibt stehen"}</label></div>
-        </div>`).join("")}</div>`).join("") || `<p class="muted">Keine Begriffe in dieser Gruppe.</p>`;
-    document.querySelectorAll("[data-toggle]").forEach((cb) => cb.onchange = async () => {
-      try { const nz = await api("/vorgang/begriff", { json: { key: cb.dataset.toggle, aktiv: cb.checked } }); S.vorgang = nz; renderSchritt2($("#step-body"), nz); } catch (e) { toast(e.message, "danger"); }
-    });
-    document.querySelectorAll("[data-rename]").forEach((b) => b.onclick = () => renameDialog(b.dataset.rename, z));
-  }
-  function renameDialog(ph, z) {
-    const g = (z.begriffe || []).find((x) => x.ph_basis === ph) || {};
-    const vorschlaege = g.vorschlaege || [];
-    modal(`<h2>Eigene Bezeichnung</h2><p class="muted small" style="margin:6px 0 12px">Statt <span class="ph">[${esc(ph)}]</span> steht dann überall im Vorgang Ihre Bezeichnung, z. B. <span class="ph">[MANDANT]</span>. Die KI versteht das genauso, die Rückübersetzung auch.</p>
-      <label class="field"><span>Bezeichnung für „${esc(g.begriff || "")}“</span><input class="input" id="m-bez" list="m-list" value="${esc(g.bezeichnung || "")}" placeholder="z. B. Mandant"><datalist id="m-list">${vorschlaege.map((v) => `<option value="${esc(v)}">`).join("")}</datalist></label>
-      <div class="row" style="margin-top:8px">${vorschlaege.slice(0, 6).map((v) => `<button class="radio-chip" data-v="${esc(v)}">${esc(v)}</button>`).join("")}</div>`,
-      [["Zurücksetzen", async () => { await setzeBezeichnung(ph, ""); }, "ghost"], ["Abbrechen", () => true], ["Übernehmen", async () => { await setzeBezeichnung(ph, $("#m-bez").value); }, "primary"]]);
-    document.querySelectorAll("[data-v]").forEach((b) => b.onclick = () => { $("#m-bez").value = b.dataset.v; });
-    setTimeout(() => $("#m-bez").focus(), 50);
-  }
-  async function setzeBezeichnung(ph, bez) {
-    try { const nz = await api("/vorgang/bezeichnung", { json: { platzhalter: ph, bezeichnung: bez } }); S.vorgang = nz; renderSchritt2($("#step-body"), nz); } catch (e) { toast(e.message, "danger"); return false; }
-  }
-  function renderDoc(z) {
-    const docs = z.dokumente || [];
-    if (S.docIndex >= docs.length) S.docIndex = 0;
-    $("#doctabs").innerHTML = docs.map((d, i) => `<button class="${i === S.docIndex ? "on" : ""}" data-doc="${i}" title="${esc(d.name)}">${esc(d.name)}${d.ocr ? " · OCR" : ""}</button>`).join("");
-    document.querySelectorAll("[data-doc]").forEach((b) => b.onclick = () => { S.docIndex = +b.dataset.doc; renderDoc(z); });
-    const d = docs[S.docIndex];
-    const dv = $("#docview");
+  function renderDoc() {
+    const d = S.z.dokumente[S.docIndex]; const dv = $("#docview");
     if (!d) { dv.textContent = ""; return; }
-    dv.innerHTML = S.docMode === "markiert" ? d.markiert_html : esc(d.anonym);
-    const info = d.ocr ? `<div class="notice warn small" style="margin-top:8px">${d.ocr} von ${d.seiten} Seiten per Texterkennung gelesen. Erkannter Text kann Fehler enthalten, deshalb hier besonders genau hinsehen.</div>` : "";
-    dv.insertAdjacentHTML("afterend", "");
-    const old = $("#ocr-info"); if (old) old.remove();
-    if (info) dv.insertAdjacentHTML("afterend", `<div id="ocr-info">${info}</div>`);
+    if (S.docMode === "markiert") dv.innerHTML = d.markiert_html; else dv.textContent = d.anonym;
+  }
+  function renderListe() {
+    const z = S.z; let ids = z.identitaeten;
+    if (S.filter === "unsicher") ids = ids.filter((i) => i.unsicher); else if (S.filter !== "alle") ids = ids.filter((i) => i.gruppe === S.filter);
+    const liste = $("#liste");
+    if (!ids.length) { liste.innerHTML = `<p class="muted" style="margin-top:14px">Nichts in dieser Auswahl.</p>`; return; }
+    const gruppen = [...new Set(ids.map((i) => i.gruppe))];
+    let n = 0;
+    liste.innerHTML = gruppen.map((g) => {
+      const items = ids.filter((i) => i.gruppe === g);
+      return `<div class="group-title"><span class="dot" style="background:${GRUPPEN_FARBE[g] || "var(--line-2)"}"></span>${esc(g)}<span class="count">· ${items.filter((i) => i.aktiv).length} von ${items.length} werden ersetzt</span></div>
+        <div class="cards">${items.map((i) => karte(i, n++)).join("")}</div>`;
+    }).join("");
+    // Verhalten
+    $$(".ident", liste).forEach((el) => {
+      const ph = el.dataset.ph;
+      $(".sw", el).onchange = (e) => identitaet({ ph, aktiv: e.target.checked });
+      const phb = $(".phbtn", el); if (phb) phb.onclick = () => bezeichnungEdit(el, ph);
+      $$(".sugg button", el).forEach((b) => (b.onclick = () => identitaet({ ph, bezeichnung: b.dataset.v })));
+      $$(".frage button", el).forEach((b) => (b.onclick = () => identitaet({ ph, zuordnen: { text: b.dataset.text, ph: b.dataset.ziel } })));
+      const sel = $("select.zu", el); if (sel) sel.onchange = () => { if (sel.value) identitaet({ ph, gehoert_zu: sel.value }); };
+      const tr = $("select.tr", el); if (tr) tr.onchange = () => { if (tr.value) identitaet({ ph, trennen: tr.value }); };
+    });
+  }
+  function karte(i, n) {
+    const andere = S.z.identitaeten.filter((o) => o.ph !== i.ph && o.gruppe === i.gruppe);
+    const varianten = i.varianten.filter((v) => v !== i.name);
+    return `<div class="ident ${i.aktiv ? "" : "aus"}" data-ph="${esc(i.ph)}" style="--g:${GRUPPEN_FARBE[i.gruppe] || "var(--line-2)"};--i:${n}">
+      <div class="head">
+        <div class="name">${esc(i.name)}${varianten.length ? `<small>auch: ${varianten.map(esc).join(" · ")}</small>` : ""}</div>
+        <div class="swlabel"><label class="switch"><input type="checkbox" class="sw" ${i.aktiv ? "checked" : ""} aria-label="${esc(i.name)} ersetzen"><span class="track"></span></label><span>${i.aktiv ? "wird ersetzt" : "bleibt stehen"}</span></div>
+      </div>
+      <div class="phrow"><span class="arrow">wird zu</span>
+        ${i.aktiv ? `<span class="phbtn" title="Klicken und eigenen Namen vergeben">${esc(i.anzeige)}</span>
+        ${i.vorschlaege.length && !i.bezeichnung ? `<span class="sugg">${i.vorschlaege.slice(0, 4).map((v) => `<button data-v="${esc(v)}">${esc(v)}</button>`).join("")}</span>` : ""}
+        ${i.bezeichnung ? `<button class="linkbtn sugg-reset" data-v="">Standard</button>` : ""}` : `<span class="muted small">bleibt im Text stehen</span>`}
+      </div>
+      <div class="meta">${esc(i.typ)} · ${i.anzahl}× in ${i.dateien.length} ${i.dateien.length === 1 ? "Datei" : "Dateien"} · ${esc(i.sicherheit)}${i.quellen.length ? " · " + esc(i.quellen.join(", ")) : ""}</div>
+      <div class="snip">${i.beispiel}</div>
+      ${i.gruende.length ? `<div class="warnline">Bitte ansehen: ${esc(i.gruende.join("; "))}</div>` : ""}
+      ${i.fragen.map((f) => `<div class="frage"><span>„${esc(f.text)}“ allein: wer ist gemeint?</span>${f.kandidaten.map((k) => `<button data-text="${esc(f.text)}" data-ziel="${esc(k.ph)}">${esc(k.name)}</button>`).join("")}</div>`).join("")}
+      <div class="actions">
+        ${andere.length ? `<label>gehört zu <select class="mini zu"><option value="">…</option>${andere.map((o) => `<option value="${esc(o.ph)}">${esc(o.name)}</option>`).join("")}</select></label>` : ""}
+        ${i.varianten.length > 1 ? `<label>trennen <select class="mini tr"><option value="">…</option>${i.varianten.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join("")}</select></label>` : ""}
+      </div>
+    </div>`;
+  }
+  function bezeichnungEdit(el, ph) {
+    const row = $(".phrow", el); const i = S.z.identitaeten.find((x) => x.ph === ph);
+    row.innerHTML = `<span class="arrow">wird zu</span><span class="phedit">[<input id="bez" value="${esc(i.bezeichnung || "")}" placeholder="${esc(i.ph)}" maxlength="40">]</span><button class="btn" id="bez-ok" style="padding:4px 10px">Übernehmen</button><button class="linkbtn" id="bez-x">Abbrechen</button>`;
+    const inp = $("#bez", row); inp.focus(); inp.select();
+    const ok = () => identitaet({ ph, bezeichnung: inp.value });
+    $("#bez-ok", row).onclick = ok; inp.onkeydown = (e) => { if (e.key === "Enter") ok(); if (e.key === "Escape") renderPruefen(); };
+    $("#bez-x", row).onclick = renderPruefen;
+  }
+  async function identitaet(body) {
+    try { S.z = await api("/identitaet", { json: body }); renderPruefen(); } catch (e) { toast(e.message, "danger"); }
+  }
+  document.addEventListener("click", (e) => { const b = e.target.closest(".sugg-reset"); if (b) identitaet({ ph: b.closest(".ident").dataset.ph, bezeichnung: "" }); });
+  function bestaetigen(text, fn) {
+    const m = modal(`<p style="margin-bottom:16px">${esc(text)}</p><div class="row" style="justify-content:flex-end"><button class="btn x">Abbrechen</button><button class="btn primary" id="ja">Ja</button></div>`);
+    $("#ja", m).onclick = () => { closeModal(); fn(); };
+  }
+  async function anonymisieren() {
+    try { await api("/anonymisieren", { method: "POST" }); await laden(); } catch (e) { toast(e.message, "danger"); }
   }
 
-  // ------------------------------------------------------------ Schritt 3: Fertigstellen
-  function renderSchritt3(body, z) {
-    const consumer = (a) => /Consumer/.test(a);
-    body.innerHTML = `
-      <div class="grid-2">
-        <section class="card raised">
-          <h2>Dateien für die KI erzeugen</h2>
-          <p class="muted" style="margin:4px 0 14px">Es entstehen Kopien mit Platzhaltern. Die Originale bleiben unverändert.</p>
-          <div class="stack">
-            <label class="field"><span>Ziel-KI <span class="hint">(fürs Protokoll; Consumer-Konten haben keinen Vertrag zur Auftragsverarbeitung)</span></span>
-              <select class="input" id="anbieter">${ANBIETER.map((a) => `<option>${esc(a)}</option>`).join("")}</select></label>
-            <div id="consumer-warn" class="notice warn" hidden><span>⚠</span><span>Bei Consumer-Konten ist Lokanon die einzige Schutzschicht. Schalten Sie dort das Training ab und laden Sie nur die Dateien aus „Fuer die KI“ hoch. Mehr dazu in der Anleitung.</span></div>
-            <div><div class="eyebrow" style="margin-bottom:6px">Zusätzlich zur Textfassung</div>
-              <label class="checkbox"><input type="checkbox" id="f-pdf" checked><span><b>PDF-Sichtkopie</b> <span class="muted">– echte Schwärzung, mit Gegenprüfung</span></span></label>
-              <label class="checkbox"><input type="checkbox" id="f-docx" checked><span><b>Word-Kopie</b> <span class="muted">– ohne Namen und Metadaten</span></span></label>
-              <label class="checkbox"><input type="checkbox" id="f-xlsx" checked><span><b>Excel-Kopie</b></span></label></div>
-            <label class="checkbox"><input type="checkbox" id="geprueft"><span><b>Ich habe die Begriffe geprüft.</b> <span class="muted">Die Prüfung durch einen Menschen ist Pflicht vor dem Versand an eine KI.</span></span></label>
-            <div class="row"><button class="btn primary big" id="erzeugen" disabled>Dateien erzeugen</button></div>
-          </div>
-          <div id="ergebnis" style="margin-top:18px"></div>
-        </section>
-        <div class="stack">
-          <section class="card">
-            <h3>So geht es in der KI weiter</h3>
-            <ol class="steps-mini" style="margin-top:10px">
-              <li><span>In ChatGPT oder Claude ein <b>Projekt</b> anlegen und die Anweisung unten als Projekt-Anweisung einfügen.</span></li>
-              <li><span>Nur die Dateien aus dem Ordner <b>„Fuer die KI“</b> hochladen oder deren Text einfügen.</span></li>
-              <li><span>Die Antwort kopieren und unter <b>„Antwort“</b> zurückübersetzen.</span></li>
-            </ol>
-            <div class="row between" style="margin:14px 0 6px"><b>Anweisung für die KI</b><button class="btn" id="copy-anw">Kopieren</button></div>
-            <pre class="anweisung" id="anw">…</pre>
-            <p class="muted small" style="margin-top:8px">Für Claude gibt es die Anweisung auch als Skill-Datei: <a href="/api/skill.zip">lokanon-pseudonyme.zip</a></p>
-          </section>
-          <section class="card" id="schluessel-card">
-            <h3>Vorgang abschließen</h3>
-            <p class="muted small" style="margin:4px 0 10px">Der Schlüssel (Platzhalter → Original) wird mit Ihrem Passwort verschlüsselt gespeichert. Ohne ihn lässt sich eine Antwort später nicht zurückübersetzen. Die Datei ist so schützenswert wie die Akte.</p>
-            <div class="row"><input class="input" type="password" id="pw" placeholder="Passwort für den Schlüssel" style="max-width:260px" autocomplete="new-password"><button class="btn primary" id="abschliessen" disabled>Schlüssel speichern</button></div>
-            <div id="schluessel-info" style="margin-top:10px">${z.schluessel_pfad ? `<div class="notice ok"><span>✓</span><span>Schlüssel gespeichert: <code>${esc(z.schluessel_pfad)}</code></span></div>` : ""}</div>
-          </section>
-        </div>
-      </div>`;
-    api("/anweisung").then((r) => { $("#anw").textContent = r.text; });
-    $("#copy-anw").onclick = () => copy($("#anw").textContent);
-    const sel = $("#anbieter"); sel.onchange = () => { $("#consumer-warn").hidden = !consumer(sel.value); };
-    $("#geprueft").onchange = () => { $("#erzeugen").disabled = !$("#geprueft").checked; };
-    $("#pw").oninput = () => { $("#abschliessen").disabled = !$("#pw").value; };
-    $("#abschliessen").onclick = async () => {
-      try { const r = await api("/vorgang/abschliessen", { json: { passwort: $("#pw").value } });
-        $("#schluessel-info").innerHTML = `<div class="notice ok"><span>✓</span><span>Schlüssel gespeichert: <code>${esc(r.schluessel_pfad)}</code>. Der Vorgang ist abgeschlossen; die Antwort können Sie jederzeit zurückübersetzen.</span></div>`; $("#pw").value = ""; $("#abschliessen").disabled = true; toast("Vorgang abgeschlossen", "ok"); }
-      catch (e) { toast(e.message, "danger"); }
-    };
-    if (z.ausgaben && z.ausgaben.length) renderErgebnis(z);
-    $("#erzeugen").onclick = async () => {
-      const btn = $("#erzeugen"); btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> Erzeuge Dateien …`;
-      const formate = [["pdf", "#f-pdf"], ["docx", "#f-docx"], ["xlsx", "#f-xlsx"]].filter(([, s]) => $(s).checked).map(([f]) => f);
-      try { const r = await api("/vorgang/ausgabe", { json: { formate, anbieter: sel.value } }); S.vorgang = await api("/vorgang"); renderErgebnis(S.vorgang, r); toast("Dateien erzeugt", "ok"); }
-      catch (e) { toast(e.message, "danger"); }
-      btn.disabled = false; btn.textContent = "Dateien erneut erzeugen";
-    };
-  }
-  function renderErgebnis(z) {
-    const aus = z.ausgaben || [];
-    const fehler = aus.some((a) => a.status === "fehler");
-    $("#ergebnis").innerHTML = `
-      <svg class="check" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="26"/><path d="M18 31l8 8 16-17"/></svg>
-      <h3 style="text-align:center;margin-bottom:12px">${fehler ? "Dateien erzeugt – bitte Hinweise beachten" : "Dateien erzeugt"}</h3>
-      <div class="pathbox"><span title="${esc(z.ki_ordner)}">${esc(z.ki_ordner)}</span><button class="btn" id="open-ki">Ordner öffnen</button></div>
-      <div style="margin-top:12px">${aus.map((a) => `<div class="result-file"><span class="st ${a.status}">${a.status === "ok" ? "✓" : "!"}</span><div style="min-width:0"><b>${esc(a.name)}</b><div class="muted small">${esc(a.dateien.join(", "))}</div>${a.hinweis ? `<div class="small" style="color:var(--${a.status === "fehler" ? "danger" : "warn"})">${esc(a.hinweis)}</div>` : ""}</div></div>`).join("")}</div>
-      ${fehler ? `<div class="notice danger" style="margin-top:10px"><span>✕</span><span>Mindestens eine Datei enthält noch Originaltext. Diese Datei nicht hochladen. Begriff unter „Prüfen“ nachtragen und erneut erzeugen.</span></div>` : ""}
-      <div class="row" style="margin-top:12px"><a class="btn" href="/api/vorgang/ki.zip">Als ZIP herunterladen</a><button class="btn ghost" id="open-basis2">Prüfbericht und Protokoll</button><button class="btn primary" id="weiter4">Weiter zu „Antwort“ →</button></div>`;
-    $("#open-ki").onclick = () => oeffnen(z.ki_ordner);
-    $("#open-basis2").onclick = () => oeffnen(z.basis);
-    $("#weiter4").onclick = () => { S.schritt = 4; renderVorgang(); };
-  }
-
-  // ------------------------------------------------------------ Schritt 4: Antwort
-  function renderSchritt4(body, z) {
-    body.innerHTML = `<section class="card raised" style="max-width:900px">
-      <h2>Antwort der KI zurückübersetzen</h2>
-      <p class="muted" style="margin:4px 0 12px">Antwort einfügen. Platzhalter wie <span class="ph">[PERSON_1]</span> oder <span class="ph">[MANDANT]</span> werden durch die Originale ersetzt, auch wenn die KI sie leicht verändert hat.</p>
-      <textarea class="input" id="antwort" rows="9" placeholder="Antwort hier einfügen …"></textarea>
-      <div class="row" style="margin-top:10px"><button class="btn primary" id="zurueck-btn">Zurückübersetzen</button></div>
-      <div id="zurueck-out" hidden style="margin-top:14px"><div class="row between"><b>Ergebnis</b><button class="btn" id="copy-out">Kopieren</button></div>
-        <pre class="anweisung" id="out" style="max-height:none"></pre>
-        <p class="muted small" style="margin-top:8px">Inhalt vor der Weiterverwendung prüfen. Die KI kann Fakten falsch wiedergegeben haben; die Rückübersetzung ersetzt nur die Platzhalter.</p></div>
+  // ------------------------------------------------------------ Zustand 3: Fertig
+  function renderFertig() {
+    const z = S.z; const r = z.ergebnis; const ok = r.dateien.filter((d) => d.status === "ok").length;
+    const erw = z.erweitert || {};
+    view.innerHTML = `<section class="fertig">
+      <svg class="check" viewBox="0 0 60 60"><circle cx="30" cy="30" r="26"/><path d="M18 31l8 8 16-17"/></svg>
+      <h1 style="text-align:center">${ok} von ${r.dateien.length} ${r.dateien.length === 1 ? "Datei" : "Dateien"} anonymisiert</h1>
+      <p class="muted" style="text-align:center;margin:6px 0 20px">${ok === r.dateien.length ? "Alle Kopien sind geprüft und ohne Personenbezug." : "Bei einer Datei hat es nicht geklappt, Hinweis unten."}</p>
+      <div class="card raised stack">
+        <div class="row between"><div class="pathbox" style="flex:1"><span title="${esc(r.ordner)}">${esc(r.ordner)}</span></div><button class="btn" id="btn-open">Ordner öffnen</button></div>
+        <div>${r.dateien.map((d) => `<div class="result-file"><span class="st ${d.status}">${d.status === "ok" ? "✓" : "!"}</span><div style="flex:1;min-width:0"><b>${esc(d.ausgabe)}</b>${d.textfassung ? ` <span class="muted small">+ ${esc(d.textfassung)}</span>` : ""}<div class="muted small">aus ${esc(d.name)} · ${d.ersetzt} Stellen ersetzt${d.hinweis ? ` · <span style="color:var(--danger)">${esc(d.hinweis)}</span>` : ""}</div></div></div>`).join("")}</div>
+        ${r.hinweise.length ? `<div class="notice warn"><div>${r.hinweise.map(esc).join("<br>")}</div></div>` : ""}
+        ${r.schluessel_pfad ? `<div class="notice info small"><div>Schlüssel für die Rückübersetzung gespeichert: <code>${esc(r.schluessel_pfad)}</code></div></div>` : ""}
+      </div>
+      <div class="row" style="justify-content:center;margin-top:22px;gap:10px">
+        ${erw.ki_anweisung ? `<button class="btn" id="btn-anw">KI-Anweisung kopieren</button>` : ""}
+        ${erw.rueckuebersetzung ? `<button class="btn" id="btn-zk">Antwort zurückübersetzen</button>` : ""}
+        <button class="btn primary big" id="btn-neu">Neue Dateien</button>
+      </div>
     </section>`;
-    $("#zurueck-btn").onclick = async () => {
-      try { const r = await api("/zurueck", { json: { text: $("#antwort").value } }); $("#out").textContent = r.text; $("#zurueck-out").hidden = false; } catch (e) { toast(e.message, "danger"); }
-    };
-    $("#copy-out").onclick = () => copy($("#out").textContent);
+    $("#btn-open").onclick = () => oeffnen(r.ordner);
+    $("#btn-neu").onclick = neuStart;
+    if ($("#btn-anw")) $("#btn-anw").onclick = anweisungDialog;
+    if ($("#btn-zk")) $("#btn-zk").onclick = zurueckDialog;
   }
 
-  // ------------------------------------------------------------ Zurückübersetzen (eigenständig)
-  async function renderZurueck() {
-    const [keys, offen] = await Promise.all([api("/schluessel"), api("/vorgang?kurz=1")]);
-    view.innerHTML = `
-      <div class="page-head"><div><h1>Antwort zurückübersetzen</h1><p class="sub">Für den offenen Vorgang oder für einen früheren Vorgang mit seiner Schlüsseldatei und dem Passwort.</p></div></div>
-      <section class="card raised" style="max-width:900px">
-        <div class="grid-2">
-          <label class="field"><span>Schlüssel</span><select class="input" id="key-sel">${offen.id ? `<option value="">Offener Vorgang: ${esc(offen.name)}</option>` : ""}${keys.schluessel.map((k) => `<option value="${esc(k.pfad)}">${esc(k.name)}</option>`).join("")}</select>
-            <span class="hint">Schlüsselordner: <code>${esc(keys.ordner)}</code></span></label>
-          <label class="field" id="pw-field"><span>Passwort</span><input class="input" type="password" id="pw2" autocomplete="current-password"></label>
-        </div>
-        <textarea class="input" id="antwort" rows="9" placeholder="Antwort der KI hier einfügen …" style="margin-top:12px"></textarea>
-        <div class="row" style="margin-top:10px"><button class="btn primary" id="zurueck-btn">Zurückübersetzen</button></div>
-        <div id="zurueck-out" hidden style="margin-top:14px"><div class="row between"><b>Ergebnis</b><button class="btn" id="copy-out">Kopieren</button></div><pre class="anweisung" id="out" style="max-height:none"></pre></div>
-      </section>`;
-    const sel = $("#key-sel"); const sync = () => { $("#pw-field").hidden = !sel.value; }; sel.onchange = sync; sync();
-    $("#zurueck-btn").onclick = async () => {
-      try { const r = await api("/zurueck", { json: { text: $("#antwort").value, schluessel_pfad: sel.value, passwort: $("#pw2").value } }); $("#out").textContent = r.text; $("#zurueck-out").hidden = false; toast(`${r.platzhalter} Platzhalter aus „${r.vorgang}“`, "ok"); } catch (e) { toast(e.message, "danger"); }
+  // ------------------------------------------------------------ Erweitert: KI-Anweisung, Rückübersetzung
+  async function anweisungDialog() {
+    const a = await api("/anweisung");
+    const m = modal(`<div class="mhead"><h2>Anweisung für ChatGPT oder Claude</h2><button class="x" aria-label="Schließen">✕</button></div>
+      <p class="muted small" style="margin-bottom:10px">Einmal als Projekt-Anweisung einfügen. Die KI lässt die Platzhalter dann stehen.</p>
+      <pre class="anweisung">${esc(a.text)}</pre>
+      <div class="row" style="justify-content:flex-end;margin-top:12px;gap:8px"><a class="btn" href="/api/skill.zip">Claude-Skill laden</a><button class="btn primary" id="cp">Kopieren</button></div>`, { wide: true });
+    $("#cp", m).onclick = () => copy(a.text, "Anweisung kopiert");
+  }
+  async function zurueckDialog() {
+    let keys = { schluessel: [], aktuell: "" };
+    try { keys = await api("/schluessel"); } catch {}
+    const m = modal(`<div class="mhead"><h2>Antwort zurückübersetzen</h2><button class="x" aria-label="Schließen">✕</button></div>
+      <div class="stack">
+        <label class="field"><span class="small muted">Schlüssel</span><select class="input" id="zk-key"><option value="">Aktueller Durchlauf</option>${keys.schluessel.map((k) => `<option value="${esc(k.pfad)}" ${k.pfad === keys.aktuell ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select></label>
+        <textarea class="input" id="zk-in" rows="8" placeholder="Antwort der KI hier einfügen …"></textarea>
+        <div class="row" style="justify-content:flex-end"><button class="btn primary" id="zk-go">Zurückübersetzen</button></div>
+        <textarea class="input" id="zk-out" rows="8" readonly placeholder="Ergebnis"></textarea>
+        <div class="row" style="justify-content:flex-end"><button class="btn" id="zk-cp">Kopieren</button></div>
+      </div>`, { wide: true });
+    $("#zk-go", m).onclick = async () => {
+      try { const r = await api("/zurueck", { json: { text: $("#zk-in", m).value, schluessel_pfad: $("#zk-key", m).value } }); $("#zk-out", m).value = r.text; toast(r.platzhalter ? `${r.platzhalter} Platzhalter zurückübersetzt (Schlüssel: ${r.quelle})` : `Keine Platzhalter gefunden (Schlüssel: ${r.quelle})`, r.platzhalter ? "ok" : "danger"); }
+      catch (e) { toast(e.message, "danger"); }
     };
-    $("#copy-out").onclick = () => copy($("#out").textContent);
+    $("#zk-cp", m).onclick = () => copy($("#zk-out", m).value);
   }
 
   // ------------------------------------------------------------ Einstellungen
-  async function renderEinstellungen() {
-    const cfg = await api("/einstellungen");
-    const gruppen = cfg._gruppen || {};
-    const aktiv = new Set(cfg.entities || []);
-    view.innerHTML = `
-      <div class="page-head"><div><h1>Einstellungen</h1><p class="sub">Was in Ihren Dokumenten stehen bleiben darf, wo Vorgänge und Schlüssel liegen, und was erkannt wird.</p></div></div>
-      <div class="grid-2">
-        <section class="card stack">
-          <h2>Ihre Kanzlei</h2>
-          <label class="field"><span>Nie ersetzen <span class="hint">– Kanzleiname, Mitarbeiter, eigene Telefonnummern und E-Mail-Adressen, eine je Zeile. Namensteile zählen mit.</span></span><textarea class="input" id="allow" rows="7">${esc((cfg.allow_list || []).join("\n"))}</textarea></label>
-          <label class="field"><span>Immer ersetzen <span class="hint">– interne Projektnamen, Kundenkürzel</span></span><textarea class="input" id="deny" rows="4">${esc((cfg.deny_list || []).join("\n"))}</textarea></label>
-        </section>
-        <section class="card stack">
-          <h2>Verhalten</h2>
-          <label class="checkbox"><input type="checkbox" id="keep" ${cfg.keep_institutions ? "checked" : ""}><span><b>Gerichte, Behörden, Versicherer, Kliniken stehen lassen</b><br><span class="muted small">Diese Einrichtungen sind meist kein Personenbezug. Einzelne lassen sich beim Prüfen trotzdem ersetzen.</span></span></label>
-          <label class="checkbox"><input type="checkbox" id="loc" ${cfg.mask_locations ? "checked" : ""}><span><b>Ortsnamen ohne Adresse ersetzen</b><br><span class="muted small">„Mülheim“ im Fließtext. Adressen und PLZ mit Ort werden immer ersetzt.</span></span></label>
-          <div><div class="eyebrow" style="margin-bottom:6px">Datumsangaben</div><div class="radio-row" id="datum">${[["kontext", "nur mit Personenbezug (Geburt, Tod)"], ["alle", "jedes Datum"], ["keine", "keine"]].map(([v, l]) => `<label class="radio-chip ${cfg.datum_modus === v ? "on" : ""}"><input type="radio" name="datum" value="${v}" ${cfg.datum_modus === v ? "checked" : ""}>${l}</label>`).join("")}</div></div>
-          <div><div class="eyebrow" style="margin-bottom:6px">Was erkannt wird</div><div class="stack" style="gap:6px">${Object.entries(gruppen).map(([g, ents]) => `<label class="checkbox"><input type="checkbox" data-grp="${esc(g)}" ${ents.some((e) => aktiv.has(e)) ? "checked" : ""}><span>${esc(g)}</span></label>`).join("")}</div></div>
-          <h2 style="margin-top:8px">Ordner</h2>
-          <label class="field"><span>Vorgänge <span class="hint">– hier landen hochgeladene Dateien, Kopien und Berichte</span></span><input class="input" id="vo" value="${esc(cfg.vorgaenge_ordner || cfg._vorgaenge_ordner_effektiv)}"></label>
-          <label class="field"><span>Schlüsseldateien <span class="hint">– bitte außerhalb von OneDrive, Dropbox oder anderen Cloud-Ordnern</span></span><input class="input" id="so" value="${esc(cfg.schluessel_ordner || cfg._schluessel_ordner_effektiv)}"></label>
-          <div class="row"><button class="btn primary" id="save">Speichern</button><button class="btn ghost" id="wizard">Einrichtung erneut starten</button></div>
-        </section>
-      </div>`;
-    document.querySelectorAll("#datum .radio-chip").forEach((l) => l.onclick = () => { document.querySelectorAll("#datum .radio-chip").forEach((x) => x.classList.remove("on")); l.classList.add("on"); });
-    $("#save").onclick = async () => {
-      const entities = []; document.querySelectorAll("[data-grp]").forEach((cb) => { if (cb.checked) entities.push(...gruppen[cb.dataset.grp]); });
-      const werte = { allow_list: $("#allow").value.split("\n").map((s) => s.trim()).filter(Boolean), deny_list: $("#deny").value.split("\n").map((s) => s.trim()).filter(Boolean),
-        keep_institutions: $("#keep").checked, mask_locations: $("#loc").checked, datum_modus: $('input[name="datum"]:checked').value,
-        vorgaenge_ordner: $("#vo").value.trim(), schluessel_ordner: $("#so").value.trim(), entities };
-      try { await api("/einstellungen", { method: "PUT", json: { werte } }); toast("Gespeichert", "ok"); } catch (e) { toast(e.message, "danger"); }
+  async function einstellungenDialog() {
+    S.cfg = await api("/einstellungen");
+    const c = S.cfg; const erw = c.erweitert || {};
+    const grp = c._gruppen || {};
+    const m = modal(`<div class="mhead"><h2>Einstellungen</h2><button class="x" aria-label="Schließen">✕</button></div>
+      <div class="settings">
+        <div class="sect"><h3>Ihre Kanzlei</h3><p class="desc">Diese Namen werden nie ersetzt: Kanzleiname, Mitarbeitende, eigene Telefonnummern und E-Mail-Adressen. Eine Angabe je Zeile, Namensteile zählen mit.</p>
+          <textarea class="input" id="s-allow" rows="5">${esc((c.allow_list || []).join("\n"))}</textarea>
+          <label class="lbl">Immer ersetzen <span class="muted small">(interne Kürzel, Projektnamen)</span></label>
+          <textarea class="input" id="s-deny" rows="2">${esc((c.deny_list || []).join("\n"))}</textarea></div>
+        <div class="sect"><h3>Erkennung</h3>
+          <label class="checkbox"><input type="checkbox" id="s-inst" ${c.keep_institutions ? "checked" : ""}><span><b>Gerichte, Behörden, Versicherer, Kliniken stehen lassen</b><br><span class="muted small">Meist kein Personenbezug; einzelne lassen sich beim Prüfen trotzdem ersetzen.</span></span></label>
+          <label class="checkbox"><input type="checkbox" id="s-orte" ${c.mask_locations ? "checked" : ""}><span><b>Ortsnamen ohne Adresse ersetzen</b><br><span class="muted small">„Mülheim“ im Fließtext. Adressen und PLZ mit Ort werden immer ersetzt.</span></span></label>
+          <div class="field"><label class="lbl">Datumsangaben</label><div class="radio-row" id="s-datum">${[["kontext", "nur mit Personenbezug (Geburt, Tod)"], ["alle", "jedes Datum"], ["keine", "keine"]].map(([v, t]) => `<label class="radio-chip ${c.datum_modus === v ? "on" : ""}"><input type="radio" name="datum" value="${v}" ${c.datum_modus === v ? "checked" : ""}>${t}</label>`).join("")}</div></div>
+          <div class="field"><label class="lbl">Was erkannt wird</label><div class="two" id="s-ents">${Object.entries(grp).map(([g, ents]) => `<label class="checkbox"><input type="checkbox" data-ents="${esc(ents.join(","))}" ${ents.some((e) => (c.entities || []).includes(e)) ? "checked" : ""}><span>${esc(g)}</span></label>`).join("")}</div></div></div>
+        <div class="sect"><h3>Ausgabe</h3>
+          <div class="two"><div class="field"><label class="lbl">Zusatz im Dateinamen</label><input class="input" id="s-suffix" value="${esc(c.suffix || "_anonymisiert")}"></div>
+            <div class="field"><label class="lbl">Ablage bei Drag &amp; Drop</label><div class="row"><input class="input" id="s-out" style="flex:1" value="${esc(c.ausgabe_ordner || "")}" placeholder="${esc(c._ausgabe_ordner_effektiv)}"><button class="btn" id="s-out-pick">Wählen</button></div><span class="muted small">Bei „Ordner wählen“ landen die Kopien neben den Originalen.</span></div></div>
+          <label class="checkbox"><input type="checkbox" id="s-md" ${c.ki_textfassung ? "checked" : ""}><span><b>Zusätzlich eine Textfassung (.md) erzeugen</b><br><span class="muted small">Reiner Text ohne Layout, mit dem KI-Assistenten am besten arbeiten.</span></span></label></div>
+        <div class="sect"><h3>Erweitert</h3><p class="desc">Alles hier ist aus, bis Sie es brauchen.</p>
+          <label class="swrow"><div class="t"><b>Antworten der KI zurückübersetzen</b><span>Lokanon speichert je Durchlauf einen verschlüsselten Schlüssel und zeigt oben „Antwort zurückübersetzen“.</span></div><span class="switch"><input type="checkbox" id="s-rz" ${erw.rueckuebersetzung ? "checked" : ""}><span class="track"></span></span></label>
+          <div class="field" id="s-pw-row" ${erw.rueckuebersetzung ? "" : "hidden"}><label class="lbl">Passwort für Schlüsseldateien</label><input class="input" type="password" id="s-pw" value="${esc(c.schluessel_passwort || "")}" placeholder="einmal festlegen"><span class="muted small">Liegt in Ihrer Einstellungsdatei auf diesem PC. Schlüssel: ${esc(c._schluessel_ordner_effektiv)}</span></div>
+          <label class="swrow"><div class="t"><b>KI-Anweisung und Claude-Skill anzeigen</b><span>Nach dem Anonymisieren erscheint „KI-Anweisung kopieren“.</span></div><span class="switch"><input type="checkbox" id="s-ki" ${erw.ki_anweisung ? "checked" : ""}><span class="track"></span></span></label>
+          <label class="swrow"><div class="t"><b>Vorgangsordner mit Prüfbericht und Protokoll</b><span>Je Durchlauf ein Ordner mit Originalen, Kopien, Prüfbericht (Klartext) und Protokoll unter ${esc(c._vorgaenge_ordner_effektiv)}.</span></div><span class="switch"><input type="checkbox" id="s-vg" ${erw.vorgaenge ? "checked" : ""}><span class="track"></span></span></label>
+        </div>
+        <div class="row between"><span class="muted small">Lokanon ${esc(S.status.version)} · Einstellungen: ${esc(S.status.daten_ordner)}</span><button class="btn primary" id="s-save">Speichern</button></div>
+      </div>`, { wide: true });
+    $$("#s-datum label", m).forEach((l) => (l.onclick = () => { $$("#s-datum label", m).forEach((x) => x.classList.remove("on")); l.classList.add("on"); }));
+    $("#s-rz", m).onchange = (e) => { $("#s-pw-row", m).hidden = !e.target.checked; };
+    $("#s-out-pick", m).onclick = async () => { try { const r = await api("/system/ordner-waehlen", { method: "POST" }); if (r.pfad) $("#s-out", m).value = r.pfad; } catch (e) { toast(e.message, "danger"); } };
+    $("#s-save", m).onclick = async () => {
+      const lines = (id) => $(id, m).value.split("\n").map((s) => s.trim()).filter(Boolean);
+      const entities = [].concat(...$$("#s-ents input", m).filter((i) => i.checked).map((i) => i.dataset.ents.split(",")));
+      const werte = { allow_list: lines("#s-allow"), deny_list: lines("#s-deny"), keep_institutions: $("#s-inst", m).checked, mask_locations: $("#s-orte", m).checked,
+        datum_modus: ($("#s-datum input:checked", m) || {}).value || "kontext", entities, suffix: $("#s-suffix", m).value, ausgabe_ordner: $("#s-out", m).value.trim(),
+        ki_textfassung: $("#s-md", m).checked, schluessel_passwort: $("#s-pw", m).value,
+        erweitert: { rueckuebersetzung: $("#s-rz", m).checked, ki_anweisung: $("#s-ki", m).checked, vorgaenge: $("#s-vg", m).checked } };
+      if (werte.erweitert.rueckuebersetzung && !werte.schluessel_passwort) { toast("Bitte ein Passwort für die Schlüsseldateien festlegen.", "danger"); return; }
+      try { await api("/einstellungen", { method: "PUT", json: { werte } }); S.cfg = await api("/einstellungen"); badge(); closeModal(); toast("Einstellungen gespeichert", "ok"); await laden(); } catch (e) { toast(e.message, "danger"); }
     };
-    $("#wizard").onclick = async () => { await api("/einstellungen", { method: "PUT", json: { werte: { eingerichtet: false } } }); location.hash = "#einrichten"; };
+  }
+  function hilfeDialog() {
+    modal(`<div class="mhead"><h2>Anleitung</h2><button class="x" aria-label="Schließen">✕</button></div><iframe class="help-frame" src="/anleitung/" title="Anleitung"></iframe>`, { full: true });
   }
 
-  // ------------------------------------------------------------ Ersteinrichtung (3 Bildschirme)
-  async function renderEinrichten() {
-    const cfg = S.cfg || (await api("/einstellungen"));
-    const e = S.einricht;
-    const seite = S.einrichtSeite;
-    const dots = `<div class="dots">${[1, 2, 3].map((n) => `<i class="${n <= seite ? "on" : ""}"></i>`).join("")}</div>`;
-    let inner = "";
-    if (seite === 1) inner = `${dots}<div class="eyebrow">Willkommen</div><h1 style="margin:4px 0 8px">Lokanon einrichten</h1>
-      <p class="muted" style="margin-bottom:18px">Drei kurze Schritte. Lokanon muss wissen, was in Ihren Dokumenten stehen bleiben darf, weil es Ihre eigene Kanzlei sonst wie einen Mandanten behandelt. Es verlässt nichts diesen Rechner.</p>
-      <div class="stack">
-        <div><div class="eyebrow" style="margin-bottom:6px">Wofür nutzen Sie Lokanon?</div><div class="radio-row" id="profil">${[["kanzlei", "Anwaltskanzlei"], ["praxis", "Arztpraxis (Vorschau)"], ["allgemein", "Allgemein"]].map(([v, l]) => `<label class="radio-chip ${(e.profil || "kanzlei") === v ? "on" : ""}"><input type="radio" name="profil" value="${v}" ${(e.profil || "kanzlei") === v ? "checked" : ""}>${l}</label>`).join("")}</div></div>
-        <label class="field"><span>Name Ihrer Kanzlei oder Praxis</span><input class="input" id="w-name" value="${esc(e.name || "")}" placeholder="z. B. Lehmkuhl & Partner Rechtsanwälte"></label>
-        <label class="field"><span>Eigene Personen <span class="hint">– Anwälte, Mitarbeiter; eine je Zeile. „Annette Lehmkuhl“ erlaubt auch „Frau Lehmkuhl“.</span></span><textarea class="input" id="w-personen" rows="4">${esc(e.personen || "")}</textarea></label>
-        <label class="field"><span>Eigene Kontaktdaten <span class="hint">– Telefon, Fax, E-Mail, Anschrift; eine je Zeile</span></span><textarea class="input" id="w-kontakt" rows="4">${esc(e.kontakt || "")}</textarea></label>
-      </div>`;
-    if (seite === 2) inner = `${dots}<div class="eyebrow">Schritt 2 von 3</div><h1 style="margin:4px 0 8px">Was soll ersetzt werden?</h1>
-      <p class="muted" style="margin-bottom:18px">Die Vorgaben passen für die meisten Kanzleien. Beim Prüfen jedes Vorgangs können Sie einzelne Begriffe trotzdem ein- oder ausschalten.</p>
-      <div class="stack">
-        <label class="checkbox"><input type="checkbox" id="w-keep" ${e.keep !== false ? "checked" : ""}><span><b>Gerichte, Behörden, Versicherer, Kliniken stehen lassen</b><br><span class="muted small">Das Amtsgericht ist kein Personenbezug. Der Arbeitgeber eines Mandanten lässt sich beim Prüfen einzeln ersetzen.</span></span></label>
-        <label class="checkbox"><input type="checkbox" id="w-loc" ${e.loc ? "checked" : ""}><span><b>Ortsnamen ohne Adresse ersetzen</b><br><span class="muted small">„in Essen“ im Fließtext. Adressen und PLZ mit Ort werden immer ersetzt. Bei kleinen Orten sinnvoll.</span></span></label>
-        <div><div class="eyebrow" style="margin-bottom:6px">Datumsangaben</div><div class="radio-row" id="w-datum">${[["kontext", "nur mit Personenbezug (Geburt, Tod) – empfohlen"], ["alle", "jedes Datum ersetzen"], ["keine", "Daten stehen lassen"]].map(([v, l]) => `<label class="radio-chip ${(e.datum || "kontext") === v ? "on" : ""}"><input type="radio" name="w-datum" value="${v}" ${(e.datum || "kontext") === v ? "checked" : ""}>${l}</label>`).join("")}</div></div>
-      </div>`;
-    if (seite === 3) inner = `${dots}<div class="eyebrow">Schritt 3 von 3</div><h1 style="margin:4px 0 8px">Wo soll Lokanon ablegen?</h1>
-      <p class="muted" style="margin-bottom:18px">Vorgänge enthalten Kopien Ihrer Dateien. Schlüsseldateien machen die Platzhalter rückübersetzbar und gehören nicht in die Cloud.</p>
-      <div class="stack">
-        <label class="field"><span>Ordner für Vorgänge</span><input class="input" id="w-vo" value="${esc(e.vo || cfg._vorgaenge_ordner_effektiv)}"></label>
-        <label class="field"><span>Ordner für Schlüsseldateien <span class="hint">– außerhalb von OneDrive, Dropbox und ähnlichen</span></span><input class="input" id="w-so" value="${esc(e.so || cfg._schluessel_ordner_effektiv)}"></label>
-        <div class="notice info"><span>ℹ</span><span>Bei „Aktenordner wählen“ entsteht stattdessen ein Unterordner „Lokanon“ direkt in der Akte.</span></div>
-      </div>`;
-    view.innerHTML = `<div class="wizard card raised" style="padding:28px 32px">${inner}
-      <div class="row between" style="margin-top:22px"><button class="btn ghost" id="w-back" ${seite === 1 ? "hidden" : ""}>Zurück</button><span></span><button class="btn primary big" id="w-next">${seite === 3 ? "Einrichtung abschließen" : "Weiter"}</button></div></div>`;
-    document.querySelectorAll(".radio-row").forEach((row) => row.querySelectorAll(".radio-chip").forEach((l) => l.onclick = () => { row.querySelectorAll(".radio-chip").forEach((x) => x.classList.remove("on")); l.classList.add("on"); }));
-    const sammeln = () => {
-      if (seite === 1) { e.profil = $('input[name="profil"]:checked').value; e.name = $("#w-name").value; e.personen = $("#w-personen").value; e.kontakt = $("#w-kontakt").value; }
-      if (seite === 2) { e.keep = $("#w-keep").checked; e.loc = $("#w-loc").checked; e.datum = $('input[name="w-datum"]:checked').value; }
-      if (seite === 3) { e.vo = $("#w-vo").value; e.so = $("#w-so").value; }
-    };
-    $("#w-back").onclick = () => { sammeln(); S.einrichtSeite--; renderEinrichten(); };
-    $("#w-next").onclick = async () => {
-      sammeln();
-      if (seite < 3) { S.einrichtSeite++; renderEinrichten(); return; }
-      const zeilen = (s) => (s || "").split("\n").map((x) => x.trim()).filter(Boolean);
-      const alt = (cfg.allow_list || []).filter((a) => !["Lehmkuhl & Partner", "Annette Lehmkuhl", "0201 8945120", "kanzlei@lehmkuhl-partner.example"].includes(a));
-      const allow = [...new Set([...alt, e.name, ...zeilen(e.personen), ...zeilen(e.kontakt)].map((s) => (s || "").trim()).filter(Boolean))];
-      const werte = { profil: e.profil || "kanzlei", allow_list: allow, keep_institutions: e.keep !== false, mask_locations: !!e.loc, datum_modus: e.datum || "kontext",
-        vorgaenge_ordner: e.vo || "", schluessel_ordner: e.so || "", eingerichtet: true };
-      try { await api("/einstellungen", { method: "PUT", json: { werte } }); S.einrichtSeite = 1; S.einricht = {}; toast("Einrichtung gespeichert", "ok"); location.hash = "#start"; } catch (err) { toast(err.message, "danger"); }
+  // ------------------------------------------------------------ Erster Start
+  function renderWizard() {
+    view.innerHTML = `<section class="wizard"><div class="card raised stack">
+      <div><div class="eyebrow">Erster Start</div><h1>Was Lokanon nie ersetzen soll</h1><p class="muted" style="margin-top:6px">Ihr Kanzleiname, Ihre Mitarbeitenden, Ihre Telefonnummern und E-Mail-Adressen stehen in jedem Schriftsatz. Sie gehören Ihnen und bleiben stehen. Eine Angabe je Zeile; Sie können das jederzeit in den Einstellungen ändern.</p></div>
+      <div class="field"><label class="lbl" for="w-kanzlei">Kanzlei</label><input class="input" id="w-kanzlei" placeholder="z. B. Rechtsanwälte Beispiel &amp; Partner"></div>
+      <div class="field"><label class="lbl" for="w-leute">Mitarbeitende und eigene Kontaktdaten</label><textarea class="input" id="w-leute" rows="5" placeholder="Dr. Anna Beispiel\nMax Mustermann\n0208 123456\nkanzlei@beispiel.de"></textarea></div>
+      <div class="row" style="justify-content:flex-end"><button class="btn primary big" id="w-ok">Los geht’s</button></div>
+    </div></section>`;
+    $("#w-ok").onclick = async () => {
+      const allow = [$("#w-kanzlei").value.trim(), ...$("#w-leute").value.split("\n").map((s) => s.trim())].filter(Boolean);
+      try { await api("/einstellungen", { method: "PUT", json: { werte: { allow_list: [...new Set(allow)], eingerichtet: true } } }); S.status.eingerichtet = true; S.cfg = await api("/einstellungen"); await laden(); } catch (e) { toast(e.message, "danger"); }
     };
   }
 
-  // ------------------------------------------------------------ Hilfe
-  function renderHilfe() {
-    view.innerHTML = `<div class="page-head"><div><h1>Anleitung</h1><p class="sub">Schritt für Schritt, mit Tarifvergleich, rechtlichem Rahmen und Checkliste. Druckbar als PDF.</p></div></div>
-      <iframe class="help-frame" src="/anleitung/index.html" title="Anleitung"></iframe>`;
-  }
-
-  render();
+  boot().catch((e) => { view.innerHTML = `<div class="notice danger">Der lokale Server antwortet nicht. Bitte Lokanon neu starten. (${esc(e.message)})</div>`; });
 })();

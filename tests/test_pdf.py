@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -14,7 +15,7 @@ sys.path.insert(0, str(ROOT / "testdaten" / "pdf"))
 
 import pymupdf  # noqa: E402
 
-from anonymizer.files import _pdf_short_placeholder, verify_pdf, write_pdf  # noqa: E402
+from anonymizer.files import _pdf_placeholder_stufen, _pdf_short_placeholder, verify_pdf, write_pdf  # noqa: E402
 
 FALL4 = ROOT / "testdaten" / "kanzlei" / "Fall4_Verkehrsrecht_Einspruch_Bussgeld_Engel.pdf"
 REF = ROOT / "testdaten" / "kanzlei" / "referenz_markierungen.jsonl"
@@ -57,16 +58,16 @@ def test_verify_detects_originals_in_source():
 def test_fall4_redacted():
     data = FALL4.read_bytes()
     pairs = _fall4_pairs()
-    pairs.append(("Dr. Annette Lehmkuhl", "[PERSON_9]"))
+    pairs.append(("Dr. Annette Lehmkuhl", "[Person_9]"))
     out = write_pdf(data, pairs)
     (OUT / "Fall4_geschwaerzt.pdf").write_bytes(out)
     assert verify_pdf(out, [o for o, _ in pairs]) == []
     text = _full_text(out)
     flat = text.replace("\n", "").replace(" ", "")
     for _orig, ph in pairs:
-        short = _pdf_short_placeholder(ph)
-        assert ph in flat or short in flat, f"{ph} fehlt im Ergebnis"
-    assert "[P2]" in flat  # "Engel" allein ist zu schmal für [PERSON_2] bei 5 pt -> Kurzform
+        assert any(stufe in flat for stufe in _pdf_placeholder_stufen(ph)), f"{ph} fehlt im Ergebnis"
+# "Engel" allein ist zu schmal für [PERSON_2] bei 5 pt -> lesbare Kurzform
+    assert "[PERSON_2]" not in flat and re.search(r"(?i)\[P(ers[a-z]*_)?2\]", flat)
     # Unbeteiligter Text bleibt stehen
     assert "Einspruch" in text and "Dortmund" in text
     with pymupdf.open(stream=out, filetype="pdf") as d:
@@ -86,13 +87,13 @@ def test_xobject_pdf():
     src = build()
     data = src.read_bytes()
     pairs = [
-        ("Dr. Claudia Engel", "[PERSON_1]"),
-        ("Markus Engel", "[PERSON_2]"),
-        ("Dr. Annette Lehmkuhl", "[PERSON_3]"),
-        ("Engel", "[PERSON_1]"),
-        ("Moltkestraße 15", "[ADRESSE_1]"),
+        ("Dr. Claudia Engel", "[Person_1]"),
+        ("Markus Engel", "[Person_2]"),
+        ("Dr. Annette Lehmkuhl", "[Person_3]"),
+        ("Engel", "[Person_1]"),
+        ("Moltkestraße 15", "[Adresse_1]"),
         ("45138 Essen", "[PLZ_ORT_1]"),
-        ("E-CE 511", "[KFZ_1]"),
+        ("E-CE 511", "[Kennzeichen_1]"),
         ("7.1-552318/26", "[AKTENZEICHEN_1]"),
         ("Chefärztin der Kinderklinik am Elisabeth-Krankenhaus", "[INDIREKT_1]"),
     ]
@@ -103,9 +104,10 @@ def test_xobject_pdf():
     assert verify_pdf(out, originals) == []
     text = _full_text(out)
     flat = text.replace("\n", "").replace(" ", "")
-    assert flat.count("[PERSON_1]") >= 3  # Seite 1, XObject auf Seite 2, direkte Zeile
-    assert flat.count("[PERSON_2]") >= 2
-    assert "[KFZ_1]" in flat and "[INDIREKT_1]" in flat
+    assert flat.count("[Person_1]") >= 3  # Seite 1, XObject auf Seite 2, direkte Zeile
+    assert flat.count("[Person_2]") >= 2
+    assert "[INDIREKT_1]" in flat
+    assert re.search(r"\[Kenn[a-z]*_1\]", flat)  # Kennzeichen umbricht im Original: gekürzt, aber lesbar
     assert "Direkt:" in text and "Mandantin" in text
     assert verify_pdf(out, ["Versteckt", "Notiz", "anhang"]) == []  # versteckter Text, Annot, Anhang weg
     with pymupdf.open(stream=out, filetype="pdf") as d:
@@ -142,9 +144,9 @@ def test_multiline_hit():
                      fontname="helv", fontsize=11)
     data = doc.tobytes()
     assert "Claudia\nEngel" in _full_text(data) or "Dr.\nClaudia" in _full_text(data)
-    out = write_pdf(data, [("Dr. Claudia Engel", "[PERSON_1]")])
+    out = write_pdf(data, [("Dr. Claudia Engel", "[Person_1]")])
     flat = _full_text(out).replace("\n", "").replace(" ", "")
-    assert flat.count("[PERSON_1]") == 1
+    assert flat.count("[Person_1]") == 1
     assert "Einspruch" in flat
 
 
@@ -175,10 +177,10 @@ def test_tj_kerning_keeps_positions():
                       b"BT /helv 11 Tf 50 742 Td [(Mandantin Dr. Cl) -30 (audia Engel wohnt) 15 ( in Essen)] TJ "
                       b"0 -14 Td [<4672617520456e67656c20626573747265697465742e>] TJ ET")
     data = doc.tobytes()
-    out = write_pdf(data, [("Dr. Claudia Engel", "[PERSON_1]"), ("Engel", "[PERSON_1]")])
+    out = write_pdf(data, [("Dr. Claudia Engel", "[Person_1]"), ("Engel", "[Person_1]")])
     assert verify_pdf(out, ["Dr. Claudia Engel", "Engel"]) == []
     flat = _full_text(out).replace("\n", "").replace(" ", "")
-    assert flat.count("[PERSON_1]") + flat.count("[P1]") == 2
+    assert len(re.findall(r"\[P(ers[a-z]*_)?1\]", flat)) == 2
     _assert_rest_unmoved(data, out, "Dr. ClaudiaEngel")
 
 
@@ -192,7 +194,7 @@ def test_type0_font_keeps_positions():
     data = doc.tobytes()
     with pymupdf.open(stream=data, filetype="pdf") as d:
         assert d[0].get_fonts()[0][2] == "Type0"
-    out = write_pdf(data, [("Dr. Claudia Engel", "[PERSON_1]")])
+    out = write_pdf(data, [("Dr. Claudia Engel", "[Person_1]")])
     assert verify_pdf(out, ["Dr. Claudia Engel"]) == []
     _assert_rest_unmoved(data, out, "Dr. ClaudiaEngel")
 
@@ -202,14 +204,14 @@ def test_word_boundaries():
     p = doc.new_page()
     p.insert_text((50, 100), "Engelmann traf Engel in Essen-Frohnhausen bei Essen.", fontname="helv", fontsize=11)
     data = doc.tobytes()
-    out = write_pdf(data, [("Engel", "[PERSON_1]"), ("Essen", "[ORT_1]")])
+    out = write_pdf(data, [("Engel", "[Person_1]"), ("Essen", "[Ort_1]")])
     text = _full_text(out)
-    # gleiche Semantik wie _replace_all: "Engelmann" bleibt, "Essen-Frohnhausen" wird zu "[ORT_1]-Frohnhausen"
+    # gleiche Semantik wie _replace_all: "Engelmann" bleibt, "Essen-Frohnhausen" wird zu "[Ort_1]-Frohnhausen"
     assert "Engelmann" in text and "-Frohnhausen" in text and "Essen" not in text
     assert verify_pdf(out, ["Engel", "Essen"]) == []
     assert verify_pdf(data, ["Engel", "Essen"]) == ["Engel", "Essen"]
     flat = text.replace("\n", "").replace(" ", "")
-    assert flat.count("[PERSON_1]") + flat.count("[P1]") == 1 and flat.count("[ORT_1]") == 2
+    assert len(re.findall(r"\[P(ers[a-z]*_)?1\]", flat)) == 1 and flat.count("[Ort_1]") == 2
     with pymupdf.open(stream=out, filetype="pdf") as d:
         assert d[0].get_images() == []  # nicht gerastert
 
@@ -218,10 +220,10 @@ def test_placeholder_font_on_xobject_page():
     """Seite ohne eigene Schriftressourcen: Platzhalter muss trotzdem in Helvetica stehen."""
     from make_xobject_pdf import build
 
-    out = write_pdf(build().read_bytes(), [("Dr. Claudia Engel", "[PERSON_1]")])
+    out = write_pdf(build().read_bytes(), [("Dr. Claudia Engel", "[Person_1]")])
     with pymupdf.open(stream=out, filetype="pdf") as d:
         fonts = {s["font"] for b in d[1].get_text("dict")["blocks"] for l in b.get("lines", [])
-                 for s in l["spans"] if s["text"].startswith("[PERSON")}
+                 for s in l["spans"] if s["text"].startswith("[Person")}
     assert fonts == {"Helvetica"}, fonts
 
 

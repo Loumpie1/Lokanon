@@ -1,5 +1,6 @@
-"""API-Tests: kompletter Weg über den lokalen Server (Vorgang anlegen, Text, Analyse, Prüfen, Ausgabe, Schlüssel,
-Rückübersetzung). Läuft gegen einen eigenen Daten-Ordner (LOKANON_HOME), nicht gegen die persönlichen Einstellungen."""
+"""API-Tests: kompletter Weg über den lokalen Server (Dateien ablegen, Analyse, Prüfen mit Identitäten, Anonymisieren
+im gleichen Format, erweiterte Funktionen). Läuft gegen einen eigenen Daten-Ordner (LOKANON_HOME), nicht gegen die
+persönlichen Einstellungen."""
 import os
 import sys
 import tempfile
@@ -23,14 +24,15 @@ TEXT = ("Mandant: Thomas Weber, geb. 03.04.1978, Goethestraße 12, 45127 Essen, 
         "Aktenzeichen: 3 O 123/26. Gegner: Autohaus Krause GmbH, Kennzeichen E-TW 412. Unser Zeichen: mü/ka\n"
         "Herr Weber arbeitet als Prokurist bei der Spedition Nolte. Sein Sohn Jonas Weber war Zeuge.\n"
         "Mit freundlichen Grüßen\nThomas Weber")
+HOME = Path(os.environ["LOKANON_HOME"])
 
 
 @pytest.fixture(scope="module")
 def client():
     cfg = est.laden()
-    home = Path(os.environ["LOKANON_HOME"])
     cfg.update(eingerichtet=True, allow_list=["Legalizer"], datum_modus="kontext", gliner_model="",  # ohne GLiNER: schneller
-               vorgaenge_ordner=str(home / "Vorgaenge"), schluessel_ordner=str(home / "schluessel"))
+               vorgaenge_ordner=str(HOME / "Vorgaenge"), schluessel_ordner=str(HOME / "schluessel"),
+               ausgabe_ordner=str(HOME / "Anonymisiert"))
     est.speichern(cfg)
     modelle.cfg = est.laden()
     modelle.starten()
@@ -41,7 +43,7 @@ def client():
 def warte(client, timeout=180):
     t0 = time.time()
     while time.time() - t0 < timeout:
-        f = client.get("/api/vorgang/fortschritt").json()
+        f = client.get("/api/fortschritt").json()
         if not f["laeuft"]:
             assert not f["fehler"], f["fehler"]
             return f
@@ -51,60 +53,96 @@ def warte(client, timeout=180):
 
 def test_status_und_einstellungen(client):
     st = client.get("/api/status").json()
-    assert st["eingerichtet"] and st["version"]
+    assert st["eingerichtet"] and st["version"] and "erweitert" in st
     cfg = client.get("/api/einstellungen").json()
-    assert "DIKTATZEICHEN" in cfg["entities"] and "_gruppen" in cfg
-    r = client.put("/api/einstellungen", json={"werte": {"deny_list": ["Projekt Phoenix"], "unbekannt": 1}})
+    assert "DIKTATZEICHEN" in cfg["entities"] and "_gruppen" in cfg and cfg["suffix"] == "_anonymisiert"
+    r = client.put("/api/einstellungen", json={"werte": {"deny_list": ["Projekt Phoenix"], "unbekannt": 1, "suffix": "x/y",
+                                                         "erweitert": {"ki_anweisung": True}}})
     assert r.status_code == 200
-    assert client.get("/api/einstellungen").json()["deny_list"] == ["Projekt Phoenix"]
-    client.put("/api/einstellungen", json={"werte": {"deny_list": []}})
+    cfg = client.get("/api/einstellungen").json()
+    assert cfg["deny_list"] == ["Projekt Phoenix"] and cfg["suffix"] == "_anonymisiert" and cfg["erweitert"]["ki_anweisung"]
+    client.put("/api/einstellungen", json={"werte": {"deny_list": [], "erweitert": {"ki_anweisung": False}}})
 
 
 def test_kompletter_weg(client):
-    z = client.post("/api/vorgang", json={"name": "Weber ./. Krause", "ordner": ""}).json()
-    assert z["id"] and z["basis"].endswith("Weber ._. Krause") or z["basis"]
-    assert client.post("/api/vorgang/text", json={"text": TEXT}).status_code == 200
-    assert (Path(z["basis"]) / "Originale" / "text.txt").read_text(encoding="utf-8") == TEXT
-    client.post("/api/vorgang/analysieren", json={"begriffe": []})
+    client.post("/api/leeren")
+    r = client.post("/api/dateien", files=[("datei", ("Schreiben Weber.txt", TEXT.encode("utf-8"), "text/plain"))])
+    assert r.status_code == 200 and r.json()["dateien"][0]["name"] == "Schreiben Weber.txt"
+    client.post("/api/analyse", json={"begriffe": []})
     warte(client)
-    v = client.get("/api/vorgang").json()
-    begriffe = {b["begriff"]: b for b in v["begriffe"]}
+    z = client.get("/api/zustand").json()
+    ids = {i["name"]: i for i in z["identitaeten"]}
     for muss in ("Thomas Weber", "Goethestraße 12", "0201 5551234", "3 O 123/26", "E-TW 412", "mü/ka"):
-        assert any(muss in k for k in begriffe), muss
-    assert "Prokurist" not in begriffe  # BERUF ist im Kanzlei-Profil aus
+        assert any(muss in k for k in ids), muss
+    assert "Prokurist" not in ids
+    # Identität: Thomas Weber fasst "Weber" und die Unterschrift zusammen
+    tw = ids["Thomas Weber"]
+    assert "Weber" in tw["varianten"] and tw["anzahl"] >= 3 and tw["anzeige"] == "[Person_1]"
+    # Nackter Nachname "Weber" passt zu Thomas und Jonas -> Frage
+    assert tw["fragen"] and {k["name"] for k in tw["fragen"][0]["kandidaten"]} == {"Thomas Weber", "Jonas Weber"}
     # Schalter: Spedition Nolte bleibt stehen
-    key = next(b["key"] for b in v["begriffe"] if b["begriff"] == "Spedition Nolte")
-    v = client.post("/api/vorgang/begriff", json={"key": key, "aktiv": False}).json()
-    assert "Spedition Nolte" in v["dokumente"][0]["anonym"]
-    # Eigene Bezeichnung
-    ph = begriffe["Thomas Weber"]["ph_basis"]
-    v = client.post("/api/vorgang/bezeichnung", json={"platzhalter": ph, "bezeichnung": "Mandant"}).json()
-    assert "[MANDANT]" in v["dokumente"][0]["anonym"] and "Thomas Weber" not in v["dokumente"][0]["anonym"]
-    assert v["dokumente"][0]["anonym"].count("[MANDANT]") == 3  # inkl. Namensteil "Weber" und Unterschrift
-    # Ausgabe
-    r = client.post("/api/vorgang/ausgabe", json={"formate": ["pdf", "docx", "xlsx"], "anbieter": "Claude Team / Enterprise"}).json()
-    assert r["ausgaben"][0]["status"] == "ok" and r["hinweise"] == []
-    ki = Path(r["ki_ordner"])
-    assert (ki / "text.md").read_text(encoding="utf-8").count("[MANDANT]") == 3
-    assert (Path(r["basis"]) / "Pruefbericht.html").exists() and (Path(r["basis"]) / "Protokoll.md").exists()
-    zip_bytes = client.get("/api/vorgang/ki.zip").content
-    assert zip_bytes[:2] == b"PK"
-    # Abschluss und Rückübersetzung
-    r = client.post("/api/vorgang/abschliessen", json={"passwort": "geheim"}).json()
-    assert Path(r["schluessel_pfad"]).exists()
-    antwort = "Sehr geehrter [MANDANT], Ihr Sohn [Person 2] ist Zeuge im Verfahren AZ_1 gegen [FIRMA_1]."
+    nolte = ids["Spedition Nolte"]
+    z = client.post("/api/identitaet", json={"ph": nolte["ph"], "aktiv": False}).json()
+    assert "Spedition Nolte" in z["dokumente"][0]["anonym"]
+    # Eigene Bezeichnung gilt für alle Schreibweisen
+    z = client.post("/api/identitaet", json={"ph": tw["ph"], "bezeichnung": "Mandant"}).json()
+    anonym = z["dokumente"][0]["anonym"]
+    assert "[Mandant]" in anonym and "Thomas Weber" not in anonym and anonym.count("[Mandant]") == 3
+    # Frage beantworten: "Weber" gehört zu Jonas -> jetzt nur noch zwei [Mandant]
+    z = client.post("/api/identitaet", json={"ph": tw["ph"], "zuordnen": {"text": "Weber", "ph": ids["Jonas Weber"]["ph"]}}).json()
+    assert z["dokumente"][0]["anonym"].count("[Mandant]") == 2
+    ids2 = {i["name"]: i for i in z["identitaeten"]}
+    assert "Weber" in ids2["Jonas Weber"]["varianten"]
+    # Anonymisieren: gleiche Datei, Zusatz im Namen, im Ausgabeordner
+    client.post("/api/anonymisieren")
+    warte(client)
+    z = client.get("/api/zustand").json()
+    e = z["ergebnis"]
+    assert e["dateien"][0]["status"] == "ok" and e["dateien"][0]["ausgabe"] == "Schreiben Weber_anonymisiert.txt"
+    out = Path(e["ordner"]) / "Schreiben Weber_anonymisiert.txt"
+    assert out.exists() and e["ordner"] == str(HOME / "Anonymisiert")
+    inhalt = out.read_text(encoding="utf-8")
+    assert "[Mandant]" in inhalt and "Thomas" not in inhalt and "Spedition Nolte" in inhalt and "Goethestraße" not in inhalt
+    assert e["schluessel_pfad"] == ""  # Rückübersetzung ist aus
+
+
+def test_erweitert_rueckuebersetzung(client):
+    client.put("/api/einstellungen", json={"werte": {"erweitert": {"rueckuebersetzung": True}, "schluessel_passwort": "geheim"}})
+    client.post("/api/leeren")
+    client.post("/api/text", json={"text": "Herr Thomas Weber aus Essen, Az. 3 O 123/26, gegen Autohaus Krause GmbH."})
+    client.post("/api/analyse", json={"begriffe": []})
+    warte(client)
+    client.post("/api/anonymisieren")
+    warte(client)
+    z = client.get("/api/zustand").json()
+    assert z["ergebnis"]["schluessel_pfad"].endswith(".anon.json") and Path(z["ergebnis"]["schluessel_pfad"]).exists()
+    antwort = "Sehr geehrter [Person_1], im Verfahren Aktenzeichen 1 gegen [FIRMA_1] gilt Folgendes."
     r = client.post("/api/zurueck", json={"text": antwort}).json()
-    assert r["text"] == "Sehr geehrter Thomas Weber, Ihr Sohn Jonas Weber ist Zeuge im Verfahren 3 O 123/26 gegen Autohaus Krause GmbH."
-    # mit Schlüsseldatei (wie bei einem späteren Vorgang)
+    assert r["text"] == "Sehr geehrter Thomas Weber, im Verfahren 3 O 123/26 gegen Autohaus Krause GmbH gilt Folgendes."
     keys = client.get("/api/schluessel").json()["schluessel"]
     r = client.post("/api/zurueck", json={"text": antwort, "schluessel_pfad": keys[0]["pfad"], "passwort": "geheim"}).json()
-    assert r["text"].startswith("Sehr geehrter Thomas Weber") and r["vorgang"] == "Weber ./. Krause"
+    assert r["text"].startswith("Sehr geehrter Thomas Weber")
     r = client.post("/api/zurueck", json={"text": antwort, "schluessel_pfad": keys[0]["pfad"], "passwort": "falsch"})
     assert r.status_code == 400 and "Passwort" in r.json()["fehler"]
+    client.put("/api/einstellungen", json={"werte": {"erweitert": {"rueckuebersetzung": False}}})
 
 
-def test_fehler_sind_verstaendlich(client):
-    r = client.post("/api/vorgang", json={"name": "x", "ordner": r"C:\gibt\es\nicht"})
+def test_ordner_modus_und_fehler(client):
+    ordner = HOME / "Akte Krause"
+    ordner.mkdir()
+    (ordner / "Notiz.txt").write_text("Thomas Weber ruft an, Tel. 0201 5551234.", encoding="utf-8")
+    (ordner / "Notiz_anonymisiert.txt").write_text("alt", encoding="utf-8")  # frühere Ausgabe wird nicht erneut gelesen
+    client.post("/api/leeren")
+    r = client.post("/api/ordner", json={"pfad": str(ordner)}).json()
+    assert [d["name"] for d in r["dateien"]] == ["Notiz.txt"]
+    client.post("/api/analyse", json={"begriffe": []})
+    warte(client)
+    client.post("/api/anonymisieren")
+    warte(client)
+    e = client.get("/api/zustand").json()["ergebnis"]
+    assert e["ordner"] == str(ordner)
+    assert "[Person_1]" in (ordner / "Notiz_anonymisiert.txt").read_text(encoding="utf-8")
+    r = client.post("/api/ordner", json={"pfad": r"C:\gibt\es\nicht"})
     assert r.status_code == 400 and "nicht gefunden" in r.json()["fehler"]
     r = client.post("/api/system/oeffnen", json={"pfad": r"C:\gibt\es\nicht"})
     assert r.status_code == 400

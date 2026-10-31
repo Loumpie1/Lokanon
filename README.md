@@ -1,56 +1,55 @@
 # Lokanon – lokaler Anonymisierer für Kanzleien
 
-Erkennt und ersetzt personenbezogene und vertrauliche Daten **lokal**, bevor Text an eine KI (ChatGPT, Claude …) geht,
-und übersetzt die KI-Antwort wieder zurück. Kein Cloud-Dienst, keine API: Presidio + spaCy + GLiNER + RapidOCR + eigene
-Regeln, eigene Oberfläche im Programmfenster (FastAPI + pywebview). Version 2.0-pilot.
+Erkennt und ersetzt personenbezogene und vertrauliche Daten **lokal**, bevor Dateien an eine KI (ChatGPT, Claude, Gemini)
+gehen. Kein Cloud-Dienst, keine API: Presidio + spaCy + GLiNER + RapidOCR + eigene Regeln, eigene Oberfläche im
+Programmfenster (FastAPI + pywebview). Version 0.2.0 (Pilot).
 
 **Für Endanwender:** fertiger Installer und Pilot-Paket unter
 [Releases](https://github.com/Loumpie1/Lokanon/releases) (Installer ca. 1,4 GB, enthält alle Sprachmodelle). Anleitung in
-der App („Anleitung“) bzw. unter `static/anleitung/index.html`. Pilot-Hinweis und Rückmeldebogen: `docs/pilot/`,
-Marketing-Deck: `docs/marketing/`. Selbst bauen: `build/README.md`.
+der App („?“ oben rechts) bzw. unter `static/anleitung/index.html`. Pilot-Hinweis und Rückmeldebogen: `docs/pilot/`,
+Marketing-Deck und Filme: `docs/marketing/`, `video/`. Selbst bauen: `build/README.md`.
 
 ## Entwicklung einrichten (Windows)
 
 1. Python 3.13 (normaler Build, nicht free-threaded) installieren.
-2. `setup.bat` doppelklicken: legt `%USERPROFILE%\Lokanon\venv` an, installiert `requirements.txt`, spaCy-Modell
+2. `setup.bat` doppelklicken: legt `%USERPROFILE%\Lokanonenv` an, installiert `requirements.txt`, spaCy-Modell
    `de_core_news_lg`, prüft RapidOCR und lädt GLiNER (`urchade/gliner_multi_pii-v1`, ca. 1,1 GB) in den Hugging-Face-Cache.
 3. `start.bat` → Programmfenster. Alternativ `python lokanon.py --browser` (Standardbrowser) oder `--port 8765`.
 
 Nach der Einrichtung läuft alles offline (`HF_HUB_OFFLINE=1` wird vom Starter gesetzt).
 
-## Bedienung (Kurzfassung)
+## Bedienung: ein Bildschirm, drei Zustände
 
-1. **Start**: Vorgang benennen, Dateien per Drag & Drop ablegen, Aktenordner wählen oder Text einfügen. Die Analyse startet
-   automatisch; gescannte PDF-Seiten werden per Texterkennung gelesen (auch gedrehte Scans).
-2. **Prüfen**: Karten nach Art (Personen, Firmen, Adressen, Kontaktdaten, Akten …) mit Fundstelle, Sicherheit und Schalter.
-   „benennen“ vergibt eine eigene Bezeichnung (`[MANDANT]` statt `[PERSON_1]`), die überall im Vorgang gilt. Rechts das
-   Original mit Markierungen (Etikett = Platzhalter, gestrichelt = bleibt stehen) oder die anonymisierte Fassung.
-   „Bitte ansehen“ listet unsichere Treffer. Übersehenes nachtragen.
-3. **Fertigstellen**: Prüfung bestätigen, „Dateien erzeugen“. Ergebnis je Datei mit Leck-Test-Status, „Ordner öffnen“,
-   KI-Anweisung zum Kopieren, Schlüssel mit Passwort speichern.
-4. **Antwort**: KI-Antwort einfügen, Platzhalter werden ersetzt (auch `[MANDANT]`, „Person 1“, `[PERSON_1]s`).
-   Frühere Vorgänge über „Antwort zurückübersetzen“ mit Schlüsseldatei und Passwort.
+1. **Ablegen**: Dateien per Drag & Drop, „Ordner wählen“ oder „Text einfügen“. Die Erkennung startet sofort; gescannte
+   PDF-Seiten werden per Texterkennung gelesen (auch gedrehte Scans).
+2. **Prüfen**: eine Karte je Person oder Angabe, Schreibweisen zusammengefasst („Moritz Günther“, „Herr Günther“,
+   „Günthers“). Schalter (ersetzen / stehen lassen), Platzhalter anklicken und eigenen Namen vergeben (`[Mandant]` statt
+   `[Person_1]`), „gehört zu …“ und „trennen …“ für Zuordnungen, Rückfrage bei mehrdeutigen Nachnamen, „Fehlt etwas?“ zum
+   Nachtragen. Rechts das Dokument mit Markierungen oder die anonymisierte Fassung. Unten: „Geprüft, jetzt anonymisieren“.
+3. **Fertig**: je Datei eine Kopie im gleichen Format mit Zusatz (`Klage.docx` → `Klage_anonymisiert.docx`, PDF echt
+   geschwärzt), bei „Ordner wählen“ neben den Originalen, sonst unter `Dokumente\Lokanon\Anonymisiert`. „Ordner öffnen“.
 
-Vorgangsordner (bei Upload/Text unter `%USERPROFILE%\Lokanon\Vorgaenge\<Name>`, bei Aktenordner `<Akte>\Lokanon`):
-`Originale\`, `Anonymisiert\` (Originalnamen), `Fuer die KI\` (bereinigte Namen – hochladen), `Pruefbericht.html`
-(Klartext!), `Uebersicht.csv`, `Protokoll.md/.json`. Schlüssel: `%USERPROFILE%\Lokanon\schluessel\<Name>.anon.json`.
-Einstellungen: `%USERPROFILE%\Lokanon\einstellungen.yaml` (Vorlage `config.default.yaml`).
+**Einstellungen** (Zahnrad): Kanzlei (nie ersetzen), Erkennung, Ausgabe (Zusatz, Ablageordner, Textfassung) und
+**Erweitert**, alles standardmäßig aus: Rückübersetzung mit verschlüsseltem Schlüssel (dann erscheint oben „Antwort
+zurückübersetzen“), KI-Anweisung und Claude-Skill, Vorgangsordner mit Prüfbericht und Protokoll unter
+`%USERPROFILE%\Lokanon\Vorgaenge`. Einstellungen: `%USERPROFILE%\Lokanon\einstellungen.yaml` (Vorlage `config.default.yaml`).
 
 Startet Lokanon nicht, steht der Grund in `%USERPROFILE%\Lokanon\lokanon.log` (das Programmfenster zeigt beim Start
 eine Wartemeldung; der erste Start nach der Installation kann ein bis zwei Minuten dauern).
 
-Platzhalter sind innerhalb eines Vorgangs konsistent (auch über mehrere Dateien, Namensteile und Genitiv), zwischen
-Vorgängen beginnt die Zählung neu.
+Platzhalter sind innerhalb eines Durchlaufs konsistent (auch über mehrere Dateien, Namensteile und Genitiv), zwischen
+Durchläufen beginnt die Zählung neu.
 
 ## Projektstruktur
 
 ```
 lokanon.py                      Starter: Server auf 127.0.0.1 + Programmfenster (pywebview/WebView2), --browser Fallback
 server/app.py                   HTTP-Schnittstelle (FastAPI), nur lokal
-server/dienst.py                Vorgangsdienst: Analyse mit Fortschritt, Begriffe, Bezeichnungen, Ausgabe, Schlüssel
+server/dienst.py                Sitzungsdienst: Analyse mit Fortschritt, Identitäten, Anonymisieren, erweiterte Funktionen
 server/einstellungen.py         persönliche Einstellungen (einstellungen.yaml), Gruppen-Auffüllung
 ui/                             Oberfläche: index.html, app.css (Designsystem), app.js, fonts/ (Source Sans 3, Source Serif 4)
-anonymizer/engine.py            Erkennung, Bereinigung, vorgangsweite Propagation, Pseudonyme, Bezeichnungen, Rückübersetzung
+anonymizer/engine.py            Erkennung, Bereinigung, Propagation über Dateien, Pseudonyme, Zuordnungen, Rückübersetzung
+anonymizer/ausgabe.py           Ausgabe im gleichen Format mit Zusatz im Dateinamen, Leck-Test
 anonymizer/recognizers_de.py    Deutsche Muster (Telefon, Adresse, Aktenzeichen, Diktatzeichen, FIN, Grundbuch, Versicherung,
                                 Datum in Worten …) + 13 eingebaute Presidio-DE-Erkenner
 anonymizer/ocr.py               Texterkennung für Scans (RapidOCR) mit Ausrichtung, Pixel-Schwärzung, OCR-Gegenprüfung

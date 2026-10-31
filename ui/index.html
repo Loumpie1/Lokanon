@@ -9,29 +9,24 @@
 <link rel="stylesheet" href="/ui/app.css">
 </head>
 <body>
-<div class="shell">
-  <aside class="rail" aria-label="Hauptnavigation">
-    <a class="brand" href="#start" title="Lokanon">
-      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M4 9 24 3l20 6v16c0 10-8 17-20 20C12 42 4 35 4 25Z" fill="currentColor"/><rect x="13" y="19" width="22" height="5" rx="2.5" fill="#fff"/><rect x="17" y="27" width="14" height="5" rx="2.5" fill="#0E9F8A"/></svg>
-      <span class="brand-name">Lokanon</span>
-    </a>
-    <nav class="nav">
-      <a href="#start" data-nav="start"><span class="nav-ico">⌂</span>Start</a>
-      <a href="#vorgang" data-nav="vorgang" id="nav-vorgang" hidden><span class="nav-ico">▤</span>Aktueller Vorgang</a>
-      <a href="#zurueck" data-nav="zurueck"><span class="nav-ico">⇄</span>Antwort zurückübersetzen</a>
-      <a href="#einstellungen" data-nav="einstellungen"><span class="nav-ico">⚙</span>Einstellungen</a>
-      <a href="#hilfe" data-nav="hilfe"><span class="nav-ico">?</span>Anleitung</a>
-    </nav>
-    <div class="rail-foot">
-      <div class="local-badge" id="local-badge"><span class="dot"></span><span id="local-text">Läuft lokal auf diesem PC</span></div>
-      <div class="rail-version" id="version"></div>
-    </div>
-  </aside>
+<header class="topbar">
+  <a class="brand" href="#" id="brand" title="Lokanon">
+    <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M4 9 24 3l20 6v16c0 10-8 17-20 20C12 42 4 35 4 25Z" fill="currentColor"/><rect x="13" y="19" width="22" height="5" rx="2.5" fill="#fff"/><rect x="17" y="27" width="14" height="5" rx="2.5" fill="#0E9F8A"/></svg>
+    <span class="brand-name">Lokanon</span>
+  </a>
+  <div class="topbar-right">
+    <div class="local-badge" id="local-badge"><span class="dot"></span><span id="local-text">Läuft lokal auf diesem PC</span></div>
+    <button class="topbtn" id="btn-zurueck" type="button" hidden>Antwort zurückübersetzen</button>
+    <button class="topbtn icon" id="btn-hilfe" type="button" title="Anleitung" aria-label="Anleitung">?</button>
+    <button class="topbtn icon" id="btn-einstellungen" type="button" title="Einstellungen" aria-label="Einstellungen">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </div>
+</header>
 
-  <main class="main" id="main">
-    <div class="view" id="view"></div>
-  </main>
-</div>
+<main class="main" id="main">
+  <div class="view" id="view"></div>
+</main>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <div class="modal-root" id="modal-root" hidden></div>
