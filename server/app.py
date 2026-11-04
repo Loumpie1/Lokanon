@@ -69,7 +69,8 @@ class EinstellungenBody(BaseModel):
 
 ERLAUBT = {"profil", "eingerichtet", "allow_list", "deny_list", "keep_institutions", "mask_locations", "datum_modus",
            "vorgaenge_ordner", "schluessel_ordner", "ausgabe_ordner", "suffix", "ki_textfassung", "erweitert",
-           "schluessel_passwort", "entities", "threshold", "propagate_repeats", "include_name_parts", "zuletzt_ordner"}
+           "schluessel_passwort", "entities", "threshold", "propagate_repeats", "include_name_parts", "zuletzt_ordner",
+           "gelernt"}
 
 
 @app.put("/api/einstellungen")
@@ -166,6 +167,16 @@ class IdentitaetBody(BaseModel):
 @app.post("/api/identitaet")
 def identitaet(body: IdentitaetBody):
     return sitzung.identitaet(body.ph, body.aktiv, body.bezeichnung, body.gehoert_zu, body.trennen, body.zuordnen)
+
+
+class LernenBody(BaseModel):
+    art: str
+    begriffe: list[str]
+
+
+@app.post("/api/lernen")
+def lernen(body: LernenBody):
+    return sitzung.lernen(body.art, body.begriffe)
 
 
 @app.post("/api/nachtragen")

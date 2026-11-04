@@ -22,6 +22,7 @@ from anonymizer.engine import (LABELS, Finding, anzeige_platzhalter, build_analy
 from anonymizer.vault import decrypt_mapping, encrypt_mapping
 from anonymizer.vorgang import (LESBARE_TYPEN, Vorgang, dateien_im_ordner, mapping_aus_schluessel, markiert_html,
                                 pruefbericht_html, sicherer_name)
+from server import einstellungen as est
 
 APP_DIR = Path(__file__).resolve().parents[1]
 ANWEISUNG_PATH = APP_DIR / "ki-anweisung" / "projekt-anweisung.md"
@@ -39,7 +40,7 @@ GRUPPEN_ANZEIGE = {
                                 "FIN"],
     "Daten und Sonstiges": ["DATUM", "BERUF", "DIAGNOSE", "EIGENE_BEGRIFFE", "MANUELL"],
 }
-QUELLE_TEXT = {"modell": "Sprachmodell", "regel": "Muster", "heuristik": "Anrede oder Unterschrift",
+QUELLE_TEXT = {"modell": "Sprachmodell", "regel": "Muster", "heuristik": "Anrede oder Unterschrift", "feld": "Formularfeld",
                "liste": "Ihre Liste", "wiederholung": "Wiederholung", "namensteil": "Namensteil", "vorgang": "andere Datei"}
 VORSCHLAEGE = {
     "PERSON": ["Mandant", "Mandantin", "Gegner", "Gegnerin", "Zeuge", "Zeugin", "Erblasser", "Erblasserin"],
@@ -221,13 +222,13 @@ class Sitzung:
             for i, d in enumerate(self.docs):
                 self._melde("Erkenne Personendaten", d.name, int(50 + 45 * i / n))
                 d.findings = detect(analyzer, d.text, cfg["entities"], float(cfg.get("threshold", 0.4)),
-                                    cfg.get("allow_list"), cfg.get("deny_list"), self.manual,
+                                    est.erlaubt_liste(cfg), est.ersetzen_liste(cfg), self.manual,
                                     cfg.get("propagate_repeats", True), cfg.get("include_name_parts", True),
                                     cfg.get("mask_locations", False), cfg.get("keep_institutions", True),
                                     cfg.get("datum_modus", "kontext"))
             self._melde("Gleiche Namen über alle Dateien ab", "", 96)
             neu = propagate_vorgang([d.text for d in self.docs], [d.findings for d in self.docs],
-                                    cfg.get("allow_list"), cfg.get("include_name_parts", True))
+                                    est.erlaubt_liste(cfg), cfg.get("include_name_parts", True))
             for d, fs in zip(self.docs, neu):
                 d.findings = fs
             self._pseudonymisieren()
@@ -304,7 +305,14 @@ class Sitzung:
             return
         self.analysieren(self.manual + neu)
 
+    def lernen(self, art: str, begriffe: list[str]) -> dict:
+        """Korrektur dauerhaft merken (Einstellungen, nur auf diesem PC) und im laufenden Durchlauf anwenden."""
+        cfg = est.lernen(self.cfg_laden(), art, begriffe)
+        self.cfg_speichern(cfg)
+        return self.zustand()
+
     def identitaeten(self) -> list[dict]:
+        stehen = {b.lower() for b in est.gelernt(self.cfg_laden(), "stehen_lassen")}
         groups: dict[str, dict] = {}
         voll_namen = {ph: name for ph, name in self.mapping.items()
                       if ph.startswith(LABELS["PERSON"] + "_") and " " in name.strip()}
@@ -316,6 +324,7 @@ class Sitzung:
                 g = groups.setdefault(ph, {"ph": ph, "typ": LABELS.get(f.entity, f.entity), "entity": f.entity,
                                            "gruppe": gruppe_von(f.entity), "name": self.mapping.get(ph, f.text),
                                            "varianten": [], "anzahl": 0, "score": 0.0, "dateien": [], "quellen": [],
+                                           "belege": [],
                                            "beispiel": "", "fragen": [], "_erst": (di, f.start)})
                 g["anzahl"] += 1
                 g["score"] = max(g["score"], f.score)
@@ -326,6 +335,9 @@ class Sitzung:
                 q = QUELLE_TEXT.get(f.quelle, f.quelle)
                 if q not in g["quellen"]:
                     g["quellen"].append(q)
+                beleg = f.grund or q
+                if beleg not in g["belege"]:
+                    g["belege"].append(beleg)
                 if not g["beispiel"]:
                     g["beispiel"] = self._snippet(d.text, f)
                 # Nackter Nachname, der zu mehreren Personen passen könnte
@@ -338,6 +350,7 @@ class Sitzung:
         out = []
         for g in groups.values():
             g["aktiv"] = g["ph"] not in self.disabled
+            g["gelernt"] = any(v.lower() in stehen for v in g["varianten"])
             g["sicherheit"] = sicherheit(g["score"])
             gruende = []
             if g["score"] < 0.6:

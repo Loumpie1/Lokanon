@@ -168,13 +168,15 @@ def feld_treffer(text: str, entities: list[str] | set[str]) -> list:
 
     from .engine import FIELD_LABEL_WORDS, NER_STOPWORDS
 
-    def neu(start: int, s: str, form: str, entity: str) -> None:
+    def neu(start: int, s: str, form: str, entity: str, bez: str) -> None:
         k = s.strip().rstrip(":").lower()
         if k in NER_STOPWORDS or k in FIELD_LABEL_WORDS or k in _KOPFWOERTER or k.rstrip(".") in _KOPFWOERTER:
             return  # Spaltenkopf statt Wert ("Zeuge | Anschrift | Telefon")
         w = _wert(s, form, entity)
         if w and w[2] in erlaubt and w[1] > w[0]:
-            out.append(Finding(start + w[0], start + w[1], w[2], SCORE, text[start + w[0]:start + w[1]], quelle="feld"))
+            grund = "Formularfeld „" + re.sub(r"\s+", " ", bez.strip().rstrip(":")) + "“"
+            out.append(Finding(start + w[0], start + w[1], w[2], SCORE, text[start + w[0]:start + w[1]], quelle="feld",
+                               grund=grund))
 
     zeilen, pos = [], 0
     for z in text.split("\n"):
@@ -193,7 +195,7 @@ def feld_treffer(text: str, entities: list[str] | set[str]) -> list:
                 for cj in ziele:
                     if bez[cj]:
                         break
-                    neu(cells[cj][0], cells[cj][1], b[1], b[0])
+                    neu(cells[cj][0], cells[cj][1], b[1], b[0], cells[ci][1])
             # Tabellenkopf: Werte in derselben Spalte der folgenden Zeilen (gleiche Spaltenzahl)
             # (mindestens zwei Bezeichnungen, oder eine in einer Kopfzeile ohne Werte: "Personalnummer | Steuerklasse")
             n_bez = sum(1 for b in bez if b)
@@ -205,7 +207,7 @@ def feld_treffer(text: str, entities: list[str] | set[str]) -> list:
                         break
                     for ci, b in enumerate(bez):
                         if b:
-                            neu(nz[ci][0], nz[ci][1], b[1], b[0])
+                            neu(nz[ci][0], nz[ci][1], b[1], b[0], cells[ci][1])
     # In der Zeile: Bezeichnung, dann Wert
     for m in _INLINE_RX.finditer(text):
         ent, form = _BEZ_INDEX[m.group("bez").lower()]
@@ -216,9 +218,9 @@ def feld_treffer(text: str, entities: list[str] | set[str]) -> list:
             # ohne Doppelpunkt mit "Nachname, Vorname" ("Name, Vorname des Versicherten Engel, Sabine")
             q = re.fullmatch(r"(?:(?:des|der)\s+[A-ZÄÖÜ]\w+\s+)?([A-ZÄÖÜ][\w'’\-]+,\s*[A-ZÄÖÜ][\w'’\-]+)\s*", rest)
             if form == "name" and q:
-                neu(m.end() + q.start(1), q.group(1), form, ent)
+                neu(m.end() + q.start(1), q.group(1), form, ent, m.group("bez"))
             continue
         if form in ("name", "name_oder_firma"):
             rest = re.split(r"[;(]|\s{2,}", rest)[0]
-        neu(m.end(), rest, form, ent)
+        neu(m.end(), rest, form, ent, m.group("bez"))
     return out

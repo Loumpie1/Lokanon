@@ -92,12 +92,14 @@
   <table>
     <tr><th>Element</th><th>Wirkung</th></tr>
     <tr><td>Schalter rechts</td><td>Ein: alle Schreibweisen dieser Person werden ersetzt. Aus: sie bleiben in allen Dateien stehen (gestrichelt im Dokument).</td></tr>
+    <tr><td>Künftig immer stehen lassen</td><td>Erscheint, wenn Sie eine Karte ausschalten. Lokanon merkt sich den Begriff und schlägt ihn nicht mehr vor, etwa einen Fachbegriff, der fälschlich als Name erkannt wurde. Rückgängig unter Einstellungen → Gelernte Begriffe.</td></tr>
+    <tr><td>„erkannt über …“</td><td>Woher der Vorschlag kommt: Formularfeld (z. B. „Name“), Muster (IBAN, Kennzeichen …), Anrede oder Unterschrift, bekannter Vorname, Sprachmodell, Wiederholung. Reine Sprachmodell-Treffer verdienen den genauesten Blick.</td></tr>
     <tr><td>Platzhalter anklicken</td><td>Eigenen Namen vergeben, zum Beispiel <code>[Mandant]</code> oder <code>[Zeugin Schmidt]</code>. Gilt überall, auch in der Rückübersetzung. „Standard“ setzt auf <code>[Person_1]</code> zurück.</td></tr>
     <tr><td>Vorschläge</td><td>Ein Klick auf „Mandant“, „Gegner“ usw. vergibt den Namen sofort.</td></tr>
     <tr><td>Frage „wer ist gemeint?“</td><td>Erscheint, wenn ein Nachname zu zwei Personen passt. Ein Klick ordnet ihn zu.</td></tr>
     <tr><td>gehört zu …</td><td>Lokanon hat zwei Karten angelegt, die dieselbe Person sind? Wählen Sie die andere Person, die Karten verschmelzen.</td></tr>
     <tr><td>trennen …</td><td>Eine Schreibweise gehört doch nicht zu dieser Person? Sie bekommt eine eigene Karte.</td></tr>
-    <tr><td>Fehlt etwas?</td><td>Begriff oben eintragen, mehrere mit Komma. Lokanon sucht ihn in allen Dateien und ersetzt ihn.</td></tr>
+    <tr><td>Fehlt etwas?</td><td>Begriff oben eintragen, mehrere mit Komma. Lokanon sucht ihn in allen Dateien und ersetzt ihn. Mit „künftig in allen Dokumenten suchen“ gilt er auch in späteren Durchläufen (er steht dann im Klartext in Ihren Einstellungen auf diesem PC).</td></tr>
   </table>
   <h3>„Bitte ansehen“</h3>
   <p>Lokanon ersetzt im Zweifel. Angaben, bei denen es sich nicht sicher ist, markiert es und erklärt warum („nur über die Anrede erkannt“, „einzelnes Wort“, „Nachname passt zu mehreren Personen“). Ein Klick auf den gelben Hinweis zeigt nur diese Karten. Was kein Personenbezug ist, schalten Sie aus.</p>
@@ -122,7 +124,7 @@
 <section id="einstellungen">
   <h2>Einstellungen (Zahnrad oben rechts)</h2>
   <div class="cards">
-    <div class="card"><h4>Ihre Kanzlei</h4><p>Was nie ersetzt wird: Kanzleiname, Mitarbeitende, eigene Telefonnummern und E-Mail-Adressen, eine Angabe je Zeile. Darunter „Immer ersetzen“ für interne Kürzel oder Projektnamen.</p></div>
+    <div class="card"><h4>Ihre Kanzlei</h4><p>Was nie ersetzt wird: Kanzleiname, Mitarbeitende, eigene Telefonnummern und E-Mail-Adressen, eine Angabe je Zeile. Darunter „Immer ersetzen“ für interne Kürzel oder Projektnamen. „Gelernte Begriffe“ zeigt, was Sie beim Prüfen dauerhaft festgelegt haben; „vergessen“ nimmt es zurück.</p></div>
     <div class="card"><h4>Erkennung</h4><p>Gerichte, Behörden, Versicherer und Kliniken stehen lassen (an); Ortsnamen ohne Adresse ersetzen (aus); Datumsangaben nur mit Personenbezug, alle oder keine; welche Gruppen erkannt werden.</p></div>
     <div class="card"><h4>Ausgabe</h4><p>Zusatz im Dateinamen, Ablageordner für Drag &amp; Drop, und ob zusätzlich eine reine Textfassung (<code>.md</code>) entstehen soll, mit der KI-Assistenten am besten arbeiten.</p></div>
     <div class="card"><h4>Erweitert</h4><p>Drei Schalter, alle aus, bis Sie sie brauchen: Rückübersetzung, KI-Anweisung, Vorgangsordner. Siehe nächster Abschnitt.</p></div>

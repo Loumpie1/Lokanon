@@ -214,7 +214,8 @@ class Finding:
     score: float
     text: str
     active: bool = True
-    quelle: str = ""  # "modell", "regel", "liste", "wiederholung", "namensteil", "heuristik"
+    quelle: str = ""  # "modell", "regel", "liste", "wiederholung", "namensteil", "heuristik", "feld"
+    grund: str = ""   # Begründung in Worten für "Prüfen" ("Formularfeld „Vorname“", "bekannter Vorname")
 
 
 @dataclass
@@ -394,7 +395,8 @@ def _parteien(text: str) -> list[Finding]:
     for m in _PARTEIEN_RX.finditer(text):
         for g in (1, 2):
             if lexikon.ist_name(m.group(g)):
-                out.append(Finding(m.start(g), m.end(g), "PERSON", 0.5, m.group(g), quelle="heuristik"))
+                out.append(Finding(m.start(g), m.end(g), "PERSON", 0.5, m.group(g), quelle="heuristik",
+                                   grund="Partei („… ./. …“)"))
     return out
 
 
@@ -409,7 +411,8 @@ def _vorname_personen(text: str) -> list[Finding]:
             continue  # "Martin Luther Straße"
         if lexikon.gewoehnlich(nach) or (lexikon.ist_wort(vor) and not lexikon.ist_nachname(nach)):
             continue  # "Rosa Kleid", "Engel Gabriel"
-        out.append(Finding(m.start(), m.end(), "PERSON", 0.5, m.group(), quelle="heuristik"))
+        out.append(Finding(m.start(), m.end(), "PERSON", 0.5, m.group(), quelle="heuristik",
+                           grund="bekannter Vorname"))
     return out
 
 
@@ -493,10 +496,10 @@ def _clean_span(text: str, f: Finding) -> Finding | None:
             quelle = "heuristik" if f.quelle == "modell" else f.quelle
             if e - s < 2:
                 return None
-            return Finding(s, e, f.entity, f.score, text[s:e], f.active, quelle)
+            return Finding(s, e, f.entity, f.score, text[s:e], f.active, quelle, f.grund)
     if e - s < 2:
         return None
-    return Finding(s, e, f.entity, f.score, text[s:e], f.active, f.quelle)
+    return Finding(s, e, f.entity, f.score, text[s:e], f.active, f.quelle, f.grund)
 
 
 class _Wortarten:
@@ -667,8 +670,8 @@ def _an_spalten_teilen(f: Finding) -> list[Finding]:
     trenner = r"[^|\n]+" if f.entity in NER_ENTITIES else r"[^|]+"
     if "|" not in f.text and not (f.entity in NER_ENTITIES and "\n" in f.text):
         return [f]
-    return [Finding(f.start + m.start(), f.start + m.end(), f.entity, f.score, m.group(), f.active, f.quelle)
-            for m in re.finditer(trenner, f.text) if m.group().strip()]
+    return [Finding(f.start + m.start(), f.start + m.end(), f.entity, f.score, m.group(), f.active, f.quelle,
+                    f.grund) for m in re.finditer(trenner, f.text) if m.group().strip()]
 
 
 # ---------------------------------------------------------------------------

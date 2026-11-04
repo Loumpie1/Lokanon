@@ -121,6 +121,35 @@ def test_kompletter_weg(client):
     assert e["schluessel_pfad"] == ""  # Rückübersetzung ist aus
 
 
+
+def test_lernen_aus_korrekturen(client):
+    """"Künftig immer stehen lassen" und "künftig immer suchen" gelten in späteren Durchläufen; in den
+    Einstellungen sichtbar und löschbar."""
+    def durchlauf(text):
+        client.post("/api/leeren")
+        client.post("/api/dateien", files=[("datei", ("Notiz.txt", text.encode("utf-8"), "text/plain"))])
+        client.post("/api/analyse", json={"begriffe": []})
+        warte(client)
+        return {i["name"]: i for i in client.get("/api/zustand").json()["identitaeten"]}
+
+    ids = durchlauf(TEXT)
+    nolte = ids["Spedition Nolte"]
+    assert nolte["belege"] and not nolte["gelernt"]
+    client.post("/api/identitaet", json={"ph": nolte["ph"], "aktiv": False})
+    z = client.post("/api/lernen", json={"art": "stehen_lassen", "begriffe": nolte["varianten"]}).json()
+    assert {i["name"]: i for i in z["identitaeten"]}["Spedition Nolte"]["gelernt"]
+    client.post("/api/lernen", json={"art": "immer_ersetzen", "begriffe": ["Projekt Phoenix"]})
+    assert client.post("/api/lernen", json={"art": "unbekannt", "begriffe": ["x"]}).status_code == 400
+    cfg = client.get("/api/einstellungen").json()
+    assert [g["begriff"] for g in cfg["gelernt"]["stehen_lassen"]] == nolte["varianten"]
+    assert cfg["gelernt"]["immer_ersetzen"][0]["datum"]
+    ids = durchlauf(TEXT + "\nIntern: Projekt Phoenix.")
+    assert "Spedition Nolte" not in ids and "Projekt Phoenix" in ids
+    # vergessen (Einstellungen speichern ohne Eintrag) -> wieder vorgeschlagen
+    client.put("/api/einstellungen", json={"werte": {"gelernt": {}}})
+    ids = durchlauf(TEXT)
+    assert "Spedition Nolte" in ids and "Formularfeld" not in " ".join(ids["Thomas Weber"]["belege"])
+
 def test_namen_im_dateinamen(client):
     client.post("/api/leeren")
     akte = "Mandant Thomas Weber, Goethestraße 12, 45127 Essen. Herr Weber bittet um Rückruf."

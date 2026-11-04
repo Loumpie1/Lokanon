@@ -43,7 +43,7 @@
     S.status = await api("/status");
     S.cfg = await api("/einstellungen");
     badge();
-    $("#btn-einstellungen").onclick = einstellungenDialog;
+    $("#btn-einstellungen").onclick = () => einstellungenDialog();  // ohne Klick-Ereignis als Abschnitt
     $("#btn-hilfe").onclick = hilfeDialog;
     $("#btn-zurueck").onclick = zurueckDialog;
     $("#brand").onclick = (e) => { e.preventDefault(); if (S.z && (S.z.ergebnis || S.z.fortschritt.fertig)) neuStart(); };
@@ -194,6 +194,7 @@
             <input class="input" id="nachtrag" placeholder="Fehlt etwas? Begriff eintragen, mehrere mit Komma">
             <button class="btn" id="btn-nachtrag">Nachtragen</button>
           </div>
+          <label class="checkbox small nachtrag-immer"><input type="checkbox" id="nachtrag-immer"><span>künftig in allen Dokumenten suchen <span class="muted">(wird in Ihren Einstellungen gespeichert)</span></span></label>
           <div class="filter" id="filter">${["alle", ...gruppen, "unsicher"].map((g) => `<button class="${S.filter === g ? "on" : ""}" data-f="${esc(g)}">${g === "alle" ? "Alle" : g === "unsicher" ? "Bitte ansehen" : esc(g)}</button>`).join("")}</div>
           <div id="liste"></div>
         </section>
@@ -213,7 +214,12 @@
     renderDoc();
     $$("#filter button").forEach((b) => (b.onclick = () => { S.filter = b.dataset.f; renderPruefen(); }));
     if ($("#unsure")) $("#unsure").onclick = () => { S.filter = "unsicher"; renderPruefen(); };
-    $("#btn-nachtrag").onclick = () => { const t = $("#nachtrag").value.split(",").map((s) => s.trim()).filter(Boolean); if (t.length) analyseStarten(t); };
+    $("#btn-nachtrag").onclick = async () => {
+      const t = $("#nachtrag").value.split(",").map((s) => s.trim()).filter(Boolean);
+      if (!t.length) return;
+      if ($("#nachtrag-immer").checked) { try { await api("/lernen", { json: { art: "immer_ersetzen", begriffe: t } }); } catch (e) { toast(e.message, "danger"); return; } }
+      analyseStarten(t);
+    };
     $("#nachtrag").onkeydown = (e) => { if (e.key === "Enter") $("#btn-nachtrag").click(); };
     $("#m-orig").onclick = () => { S.docMode = "markiert"; renderPruefen(); };
     $("#m-anon").onclick = () => { S.docMode = "anonym"; renderPruefen(); };
@@ -247,6 +253,7 @@
       $$(".frage button", el).forEach((b) => (b.onclick = () => identitaet({ ph, zuordnen: { text: b.dataset.text, ph: b.dataset.ziel } })));
       const sel = $("select.zu", el); if (sel) sel.onchange = () => { if (sel.value) identitaet({ ph, gehoert_zu: sel.value }); };
       const tr = $("select.tr", el); if (tr) tr.onchange = () => { if (tr.value) identitaet({ ph, trennen: tr.value }); };
+      const lb = $(".lern", el); if (lb) lb.onclick = () => lernen(ph);
     });
   }
   function karte(i, n) {
@@ -262,9 +269,11 @@
         ${i.vorschlaege.length && !i.bezeichnung ? `<span class="sugg">${i.vorschlaege.slice(0, 4).map((v) => `<button data-v="${esc(v)}">${esc(v)}</button>`).join("")}</span>` : ""}
         ${i.bezeichnung ? `<button class="linkbtn sugg-reset" data-v="">Standard</button>` : ""}` : `<span class="muted small">bleibt im Text stehen</span>`}
       </div>
-      <div class="meta">${esc(i.typ)} · ${i.anzahl}× in ${i.dateien.length} ${i.dateien.length === 1 ? "Datei" : "Dateien"} · ${esc(i.sicherheit)}${i.quellen.length ? " · " + esc(i.quellen.join(", ")) : ""}</div>
+      <div class="meta">${esc(i.typ)} · ${i.anzahl}× in ${i.dateien.length} ${i.dateien.length === 1 ? "Datei" : "Dateien"} · ${esc(i.sicherheit)}${i.belege.length ? " · erkannt über " + esc(i.belege.join(", ")) : ""}</div>
       <div class="snip">${i.beispiel}</div>
       ${i.gruende.length ? `<div class="warnline">Bitte ansehen: ${esc(i.gruende.join("; "))}</div>` : ""}
+      ${!i.aktiv ? (i.gelernt ? `<div class="lernzeile muted small">Steht künftig immer · änderbar unter Einstellungen → Gelernte Begriffe</div>`
+        : `<div class="lernzeile"><button class="linkbtn lern">Künftig immer stehen lassen</button><span class="muted small">sonst nur in diesem Durchlauf</span></div>`) : ""}
       ${i.fragen.map((f) => `<div class="frage"><span>„${esc(f.text)}“ allein: wer ist gemeint?</span>${f.kandidaten.map((k) => `<button data-text="${esc(f.text)}" data-ziel="${esc(k.ph)}">${esc(k.name)}</button>`).join("")}</div>`).join("")}
       <div class="actions">
         ${andere.length ? `<label>gehört zu <select class="mini zu"><option value="">…</option>${andere.map((o) => `<option value="${esc(o.ph)}">${esc(o.name)}</option>`).join("")}</select></label>` : ""}
@@ -279,6 +288,11 @@
     const ok = () => identitaet({ ph, bezeichnung: inp.value });
     $("#bez-ok", row).onclick = ok; inp.onkeydown = (e) => { if (e.key === "Enter") ok(); if (e.key === "Escape") renderPruefen(); };
     $("#bez-x", row).onclick = renderPruefen;
+  }
+  async function lernen(ph) {
+    const i = S.z.identitaeten.find((x) => x.ph === ph); if (!i) return;
+    try { S.z = await api("/lernen", { json: { art: "stehen_lassen", begriffe: i.varianten } }); renderPruefen(); toast("Wird künftig nicht mehr vorgeschlagen", "ok"); }
+    catch (e) { toast(e.message, "danger"); }
   }
   async function identitaet(body) {
     try { S.z = await api("/identitaet", { json: body }); renderPruefen(); } catch (e) { toast(e.message, "danger"); }
@@ -356,6 +370,8 @@
           <textarea class="input" id="s-allow" rows="5">${esc((c.allow_list || []).join("\n"))}</textarea>
           <label class="lbl">Immer ersetzen <span class="muted small">(interne Kürzel, Projektnamen)</span></label>
           <textarea class="input" id="s-deny" rows="2">${esc((c.deny_list || []).join("\n"))}</textarea></div>
+        <div class="sect" id="s-gelernt"><h3>Gelernte Begriffe</h3><p class="desc">Was Sie beim Prüfen mit „Künftig immer stehen lassen“ oder „künftig in allen Dokumenten suchen“ festgelegt haben. Gespeichert nur auf diesem PC.</p>
+          <div id="s-lern"></div></div>
         <div class="sect"><h3>Erkennung</h3>
           <label class="checkbox"><input type="checkbox" id="s-inst" ${c.keep_institutions ? "checked" : ""}><span><b>Gerichte, Behörden, Versicherer, Kliniken stehen lassen</b><br><span class="muted small">Meist kein Personenbezug; einzelne lassen sich beim Prüfen trotzdem ersetzen.</span></span></label>
           <label class="checkbox"><input type="checkbox" id="s-orte" ${c.mask_locations ? "checked" : ""}><span><b>Ortsnamen ohne Adresse ersetzen</b><br><span class="muted small">„Mülheim“ im Fließtext. Adressen und PLZ mit Ort werden immer ersetzt.</span></span></label>
@@ -376,6 +392,14 @@
         <div class="row between"><span class="muted small">Lokanon ${esc(S.status.version)} · Einstellungen: ${esc(S.status.daten_ordner)}</span><button class="btn primary" id="s-save">Speichern</button></div>
       </div>`, { wide: true });
     vorstellungFuellen($("#s-mkt", m));
+    const gel = JSON.parse(JSON.stringify(c.gelernt || {}));
+    const lernListe = () => {
+      const zeilen = [["stehen_lassen", "bleibt stehen"], ["immer_ersetzen", "wird immer ersetzt"]].flatMap(([art, was]) =>
+        (gel[art] || []).map((g, k) => `<div class="lernrow"><span><b>${esc(g.begriff)}</b> <span class="muted small">${was} · seit ${esc(g.datum || "")}</span></span><button class="linkbtn" data-art="${art}" data-k="${k}" aria-label="${esc(g.begriff)} vergessen">vergessen</button></div>`));
+      $("#s-lern", m).innerHTML = zeilen.length ? zeilen.join("") : `<span class="muted small">Noch nichts gelernt.</span>`;
+      $$("#s-lern button", m).forEach((b) => (b.onclick = () => { gel[b.dataset.art].splice(+b.dataset.k, 1); lernListe(); }));
+    };
+    lernListe();
     if (abschnitt) { const z = $(`#s-${abschnitt}`, m); if (z) setTimeout(() => z.scrollIntoView({ block: "start" }), 50); }
     $$("#s-datum label", m).forEach((l) => (l.onclick = () => { $$("#s-datum label", m).forEach((x) => x.classList.remove("on")); l.classList.add("on"); }));
     $("#s-rz", m).onchange = (e) => { $("#s-pw-row", m).hidden = !e.target.checked; };
@@ -383,7 +407,7 @@
     $("#s-save", m).onclick = async () => {
       const lines = (id) => $(id, m).value.split("\n").map((s) => s.trim()).filter(Boolean);
       const entities = [].concat(...$$("#s-ents input", m).filter((i) => i.checked).map((i) => i.dataset.ents.split(",")));
-      const werte = { allow_list: lines("#s-allow"), deny_list: lines("#s-deny"), keep_institutions: $("#s-inst", m).checked, mask_locations: $("#s-orte", m).checked,
+      const werte = { gelernt: gel, allow_list: lines("#s-allow"), deny_list: lines("#s-deny"), keep_institutions: $("#s-inst", m).checked, mask_locations: $("#s-orte", m).checked,
         datum_modus: ($("#s-datum input:checked", m) || {}).value || "kontext", entities, suffix: $("#s-suffix", m).value, ausgabe_ordner: $("#s-out", m).value.trim(),
         ki_textfassung: $("#s-md", m).checked, schluessel_passwort: $("#s-pw", m).value,
         erweitert: { rueckuebersetzung: $("#s-rz", m).checked, ki_anweisung: $("#s-ki", m).checked, vorgaenge: $("#s-vg", m).checked } };

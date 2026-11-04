@@ -47,6 +47,41 @@ def _gruppen_auffuellen(cfg: dict) -> dict:
     return cfg
 
 
+LERNARTEN = ("stehen_lassen", "immer_ersetzen")
+
+
+def gelernt(cfg: dict, art: str) -> list[str]:
+    """Begriffe, die beim Prüfen gelernt wurden ("Künftig immer stehen lassen" / "künftig immer suchen")."""
+    return [g["begriff"] for g in (cfg.get("gelernt") or {}).get(art, []) if isinstance(g, dict) and g.get("begriff")]
+
+
+def erlaubt_liste(cfg: dict) -> list[str]:
+    """Allow-Liste für die Erkennung: eigene Einträge plus gelernte "stehen lassen"."""
+    return list(dict.fromkeys([*(cfg.get("allow_list") or []), *gelernt(cfg, "stehen_lassen")]))
+
+
+def ersetzen_liste(cfg: dict) -> list[str]:
+    """Immer ersetzen: eigene Einträge plus gelernte "immer suchen"."""
+    return list(dict.fromkeys([*(cfg.get("deny_list") or []), *gelernt(cfg, "immer_ersetzen")]))
+
+
+def lernen(cfg: dict, art: str, begriffe: list[str]) -> dict:
+    """Begriffe mit Datum unter cfg["gelernt"][art] ablegen (ohne Doppelte); gibt cfg zurück."""
+    from datetime import date
+
+    if art not in LERNARTEN:
+        raise ValueError("Unbekannte Lernart.")
+    g = cfg.setdefault("gelernt", {})
+    liste = g.setdefault(art, [])
+    vorhanden = {e.get("begriff", "").lower() for e in liste if isinstance(e, dict)}
+    for b in begriffe:
+        b = " ".join(str(b).split())
+        if len(b) >= 2 and b.lower() not in vorhanden:
+            liste.append({"begriff": b, "datum": date.today().isoformat()})
+            vorhanden.add(b.lower())
+    return cfg
+
+
 def laden() -> dict:
     default = yaml.safe_load(DEFAULT_PATH.read_text(encoding="utf-8")) if DEFAULT_PATH.exists() else {}
     p = pfad()
