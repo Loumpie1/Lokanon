@@ -116,7 +116,7 @@
     <tr><td><code>Notiz.txt</code>, <code>.md</code>, <code>.csv</code></td><td><code>Notiz_anonymisiert.txt</code></td><td>Text ersetzt.</td></tr>
   </table>
   <p><b>Wo die Kopien landen:</b> Bei „Ordner wählen“ direkt neben den Originalen im selben Ordner. Bei Drag &amp; Drop und eingefügtem Text in <code>Dokumente\Lokanon\Anonymisiert</code>; den Ort ändern Sie in den Einstellungen. Die Fertig-Seite hat immer einen Knopf „Ordner öffnen“.</p>
-  <p>Der Zusatz im Dateinamen (<code>_anonymisiert</code>) lässt sich in den Einstellungen ändern. Dateien mit diesem Zusatz überspringt Lokanon beim nächsten „Ordner wählen“, damit nichts doppelt anonymisiert wird.</p>
+  <p>Der Zusatz im Dateinamen (<code>_anonymisiert</code>) lässt sich in den Einstellungen ändern. Dateien mit diesem Zusatz überspringt Lokanon beim nächsten „Ordner wählen“, damit nichts doppelt anonymisiert wird. Erkannte Namen ersetzt Lokanon auch im Dateinamen: Aus „Klage Müller.docx“ wird „Klage Person_1_anonymisiert.docx“, mit eigener Bezeichnung „Klage Mandant_anonymisiert.docx“.</p>
 </section>
 
 <section id="einstellungen">
@@ -157,7 +157,7 @@
     <div class="card warn"><h4>Pseudonym, nicht anonym</h4><p>Solange die Kanzlei den Schlüssel hat, bleibt für sie der Personenbezug. Für den KI-Anbieter fehlt er.</p></div>
     <div class="card warn"><h4>Scans</h4><p>Handschrift, Stempel und schlechte Vorlagen können die Texterkennung täuschen. Geschwärzte PDFs gibt es nur nach bestandener Gegenprüfung.</p></div>
     <div class="card warn"><h4>Word und Excel</h4><p>Kommentare, Änderungsverfolgung und Textfelder werden noch nicht bereinigt. Im Zweifel die Textfassung einschalten und diese weitergeben.</p></div>
-    <div class="card warn"><h4>Dateinamen</h4><p>Die Kopie heißt wie das Original, plus Zusatz. Steht ein Name im Dateinamen („Klage Müller.docx“), benennen Sie die Kopie vor dem Hochladen um.</p></div>
+    <div class="card warn"><h4>Dateinamen</h4><p>Erkannte Namen werden auch im Dateinamen ersetzt, aus allen Dateien des Durchgangs. Was nirgends im Text erkannt wurde, bleibt im Namen stehen: Werfen Sie vor dem Hochladen einen Blick auf die Liste auf der Fertig-Seite.</p></div>
   </div>
 </section>
 

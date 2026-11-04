@@ -287,7 +287,12 @@ def ki_dateiname(original: str, pairs: list[tuple[str, str]]) -> str:
     """Dateiname für die KI: erkannte Begriffe im Namen durch Platzhalter ersetzen.
     "Fall1_Erbrecht_Brinkhoff.docx" + [("Brinkhoff", "[PERSON_2]")] -> "Fall1_Erbrecht_PERSON_2".
     Eckige Klammern lassen wir im Dateinamen weg (Upload-Masken mögen sie nicht)."""
-    stamm = Path(original).stem
+    return sicherer_name(namen_ersetzen(Path(original).stem, pairs))
+
+
+def namen_ersetzen(stamm: str, pairs: list[tuple[str, str]]) -> str:
+    """Erkannte Begriffe in einem Dateinamen-Stamm durch den Platzhalter ohne Klammern ersetzen; sonst bleibt der
+    Stamm Zeichen für Zeichen gleich."""
     neu = stamm
     labels = {v.lower() for v in LABELS.values()}
     for orig, ph in pairs:  # pairs sind längste zuerst
@@ -300,7 +305,7 @@ def ki_dateiname(original: str, pairs: list[tuple[str, str]]) -> str:
         for variante in (orig.replace(" ", ""), orig.replace(" ", "_"), orig.replace(" ", "-")):
             if variante != orig and len(variante) >= 4:
                 neu = re.sub(re.escape(variante), ph.strip("[]"), neu, flags=re.IGNORECASE)
-    return sicherer_name(neu)
+    return neu
 
 
 # ---------------------------------------------------------------------------

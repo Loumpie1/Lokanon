@@ -196,6 +196,16 @@ def test_ki_dateiname():
     assert ki_dateiname("Rechnung.pdf", pairs) == "Rechnung"
 
 
+def test_dateiname_anonym():
+    from anonymizer.ausgabe import dateiname_anonym
+
+    pairs = [("Hans Müller", "[Mandant]"), ("Müller", "[Mandant]")]
+    assert dateiname_anonym("Klage Müller.docx", pairs=pairs) == "Klage Mandant_anonymisiert.docx"
+    assert dateiname_anonym("Klage Hans Müller (Entwurf).pdf", pairs=pairs) == "Klage Mandant (Entwurf)_anonymisiert.pdf"
+    assert dateiname_anonym("Müllerstraße & Co.pdf", "_anon", pairs) == "Müllerstraße & Co_anon.pdf"
+    assert dateiname_anonym("Klage Müller.docx") == "Klage Müller_anonymisiert.docx"
+
+
 def test_vorgang_ablage():
     tmp = Path(tempfile.mkdtemp())
     (tmp / "a.txt").write_text("x", encoding="utf-8")

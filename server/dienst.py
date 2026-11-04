@@ -406,11 +406,16 @@ class Sitzung:
             erweitert = cfg.get("erweitert") or {}
             vorgang = self._vorgang_anlegen(cfg) if erweitert.get("vorgaenge") else None
             dateien, hinweise = [], []
+            namen_paare, vergeben = self._dateiname_paare(), set()
             n = len(self.docs)
             for i, d in enumerate(self.docs):
                 self._melde("Anonymisiere", d.name, int(100 * i / n))
                 pairs = replacement_pairs(d.text, d.findings, self.mapping, self.bezeichnungen, self.zuordnung)
-                neu = aus.dateiname_anonym(d.name, suffix)
+                neu = aus.dateiname_anonym(d.name, suffix, namen_paare)
+                stamm, endung, k = Path(neu).stem, Path(neu).suffix, 2
+                while neu.lower() in vergeben:  # zwei Originale ergeben denselben Namen
+                    neu, k = f"{stamm} ({k}){endung}", k + 1
+                vergeben.add(neu.lower())
                 eintrag = {"name": d.name, "ausgabe": neu, "pfad": str(ziel / neu), "status": "ok", "hinweis": "",
                            "ersetzt": sum(1 for f in d.findings if f.active)}
                 try:
@@ -455,6 +460,24 @@ class Sitzung:
             self.fortschritt.fehler = f"{e}"
         finally:
             self.fortschritt.laeuft = False
+
+    def _dateiname_paare(self) -> list[tuple[str, str]]:
+        """Ersetzungen für Dateinamen aus allen Dateien der Sitzung, damit "Klage Müller.docx" auch dann bereinigt
+        wird, wenn Müller nur in einer anderen Datei steht. Dazu die Namensteile erkannter Personen ("Müller" aus
+        "Hans Müller"), längste zuerst."""
+        paare: dict[str, str] = {}
+        for d in self.docs:
+            for orig, ph in replacement_pairs(d.text, d.findings, self.mapping, self.bezeichnungen, self.zuordnung):
+                paare.setdefault(orig, ph)
+        for d in self.docs:
+            for f in d.findings:
+                if not f.active or f.entity != "PERSON" or f.text not in paare:
+                    continue
+                for teil in f.text.replace("-", " ").split():
+                    teil = teil.strip(".,;:")
+                    if len(teil) >= 3 and teil[0].isupper() and teil.lower() not in _ANREDEN:
+                        paare.setdefault(teil, paare[f.text])
+        return sorted(paare.items(), key=lambda kv: len(kv[0]), reverse=True)
 
     def _vorgang_anlegen(self, cfg: dict) -> Vorgang:
         from server.einstellungen import vorgaenge_ordner
@@ -510,6 +533,9 @@ class Sitzung:
                 if p.is_file():
                     z.write(p, f"{SKILL_DIR.name}/{p.relative_to(SKILL_DIR)}")
         return buf.getvalue()
+
+
+_ANREDEN = {"herr", "herrn", "frau", "prof", "dr", "dres", "von", "van", "der", "den"}
 
 
 def _ist_ausgabe(p: Path, suffix: str) -> bool:

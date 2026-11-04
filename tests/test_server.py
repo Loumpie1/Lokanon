@@ -111,12 +111,37 @@ def test_kompletter_weg(client):
     warte(client)
     z = client.get("/api/zustand").json()
     e = z["ergebnis"]
-    assert e["dateien"][0]["status"] == "ok" and e["dateien"][0]["ausgabe"] == "Schreiben Weber_anonymisiert.txt"
-    out = Path(e["ordner"]) / "Schreiben Weber_anonymisiert.txt"
+    # Der Name im Dateinamen wird wie im Text ersetzt ("Weber" allein gehört jetzt zu Jonas)
+    neu = f"Schreiben {ids['Jonas Weber']['ph']}_anonymisiert.txt"
+    assert e["dateien"][0]["status"] == "ok" and e["dateien"][0]["ausgabe"] == neu
+    out = Path(e["ordner"]) / neu
     assert out.exists() and e["ordner"] == str(HOME / "Anonymisiert")
     inhalt = out.read_text(encoding="utf-8")
     assert "[Mandant]" in inhalt and "Thomas" not in inhalt and "Spedition Nolte" in inhalt and "Goethestraße" not in inhalt
     assert e["schluessel_pfad"] == ""  # Rückübersetzung ist aus
+
+
+def test_namen_im_dateinamen(client):
+    client.post("/api/leeren")
+    akte = "Mandant Thomas Weber, Goethestraße 12, 45127 Essen. Herr Weber bittet um Rückruf."
+    client.post("/api/dateien", files=[("datei", ("Akte.txt", akte.encode("utf-8"), "text/plain")),
+                                       ("datei", ("Notiz Thomas Weber.txt", b"Rueckruf erbeten.", "text/plain")),
+                                       ("datei", ("Weber & Co (Entwurf).txt", b"Bitte pruefen.", "text/plain")),
+                                       ("datei", ("Weber.txt", b"Termin am Montag.", "text/plain")),
+                                       ("datei", ("Thomas-Weber.txt", b"Termin am Dienstag.", "text/plain"))])
+    client.post("/api/analyse", json={"begriffe": []})
+    warte(client)
+    client.post("/api/anonymisieren")
+    warte(client)
+    e = client.get("/api/zustand").json()["ergebnis"]
+    namen = {d["name"]: d["ausgabe"] for d in e["dateien"]}
+    # Name steht nur in einer anderen Datei, Sonderzeichen bleiben, gleiche Ausgabenamen werden durchnummeriert
+    assert namen["Akte.txt"] == "Akte_anonymisiert.txt"
+    assert namen["Notiz Thomas Weber.txt"] == "Notiz Person_1_anonymisiert.txt"
+    assert namen["Weber & Co (Entwurf).txt"] == "Person_1 & Co (Entwurf)_anonymisiert.txt"
+    assert namen["Weber.txt"] == "Person_1_anonymisiert.txt"
+    assert namen["Thomas-Weber.txt"] == "Person_1_anonymisiert (2).txt"
+    assert all((Path(e["ordner"]) / n).exists() for n in namen.values())
 
 
 def test_erweitert_rueckuebersetzung(client):

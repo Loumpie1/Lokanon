@@ -10,9 +10,14 @@ from . import files as fio
 TEXT_TYPEN = {"txt", "md"}
 
 
-def dateiname_anonym(original: str, suffix: str = "_anonymisiert") -> str:
+def dateiname_anonym(original: str, suffix: str = "_anonymisiert", pairs: list[tuple[str, str]] | None = None) -> str:
+    """Name der Kopie. Mit `pairs` werden erkannte Namen auch im Dateinamen ersetzt:
+    "Klage Müller.docx" -> "Klage Person_1_anonymisiert.docx" (mit eigener Bezeichnung "Klage Mandant_…")."""
+    from .vorgang import namen_ersetzen
+
     p = Path(original)
-    return f"{p.stem}{suffix}{p.suffix}"
+    stamm = namen_ersetzen(p.stem, pairs) if pairs else p.stem
+    return f"{stamm}{suffix}{p.suffix}"
 
 
 def erzeuge(name: str, data: bytes | None, anonym_text: str, pairs: list[tuple[str, str]]) -> bytes:
