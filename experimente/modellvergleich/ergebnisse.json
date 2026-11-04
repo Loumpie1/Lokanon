@@ -1,0 +1,1529 @@
+{
+ "jetzt (urchade)": {
+  "laden_s": 16.304320573806763,
+  "korpus": {
+   "gesamt": {
+    "hit": 273,
+    "total": 275,
+    "found": 247,
+    "fp": 2,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 0.9927272727272727,
+    "precision": 0.9918032786885246,
+    "fehlalarme_je_seite": 0.09090909090909091
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 50,
+     "total": 50,
+     "found": 49,
+     "fp": 2,
+     "namensteile": 3,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9565217391304348,
+     "fehlalarme_je_seite": 0.5
+    },
+    "bescheid_formular": {
+     "hit": 57,
+     "total": 57,
+     "found": 52,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "lohn_konto_rechnung": {
+     "hit": 47,
+     "total": 47,
+     "found": 41,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 63,
+     "total": 65,
+     "found": 54,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 0.9692307692307692,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "schriftsatz": {
+     "hit": 56,
+     "total": 56,
+     "found": 51,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    }
+   },
+   "tempo_s_je_1000": 2.202230095399417,
+   "uebersehen": [
+    [
+     "PERSONALNR",
+     "004711",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DATUM",
+     "15.03.1980",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "PERSON",
+     "Calprotectin",
+     "modell",
+     "A1_Arztbrief_Fuchs.docx"
+    ],
+    [
+     "ORGANIZATION",
+     "Child Behavior Checklist",
+     "modell",
+     "A4_Familiengutachten_Schneider.docx"
+    ]
+   ]
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 100,
+    "total": 104,
+    "found": 93,
+    "fp": 5,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9615384615384616,
+    "precision": 0.946236559139785,
+    "fehlalarme_je_seite": 0.5
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 20,
+     "total": 20,
+     "found": 21,
+     "fp": 3,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 0.8571428571428571,
+     "fehlalarme_je_seite": 1.5
+    },
+    "bescheid_formular": {
+     "hit": 20,
+     "total": 22,
+     "found": 19,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9090909090909091,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "lohn_konto_rechnung": {
+     "hit": 18,
+     "total": 18,
+     "found": 15,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 19,
+     "total": 20,
+     "found": 16,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.95,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "schriftsatz": {
+     "hit": 23,
+     "total": 24,
+     "found": 22,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9583333333333334,
+     "precision": 0.9090909090909091,
+     "fehlalarme_je_seite": 1.0
+    }
+   },
+   "tempo_s_je_1000": 1.749759337901493,
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "KENNNUMMER",
+     "K77013",
+     "R1_Werkstattrechnung_Rotthaus_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "ADRESSE",
+     "König-Heinrich-Platz 1",
+     "regel",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "ORGANIZATION",
+     "Orthopädische Gemeinschaftspraxis",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ]
+   ]
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 103,
+    "fp": 1,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9896907216494846,
+    "fehlalarme_je_seite": 0.16666666666666666
+   },
+   "familien": {
+    "kanzlei": {
+     "hit": 107,
+     "total": 107,
+     "found": 103,
+     "fp": 1,
+     "namensteile": 6,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 1.0,
+     "precision": 0.9896907216494846,
+     "fehlalarme_je_seite": 0.16666666666666666
+    }
+   },
+   "tempo_s_je_1000": 1.8405915982340506,
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ]
+   ]
+  }
+ },
+ "nobody-pii-de, unsere Labels": {
+  "laden_s": 19.400062084197998,
+  "korpus": {
+   "gesamt": {
+    "hit": 273,
+    "total": 275,
+    "found": 252,
+    "fp": 7,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 0.9927272727272727,
+    "precision": 0.9718875502008032,
+    "fehlalarme_je_seite": 0.3181818181818182
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 50,
+     "total": 50,
+     "found": 48,
+     "fp": 2,
+     "namensteile": 3,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9555555555555556,
+     "fehlalarme_je_seite": 0.5
+    },
+    "bescheid_formular": {
+     "hit": 57,
+     "total": 57,
+     "found": 53,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9811320754716981,
+     "fehlalarme_je_seite": 0.25
+    },
+    "lohn_konto_rechnung": {
+     "hit": 47,
+     "total": 47,
+     "found": 41,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 63,
+     "total": 65,
+     "found": 56,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 0.9692307692307692,
+     "precision": 0.9821428571428571,
+     "fehlalarme_je_seite": 0.16666666666666666
+    },
+    "schriftsatz": {
+     "hit": 56,
+     "total": 56,
+     "found": 54,
+     "fp": 3,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9444444444444444,
+     "fehlalarme_je_seite": 0.75
+    }
+   },
+   "tempo_s_je_1000": 1.840255206847522,
+   "uebersehen": [
+    [
+     "PERSONALNR",
+     "004711",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DATUM",
+     "15.03.1980",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "PLZ_ORT",
+     "45130 Essen",
+     "wiederholung",
+     "S1_Klage_Verkehrsunfall_Fischer.docx"
+    ],
+    [
+     "PLZ_ORT",
+     "45130 Essen",
+     "regel",
+     "S1_Klage_Verkehrsunfall_Fischer.docx"
+    ],
+    [
+     "PLZ_ORT",
+     "45130 Essen",
+     "wiederholung",
+     "S1_Klage_Verkehrsunfall_Fischer.docx"
+    ],
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer.pdf"
+    ],
+    [
+     "PERSON",
+     "Calprotectin",
+     "modell",
+     "A1_Arztbrief_Fuchs.docx"
+    ],
+    [
+     "ORGANIZATION",
+     "Child Behavior Checklist",
+     "modell",
+     "A4_Familiengutachten_Schneider.docx"
+    ],
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer_scan.pdf"
+    ]
+   ]
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 100,
+    "total": 104,
+    "found": 94,
+    "fp": 4,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9615384615384616,
+    "precision": 0.9574468085106383,
+    "fehlalarme_je_seite": 0.4
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 20,
+     "total": 20,
+     "found": 20,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 0.9,
+     "fehlalarme_je_seite": 1.0
+    },
+    "bescheid_formular": {
+     "hit": 20,
+     "total": 22,
+     "found": 19,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9090909090909091,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "lohn_konto_rechnung": {
+     "hit": 18,
+     "total": 18,
+     "found": 16,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 19,
+     "total": 20,
+     "found": 17,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.95,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "schriftsatz": {
+     "hit": 23,
+     "total": 24,
+     "found": 22,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9583333333333334,
+     "precision": 0.9090909090909091,
+     "fehlalarme_je_seite": 1.0
+    }
+   },
+   "tempo_s_je_1000": 1.5866336801772707,
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "KENNNUMMER",
+     "K77013",
+     "R1_Werkstattrechnung_Rotthaus_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "PERSON",
+     "Dipl",
+     "heuristik",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ]
+   ]
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 103,
+    "fp": 1,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9896907216494846,
+    "fehlalarme_je_seite": 0.16666666666666666
+   },
+   "familien": {
+    "kanzlei": {
+     "hit": 107,
+     "total": 107,
+     "found": 103,
+     "fp": 1,
+     "namensteile": 6,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 1.0,
+     "precision": 0.9896907216494846,
+     "fehlalarme_je_seite": 0.16666666666666666
+    }
+   },
+   "tempo_s_je_1000": 1.6992911884950257,
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ]
+   ]
+  }
+ },
+ "nobody-pii-de, eigene Labels": {
+  "laden_s": 13.185908317565918,
+  "korpus": {
+   "gesamt": {
+    "hit": 263,
+    "total": 275,
+    "found": 254,
+    "fp": 7,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 0.9563636363636364,
+    "precision": 0.9721115537848606,
+    "fehlalarme_je_seite": 0.3181818181818182
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 50,
+     "total": 50,
+     "found": 48,
+     "fp": 2,
+     "namensteile": 3,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9555555555555556,
+     "fehlalarme_je_seite": 0.5
+    },
+    "bescheid_formular": {
+     "hit": 55,
+     "total": 57,
+     "found": 53,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 0.9649122807017544,
+     "precision": 0.9811320754716981,
+     "fehlalarme_je_seite": 0.25
+    },
+    "lohn_konto_rechnung": {
+     "hit": 46,
+     "total": 47,
+     "found": 41,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 0.9787234042553191,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 60,
+     "total": 65,
+     "found": 55,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 0.9230769230769231,
+     "precision": 0.9818181818181818,
+     "fehlalarme_je_seite": 0.16666666666666666
+    },
+    "schriftsatz": {
+     "hit": 52,
+     "total": 56,
+     "found": 57,
+     "fp": 3,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 0.9285714285714286,
+     "precision": 0.9473684210526315,
+     "fehlalarme_je_seite": 0.75
+    }
+   },
+   "tempo_s_je_1000": 1.1853332975838489,
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "f.brueggemann@brueggemann-ra.example",
+     "S2_Schreiben_Gegenseite.pdf"
+    ],
+    [
+     "EMAIL_ADDRESS",
+     "sabine.engel@posteo.example",
+     "S3_EMail_Kuendigung_Engel.txt"
+    ],
+    [
+     "EMAIL_ADDRESS",
+     "m.brenner@rrl-kessler.example",
+     "S3_EMail_Kuendigung_Engel.txt"
+    ],
+    [
+     "EMAIL_ADDRESS",
+     "s.engel@rrl-kessler.example",
+     "S3_EMail_Kuendigung_Engel.txt"
+    ],
+    [
+     "EMAIL_ADDRESS",
+     "monika.schneider@web.example",
+     "B2_Schadenmeldung_Schneider.docx"
+    ],
+    [
+     "EMAIL_ADDRESS",
+     "m.wolf@gmx.example",
+     "B3_Unfallbericht_Koch_Wolf.pdf"
+    ],
+    [
+     "EMAIL_ADDRESS",
+     "info@sanitaer-hoffmann.example",
+     "L3_Rechnung_Sanitaer.docx"
+    ],
+    [
+     "PERSONALNR",
+     "004711",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "STEUER_ID",
+     "57 281 463 956",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "13 150380 B 120",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DATUM",
+     "15.03.1980",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "EMAIL_ADDRESS",
+     "f.brueggemann@brueggemann-ra.example",
+     "S2_Schreiben_Gegenseite_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "PLZ_ORT",
+     "45130 Essen",
+     "wiederholung",
+     "S1_Klage_Verkehrsunfall_Fischer.docx"
+    ],
+    [
+     "PLZ_ORT",
+     "45130 Essen",
+     "regel",
+     "S1_Klage_Verkehrsunfall_Fischer.docx"
+    ],
+    [
+     "PLZ_ORT",
+     "45130 Essen",
+     "wiederholung",
+     "S1_Klage_Verkehrsunfall_Fischer.docx"
+    ],
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer.pdf"
+    ],
+    [
+     "PERSON",
+     "Calprotectin",
+     "modell",
+     "A1_Arztbrief_Fuchs.docx"
+    ],
+    [
+     "ORGANIZATION",
+     "Child Behavior Checklist",
+     "modell",
+     "A4_Familiengutachten_Schneider.docx"
+    ],
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer_scan.pdf"
+    ]
+   ]
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 100,
+    "total": 104,
+    "found": 94,
+    "fp": 4,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9615384615384616,
+    "precision": 0.9574468085106383,
+    "fehlalarme_je_seite": 0.4
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 20,
+     "total": 20,
+     "found": 20,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 0.9,
+     "fehlalarme_je_seite": 1.0
+    },
+    "bescheid_formular": {
+     "hit": 20,
+     "total": 22,
+     "found": 19,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9090909090909091,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "lohn_konto_rechnung": {
+     "hit": 18,
+     "total": 18,
+     "found": 16,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 19,
+     "total": 20,
+     "found": 17,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.95,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "schriftsatz": {
+     "hit": 23,
+     "total": 24,
+     "found": 22,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9583333333333334,
+     "precision": 0.9090909090909091,
+     "fehlalarme_je_seite": 1.0
+    }
+   },
+   "tempo_s_je_1000": 1.0562807674366486,
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "KENNNUMMER",
+     "K77013",
+     "R1_Werkstattrechnung_Rotthaus_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "PERSON",
+     "Dipl",
+     "heuristik",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ]
+   ]
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 103,
+    "fp": 1,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9896907216494846,
+    "fehlalarme_je_seite": 0.16666666666666666
+   },
+   "familien": {
+    "kanzlei": {
+     "hit": 107,
+     "total": 107,
+     "found": 103,
+     "fp": 1,
+     "namensteile": 6,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 1.0,
+     "precision": 0.9896907216494846,
+     "fehlalarme_je_seite": 0.16666666666666666
+    }
+   },
+   "tempo_s_je_1000": 1.0914348771741693,
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ]
+   ]
+  }
+ },
+ "GLiNER2-PII": {
+  "laden_s": 13.756789684295654,
+  "korpus": {
+   "gesamt": {
+    "hit": 272,
+    "total": 275,
+    "found": 260,
+    "fp": 5,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 0.9890909090909091,
+    "precision": 0.980544747081712,
+    "fehlalarme_je_seite": 0.22727272727272727
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 50,
+     "total": 50,
+     "found": 52,
+     "fp": 2,
+     "namensteile": 3,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9591836734693877,
+     "fehlalarme_je_seite": 0.5
+    },
+    "bescheid_formular": {
+     "hit": 57,
+     "total": 57,
+     "found": 56,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9642857142857143,
+     "fehlalarme_je_seite": 0.5
+    },
+    "lohn_konto_rechnung": {
+     "hit": 47,
+     "total": 47,
+     "found": 42,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 62,
+     "total": 65,
+     "found": 58,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 0.9538461538461539,
+     "precision": 0.9827586206896551,
+     "fehlalarme_je_seite": 0.16666666666666666
+    },
+    "schriftsatz": {
+     "hit": 56,
+     "total": 56,
+     "found": 52,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    }
+   },
+   "tempo_s_je_1000": 1.4935995739274286,
+   "uebersehen": [
+    [
+     "STEUER_ID",
+     "57 281 463 956",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "13 150380 B 120",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DATUM",
+     "15.03.1980",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer.pdf"
+    ],
+    [
+     "PERSON",
+     "BARMER",
+     "modell",
+     "B4_Rentenbescheid_Hoffmann.pdf"
+    ],
+    [
+     "PERSON",
+     "Calprotectin",
+     "modell",
+     "A1_Arztbrief_Fuchs.docx"
+    ],
+    [
+     "ORGANIZATION",
+     "Child Behavior Checklist",
+     "modell",
+     "A4_Familiengutachten_Schneider.docx"
+    ],
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer_scan.pdf"
+    ]
+   ]
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 101,
+    "total": 104,
+    "found": 99,
+    "fp": 6,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9711538461538461,
+    "precision": 0.9393939393939394,
+    "fehlalarme_je_seite": 0.6
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 20,
+     "total": 20,
+     "found": 20,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 0.9,
+     "fehlalarme_je_seite": 1.0
+    },
+    "bescheid_formular": {
+     "hit": 20,
+     "total": 22,
+     "found": 21,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9090909090909091,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "lohn_konto_rechnung": {
+     "hit": 18,
+     "total": 18,
+     "found": 15,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 20,
+     "total": 20,
+     "found": 19,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 0.9473684210526315,
+     "fehlalarme_je_seite": 0.5
+    },
+    "schriftsatz": {
+     "hit": 23,
+     "total": 24,
+     "found": 24,
+     "fp": 3,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9583333333333334,
+     "precision": 0.875,
+     "fehlalarme_je_seite": 1.5
+    }
+   },
+   "tempo_s_je_1000": 1.323570920580624,
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "ADRESSE",
+     "König-Heinrich-Platz 1",
+     "regel",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "PERSON",
+     "Dipl",
+     "heuristik",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ],
+    [
+     "DE_TAX_ID",
+     "88.410",
+     "modell",
+     "R1_Werkstattrechnung_Rotthaus_scan.pdf"
+    ]
+   ]
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 110,
+    "fp": 2,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9807692307692307,
+    "fehlalarme_je_seite": 0.3333333333333333
+   },
+   "familien": {
+    "kanzlei": {
+     "hit": 107,
+     "total": 107,
+     "found": 110,
+     "fp": 2,
+     "namensteile": 6,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 1.0,
+     "precision": 0.9807692307692307,
+     "fehlalarme_je_seite": 0.3333333333333333
+    }
+   },
+   "tempo_s_je_1000": 1.3596848352993678,
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "PLZ_ORT",
+     "45468 Mülheim an der Ruhr",
+     "wiederholung",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ],
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ]
+   ]
+  }
+ },
+ "GLiNER2-PII + Firma": {
+  "laden_s": 12.870263814926147,
+  "korpus": {
+   "gesamt": {
+    "hit": 272,
+    "total": 275,
+    "found": 258,
+    "fp": 4,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 0.9890909090909091,
+    "precision": 0.984313725490196,
+    "fehlalarme_je_seite": 0.18181818181818182
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 50,
+     "total": 50,
+     "found": 51,
+     "fp": 2,
+     "namensteile": 3,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9583333333333334,
+     "fehlalarme_je_seite": 0.5
+    },
+    "bescheid_formular": {
+     "hit": 57,
+     "total": 57,
+     "found": 55,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 0.9818181818181818,
+     "fehlalarme_je_seite": 0.25
+    },
+    "lohn_konto_rechnung": {
+     "hit": 47,
+     "total": 47,
+     "found": 42,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 62,
+     "total": 65,
+     "found": 58,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 0.9538461538461539,
+     "precision": 0.9827586206896551,
+     "fehlalarme_je_seite": 0.16666666666666666
+    },
+    "schriftsatz": {
+     "hit": 56,
+     "total": 56,
+     "found": 52,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 4,
+     "dokumente": 4,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    }
+   },
+   "tempo_s_je_1000": 1.4864461766052683,
+   "uebersehen": [
+    [
+     "STEUER_ID",
+     "57 281 463 956",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "13 150380 B 120",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ],
+    [
+     "DATUM",
+     "15.03.1980",
+     "L1_Lohnabrechnung_Becker_scan.pdf"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer.pdf"
+    ],
+    [
+     "PERSON",
+     "Calprotectin",
+     "modell",
+     "A1_Arztbrief_Fuchs.docx"
+    ],
+    [
+     "ORGANIZATION",
+     "Child Behavior Checklist",
+     "modell",
+     "A4_Familiengutachten_Schneider.docx"
+    ],
+    [
+     "DATUM",
+     "27.10.2026",
+     "regel",
+     "B1_Bussgeldbescheid_Bauer_scan.pdf"
+    ]
+   ]
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 101,
+    "total": 104,
+    "found": 99,
+    "fp": 6,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9711538461538461,
+    "precision": 0.9393939393939394,
+    "fehlalarme_je_seite": 0.6
+   },
+   "familien": {
+    "arzt_gutachten": {
+     "hit": 20,
+     "total": 20,
+     "found": 20,
+     "fp": 2,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 0.9,
+     "fehlalarme_je_seite": 1.0
+    },
+    "bescheid_formular": {
+     "hit": 20,
+     "total": 22,
+     "found": 21,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9090909090909091,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "lohn_konto_rechnung": {
+     "hit": 18,
+     "total": 18,
+     "found": 15,
+     "fp": 0,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 1.0,
+     "fehlalarme_je_seite": 0.0
+    },
+    "scans": {
+     "hit": 20,
+     "total": 20,
+     "found": 19,
+     "fp": 1,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 1.0,
+     "precision": 0.9473684210526315,
+     "fehlalarme_je_seite": 0.5
+    },
+    "schriftsatz": {
+     "hit": 23,
+     "total": 24,
+     "found": 24,
+     "fp": 3,
+     "namensteile": 0,
+     "seiten": 2,
+     "dokumente": 2,
+     "recall": 0.9583333333333334,
+     "precision": 0.875,
+     "fehlalarme_je_seite": 1.5
+    }
+   },
+   "tempo_s_je_1000": 1.3305961466492244,
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "ADRESSE",
+     "König-Heinrich-Platz 1",
+     "regel",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "PERSON",
+     "Dipl",
+     "heuristik",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ],
+    [
+     "DE_TAX_ID",
+     "88.410",
+     "modell",
+     "R1_Werkstattrechnung_Rotthaus_scan.pdf"
+    ]
+   ]
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 110,
+    "fp": 2,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9807692307692307,
+    "fehlalarme_je_seite": 0.3333333333333333
+   },
+   "familien": {
+    "kanzlei": {
+     "hit": 107,
+     "total": 107,
+     "found": 110,
+     "fp": 2,
+     "namensteile": 6,
+     "seiten": 6,
+     "dokumente": 6,
+     "recall": 1.0,
+     "precision": 0.9807692307692307,
+     "fehlalarme_je_seite": 0.3333333333333333
+    }
+   },
+   "tempo_s_je_1000": 1.382287479633356,
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "PLZ_ORT",
+     "45468 Mülheim an der Ruhr",
+     "wiederholung",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ],
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ]
+   ]
+  }
+ }
+}

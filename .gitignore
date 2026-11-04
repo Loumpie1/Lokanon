@@ -36,3 +36,8 @@ video/out/ma/
 
 # Tonspur: WAV entsteht aus video/tools/sound.py, nur das AAC wird versioniert
 video/public/ma/audio/*.wav
+
+# Experimente: erzeugte Daten und trainierte Modelle (gross, jederzeit neu erzeugbar)
+experimente/*/daten/
+experimente/*/modell/
+experimente/*/ergebnisse/

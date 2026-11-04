@@ -560,6 +560,8 @@ def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
     t = f.text.strip().lower()
     if t in NER_STOPWORDS or t.rstrip(".:") in NER_STOPWORDS or len(t) < 3:
         return False
+    if not any(ch.isalpha() for ch in t):
+        return False  # "__________" (Ausfüllzeile in Formularen) ist kein Name
     if "@" in t or "://" in t or t.startswith("www.") or _ROEMISCH_RX.fullmatch(t):
         return False  # E-Mail, URL, römische Gliederung sind nie Person/Firma
     toks_all = [w.strip(".,:").lower() for w in f.text.split()]
@@ -759,6 +761,7 @@ def detect(
     findings = [f for f in findings if not _belongs_to_mention(text, f, mentions, personen=personen,
                                                                kontakte=kontakte)]
 
+    findings = _firmenteile_umdeuten(text, findings)
     findings += _term_findings(text, deny_list or [], "EIGENE_BEGRIFFE")
     findings += _term_findings(text, manual_terms or [], "MANUELL")
     findings = _resolve_overlaps(findings)
@@ -785,6 +788,30 @@ def detect(
         # (sonst bliebe z. B. die PLZ des Mandanten an der Gerichtsadresse lesbar).
         findings = _resolve_overlaps(findings + extra)
 
+    return findings
+
+
+def _firmenteile_umdeuten(text: str, findings: list[Finding]) -> list[Finding]:
+    """Ein einzelnes Wort, das zu einem erkannten Firmennamen gehört, ist die Firma und keine Person:
+    "(Martin Auftragsnummer)" neben "Modehaus Martin GmbH & Co. KG". Mit Anrede oder Titel davor ("Herr Martin")
+    und als Teil eines mehrteiligen Personennamens bleibt es eine Person."""
+    teile: dict[str, str] = {}
+    for o in findings:
+        if o.entity == "ORGANIZATION":
+            for w in re.findall(r"[A-Za-zÄÖÜäöüß]{3,}", o.text):
+                teile.setdefault(w.lower(), o.text)
+    if not teile:
+        return findings
+    in_personen = {w.strip(".,").lower() for f in findings if f.entity == "PERSON" and len(f.text.split()) > 1
+                   for w in f.text.split()}
+    for f in findings:
+        w = f.text.strip()
+        if f.entity != "PERSON" or " " in w or w.lower() not in teile or w.lower() in in_personen:
+            continue
+        davor = text[max(0, f.start - 20):f.start].split()
+        if davor and davor[-1].lower().rstrip(".") in {s.rstrip(".") for s in SALUTATIONS + TITLES}:
+            continue
+        f.entity, f.grund = "ORGANIZATION", f"Teil der Firma „{teile[w.lower()]}“"
     return findings
 
 

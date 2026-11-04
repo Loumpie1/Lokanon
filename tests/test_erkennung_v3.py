@@ -124,3 +124,19 @@ def test_leckpruefung_findet_namen_trotz_ligatur():
     assert fio.verify_pdf(data, ["Renate Hoffmann"]) == ["Renate Hoffmann"]
     out = fio.write_pdf(data, [("Renate Hoffmann", "[Person_1]"), ("Hoffmann", "[Person_1]")])
     assert fio.verify_pdf(out, ["Renate Hoffmann", "Hoffmann"]) == []
+
+
+def test_formular_ausfuellzeilen_und_firmenname_als_vorname():
+    """Leere Ausfüllzeilen sind nie ein Name; ein Vorname, der Teil eines erkannten Firmennamens ist, steht für die
+    Firma ("(Martin Auftragsnummer)" neben "Modehaus Martin GmbH & Co. KG"), mit Anrede bleibt er eine Person."""
+    from anonymizer.engine import Finding, _firmenteile_umdeuten, _plausible
+
+    assert not _plausible("x", Finding(0, 10, "PERSON", 0.85, "__________", quelle="modell"))
+    text = "(Martin Auftragsnummer) bei der MODEHAUS MARTIN GMBH & Co. KG. Herr Martin rief an."
+    firma = text.index("MODEHAUS")
+    fs = [Finding(1, 7, "PERSON", 1.0, "Martin", quelle="modell"),
+          Finding(firma, firma + 29, "ORGANIZATION", 0.85, text[firma:firma + 29], quelle="modell"),
+          Finding(text.index("Martin rief"), text.index("Martin rief") + 6, "PERSON", 1.0, "Martin", quelle="modell")]
+    fs = _firmenteile_umdeuten(text, fs)
+    assert [f.entity for f in fs] == ["ORGANIZATION", "ORGANIZATION", "PERSON"]
+    assert "Teil der Firma" in fs[0].grund
