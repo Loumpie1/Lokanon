@@ -15,7 +15,7 @@ from presidio_analyzer.context_aware_enhancers import LemmaContextAwareEnhancer
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_analyzer.predefined_recognizers import SpacyRecognizer
 
-from .recognizers_de import DATUM_ALLE_RX, DATUM_KONTEXT, german_recognizers
+from .recognizers_de import DATUM_ALLE_RX, DATUM_KONTEXT, RECHTSFORMEN, german_recognizers
 
 DATUM_KONTEXT_KURZ = ["geb", "geburt", "verstorb", "versterb", "gestorb", "sterb", "tod"]
 
@@ -46,6 +46,7 @@ LABELS = {
     "FUEHRERSCHEIN": "Fuehrerschein",
     "DE_LANR": "LANR",
     "DE_BSNR": "BSNR",
+    "PERSONALNR": "PersNr",
     "DE_HANDELSREGISTER": "HRB",
     "DE_KFZ": "Kennzeichen",
     "KFZ": "Kennzeichen",
@@ -66,7 +67,7 @@ GRUPPEN = {
     "Akten und Verträge": ["AKTENZEICHEN", "DIKTATZEICHEN", "GRUNDBUCH", "VERSICHERUNGSNR", "DE_HANDELSREGISTER"],
     "Konto und Steuer": ["IBAN_CODE", "KONTONUMMER", "CREDIT_CARD", "DE_TAX_ID", "DE_TAX_NUMBER", "DE_VAT_ID"],
     "Ausweise und Nummern": ["DE_ID_CARD", "DE_PASSPORT", "DE_FUEHRERSCHEIN", "FUEHRERSCHEIN", "DE_SOCIAL_SECURITY",
-                             "DE_HEALTH_INSURANCE", "DE_LANR", "DE_BSNR"],
+                             "DE_HEALTH_INSURANCE", "DE_LANR", "DE_BSNR", "PERSONALNR"],
     "Fahrzeug": ["DE_KFZ", "KFZ", "FIN"],
     "Datum": ["DATUM"],
     "Beruf und Gesundheit (indirekte Hinweise)": ["BERUF", "DIAGNOSE"],
@@ -106,7 +107,24 @@ NER_STOPWORDS = {
     "versicherungsnehmerin", "gläubiger", "schuldner", "mieter", "vermieter", "eigentümer", "zeugen", "anwalt", "anwältin",
     "rechtsanwalt", "rechtsanwältin", "notar", "notarin", "steuerberater", "steuerberaterin", "gegenseite",
     "netto", "brutto", "summe", "gesamt", "betrag", "rechnungsbetrag", "endbetrag", "zwischensumme",
+    # Lohn- und Gehaltsabrechnung
+    "avmg", "sv", "kv", "rv", "av", "pv", "kv/pv", "ges", "monat", "jahressummen", "steuerklasse", "konfession",
+    "personalnummer", "personalabteilung", "abrechnung", "entgeltabrechnung", "berechnungsgrundlage",
+    "entgeltbestandteile", "solidaritätszuschlag", "kirchensteuer", "lohnsteuer", "kinderfreibetrag",
 }
+# Wortteile aus Lohn- und Gehaltsabrechnungen: ein Name/eine Firma, die so beginnt oder endet, ist ein Fachbegriff
+# ("Gesamtbrutto", "SV-Brutto", "Krankengeldzuschuss", "AVmG-Brutto", "AN-Anteil", "Schichtzulage")
+_LOHN_ENDUNGEN = ("brutto", "netto", "zuschuss", "zuschüsse", "zuschlag", "zulage", "umlage", "entgelt", "bezüge",
+                  "vergütung", "lohn", "gehalt", "abzug", "abzüge", "auszahlung", "freibetrag", "beitrag", "beiträge",
+                  "anteil", "steuer", "summen", "pflichtig")
+_LOHN_ANFAENGE = ("brutto", "netto", "lohnsteuer", "lohnart", "entgelt", "gehalt", "zuschuss", "zulage", "umlage",
+                  "beitrag", "auszahlung", "steuerbrutto", "sozialversicherung")
+# Geldbetrag, auch aus OCR mit Leerzeichen ("846, 10", "33. 081, 83") – nie eine Kennnummer
+_BETRAG_RX = re.compile(r"-?\d{1,3}(?:[.\s]\s?\d{3})*\s?,\s?\d{2}\s?(?:€|EUR)?")
+_KVNR_RX = re.compile(r"[A-Za-z]\s?(?:\d\s?){9}")
+_RECHTSFORM_RX = re.compile(rf"(?<!\w)(?:{RECHTSFORMEN})(?!\w)")
+# Rechtsform am Anfang eines Modelltreffers (ohne "AG", "SE", "Stiftung": "AG Essen", "Stiftung Warentest")
+_RECHTSFORM_ANFANG_RX = re.compile(r"(?:gGmbH|GmbH|mbH|KGaA|KG|OHG|GbR|UG|e\.\s?V\.|eG|Inc\.|Ltd\.)(?!\w)")
 # Artikel, Pronomen, Präpositionen – nie ein Name oder Namensteil
 FUNKTIONSWOERTER = {"der", "die", "das", "den", "dem", "des", "ein", "eine", "einer", "eines", "und", "oder", "von",
                     "van", "zu", "zur", "zum", "für", "mit", "bei", "aus", "nach", "vor", "an", "am", "im", "in",
@@ -125,7 +143,7 @@ _ORG_KLEIN = {"und", "&", "für", "von", "der", "die", "des", "am", "im", "in", 
 # Typen, bei denen ein Modelltreffer ohne Ziffer kein echter Treffer sein kann
 NUMERISCHE_TYPEN = {"KFZ", "DE_KFZ", "FUEHRERSCHEIN", "DE_FUEHRERSCHEIN", "VERSICHERUNGSNR", "KONTONUMMER", "AKTENZEICHEN",
                     "FIN", "IBAN_CODE", "TELEFON", "DE_TAX_ID", "DE_TAX_NUMBER", "DE_VAT_ID", "DE_SOCIAL_SECURITY",
-                    "DE_HEALTH_INSURANCE", "DE_ID_CARD", "DE_PASSPORT", "DE_LANR", "DE_BSNR", "DE_HANDELSREGISTER",
+                    "DE_HEALTH_INSURANCE", "DE_ID_CARD", "DE_PASSPORT", "DE_LANR", "DE_BSNR", "PERSONALNR", "DE_HANDELSREGISTER",
                     "ADRESSE", "PLZ_ORT", "CREDIT_CARD"}
 NER_ENTITIES = {"PERSON", "ORGANIZATION", "LOCATION"}
 
@@ -428,6 +446,10 @@ def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
                 digits = sum(ch.isdigit() for ch in f.text)
                 if digits == 0 or (f.entity == "KONTONUMMER" and digits < 7):
                     return False
+            if f.entity == "DE_HEALTH_INSURANCE" and not _KVNR_RX.fullmatch(f.text.strip()):
+                return False  # Krankenversichertennummer = Buchstabe + 9 Ziffern
+        if f.entity in NUMERISCHE_TYPEN and f.quelle != "liste" and _BETRAG_RX.fullmatch(f.text.strip()):
+            return False  # "846, 10" ist ein Betrag
         return True
     t = f.text.strip().lower()
     if t in NER_STOPWORDS or t.rstrip(".:") in NER_STOPWORDS or len(t) < 3:
@@ -443,6 +465,11 @@ def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
         return False
     if any(ch.isdigit() for ch in t) or "\n" in f.text:
         return False
+    if any(p.endswith(_LOHN_ENDUNGEN) or p.startswith(_LOHN_ANFAENGE) for p in teile) and not (
+            f.entity == "ORGANIZATION" and _RECHTSFORM_RX.search(f.text)):
+        return False  # "Gesamtbrutto", "SV-Brutto", "Krankengeldzuschuss" – Fachbegriffe der Lohnabrechnung
+    if f.entity == "ORGANIZATION" and f.quelle == "modell" and _RECHTSFORM_ANFANG_RX.match(f.text):
+        return False  # "GmbH · Postfach": Rechtsform steht am Ende eines Firmennamens, nicht am Anfang
     if f.entity == "PERSON" and any(w.lower().endswith(_SUBSTANTIV_ENDUNGEN) for w in toks_all):
         return False  # "Planenfarbe", "Rechnungs", "Auftragsnummer" – zusammengesetzte Substantive
     if wa is not None and f.quelle == "modell":

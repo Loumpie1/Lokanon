@@ -50,6 +50,12 @@ RECHTSFORMEN = (
 )
 
 
+_PERSONALNR_LABELS = ["personalnummer", "personal-nummer", "personal-nr.", "personalnr.", "personal-nr", "pers.-nr.",
+                      "pers.nr.", "pers-nr.", "pers.-nr", "mitarbeiternummer", "mitarbeiter-nr.", "pnr."]
+_PERSONALNR_RX = ("(?:" + "|".join(rf"(?<=(?i:{re.escape(lb)}){sep})" for lb in _PERSONALNR_LABELS
+                                   for sep in (r"\s", r":\s", r"\s:\s")) + r")\d{3,10}(?![\d,.])")
+
+
 def _pr(entity, patterns, context=None):
     return PatternRecognizer(
         supported_entity=entity,
@@ -150,6 +156,9 @@ def german_recognizers():
             ["kontonummer", "konto-nr", "konto", "kto", "depot", "depotnummer", "depot-nr", "kundenkonto",
              "bankverbindung", "blz", "sparbuch"],
         ),
+        # Personalnummer (Lohnabrechnung, Arbeitsvertrag): nur direkt hinter der Bezeichnung, nackte Ziffern sind zu
+        # vieldeutig. "Personalnummer 004711", "Pers.-Nr.: 12345"
+        _pr("PERSONALNR", [(_PERSONALNR_RX, 0.6)]),
         # ---------- Firmen mit Rechtsform ----------
         _pr(
             "ORGANIZATION",

@@ -59,8 +59,16 @@ def engine():
 
 
 def ist_scan(page) -> bool:
-    """Seite ohne nennenswerte Textebene, aber mit Bild = Scan."""
-    return len(page.get_text().strip()) < 20 and bool(page.get_images(full=False))
+    """Seite ohne nennenswerte sichtbare Textebene, aber mit Bild = Scan. Die unsichtbare OCR-Schicht eines
+    Scanners ("durchsuchbares PDF") zählt nicht als Text: Sie ist oft ungenau ("ENTGELTBE S TANDTEILE"),
+    liegt nicht exakt über dem Schriftbild, und Lokanon schwärzt auf dem Bild selbst."""
+    if not page.get_images(full=False):
+        return False
+    if len(page.get_text().strip()) < 20:
+        return True
+    from .files import pdf_sichtbarer_text
+
+    return len(pdf_sichtbarer_text(page).strip()) < 20
 
 
 def _render(page, dpi: int = DPI, rotation: int = 0):

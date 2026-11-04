@@ -179,3 +179,42 @@ def test_gedrehter_scan_wird_aufrecht_geschwaerzt(gedrehter_scan):
     low = seite.text.lower()
     assert "engel" not in low and "j010b7xy351" not in low and seite.zeilen >= 10
     assert fio.verify_pdf(out, [o for o, _ in pairs]) == []
+
+
+# ---------------------------------------------------------------- Lohnabrechnung (Pilot 04.11.2026, Text fiktiv)
+
+LOHN = ("Verkehrsbetrieb Musterstadt GmbH · Postfach 10 20 30 · 45000 Musterstadt\n"
+        "Herrn\nJan Beispielmann\nLindenweg 7\n45100 Musterstadt\n"
+        "Personalnummer 004711 Steuerklasse 1\n"
+        "ENTGELTBE S TANDTEILE\nBERECHNUNGSGRUNDLAGE\nMONAT\nJAHRE S SUMMEN\n"
+        "Krankengeldzuschuss ges.\n846, 10\nGesamtbrutto\nSteuer-Brutto\nSV-Brutto KV/PV\nSV-Brutto RV\n"
+        "SV-Brutto AV\nAVmG-Brutto\n846, 10\n33. 081, 83\nKrankenversicherung AN-Anteil 280, 15\n"
+        "Auszahlungsbetrag 2. 611, 08\nPersonalabteilung\n")
+
+
+def test_lohnabrechnung_fachbegriffe_sind_keine_namen(analyzer, cfg):
+    fs = _detect(analyzer, cfg, LOHN)
+    by = {f.text: f.entity for f in fs}
+    for fach in ("Krankengeldzuschuss", "Gesamtbrutto", "Steuer-Brutto", "SV-Brutto", "AVmG-Brutto", "AVmG", "AN-Anteil",
+                 "Personalabteilung"):
+        assert fach not in by, (fach, by.get(fach))
+    assert by.get("Jan Beispielmann") == "PERSON"
+    assert by.get("004711") == "PERSONALNR"
+    # Firmenname im Briefkopf: der ganze Name, nicht "GmbH · Postfach"
+    assert by.get("Verkehrsbetrieb Musterstadt GmbH") == "ORGANIZATION"
+    assert not any(t.startswith("GmbH") for t in by)
+
+
+def test_betrag_ist_keine_kennnummer():
+    from anonymizer.engine import _plausible
+
+    for ent in ("DE_HEALTH_INSURANCE", "KONTONUMMER", "VERSICHERUNGSNR"):
+        assert not _plausible(LOHN, Finding(0, 7, ent, 0.9, "846, 10", quelle="modell"))
+        assert not _plausible(LOHN, Finding(0, 9, ent, 0.9, "33. 081, 83", quelle="modell"))
+    assert _plausible("", Finding(0, 10, "DE_HEALTH_INSURANCE", 0.9, "A123456789", quelle="modell"))
+    assert not _plausible("", Finding(0, 6, "DE_HEALTH_INSURANCE", 0.9, "846 10", quelle="modell"))
+
+
+def test_firma_mit_rechtsform_und_lohnwort_bleibt(analyzer, cfg):
+    fs = _detect(analyzer, cfg, "Die Lohnbüro Schmitz GmbH hat die Abrechnung erstellt.")
+    assert any(f.entity == "ORGANIZATION" and "Schmitz" in f.text for f in fs)

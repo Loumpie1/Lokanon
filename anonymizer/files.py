@@ -37,8 +37,10 @@ Seite nach dem Apply ein Original im Seitentext stehen, wird die Seite gerastert
 Unsichtbarer Text (render mode 3, Deckkraft 0, OCR-Schicht "GlyphLessFont") wird im
 selben Redaction-Durchlauf entfernt (Kriterien wie Document.scrub); scrub läuft danach mit
 hidden_text=False, weil sein eigener Durchlauf sonst Platzhalter-Glyphen neben ehemaligen
-Hidden-Text-Flächen abschneiden kann. Nicht abgedeckt: Text, der nur als
-Grafikpfade oder in Bildern (Scans) vorliegt – dafür ist OCR nötig.
+Hidden-Text-Flächen abschneiden kann. Dieser Durchlauf entfernt nur Text, keine
+Bildpixel: Bei einem durchsuchbaren Scan (Bild + unsichtbare Scanner-OCR) wäre sonst das
+ganze Schriftbild weiß. Solche Seiten gelten als Scan (ocr.ist_scan) und werden per eigener
+OCR gelesen und geschwärzt. Nicht abgedeckt: Text, der nur als Grafikpfade vorliegt.
 """
 from __future__ import annotations
 
@@ -572,15 +574,14 @@ def _pdf_split_tj(doc) -> None:
                     doc.update_stream(sx, old)
 
 
-def _pdf_hidden_rects(page) -> list:
-    """Rechtecke aller unsichtbaren Text-Spans (gleiche Kriterien wie Document.scrub:
-    GlyphLessFont/OCR-Schicht, Deckkraft 0, weder gefüllt noch konturiert)."""
+def _pdf_text_spans(page):
+    """(Span, unsichtbar) je Text-Span. Unsichtbar wie bei Document.scrub: GlyphLessFont/
+    OCR-Schicht, Deckkraft 0, weder gefüllt noch konturiert."""
     import pymupdf
 
     filled = getattr(pymupdf.mupdf, "FZ_STEXT_FILLED", None)
     stroked = getattr(pymupdf.mupdf, "FZ_STEXT_STROKED", None)
     flags = pymupdf.TEXT_PRESERVE_SPANS | getattr(pymupdf, "TEXT_COLLECT_STYLES", 0)
-    rects = []
     for block in page.get_text("dict", flags=flags).get("blocks", []):
         if block.get("type") != 0:
             continue
@@ -591,11 +592,25 @@ def _pdf_hidden_rects(page) -> list:
                 cf = span.get("char_flags")
                 if isinstance(cf, int) and isinstance(filled, int) and isinstance(stroked, int):
                     hidden = hidden or not (cf & filled or cf & stroked)
-                if hidden:
-                    r = pymupdf.Rect(span["bbox"])
-                    if not r.is_empty and not r.is_infinite:
-                        rects.append(r)
+                yield span, hidden
+
+
+def _pdf_hidden_rects(page) -> list:
+    """Rechtecke aller unsichtbaren Text-Spans."""
+    import pymupdf
+
+    rects = []
+    for span, hidden in _pdf_text_spans(page):
+        if hidden:
+            r = pymupdf.Rect(span["bbox"])
+            if not r.is_empty and not r.is_infinite:
+                rects.append(r)
     return rects
+
+
+def pdf_sichtbarer_text(page) -> str:
+    """Seitentext ohne unsichtbare Spans (z. B. ohne die OCR-Schicht eines Scanners)."""
+    return "".join(span.get("text", "") for span, hidden in _pdf_text_spans(page) if not hidden)
 
 
 def _pdf_ensure_font(page) -> None:
@@ -623,6 +638,8 @@ def write_pdf(data: bytes, pairs: list[tuple[str, str]]) -> bytes:
     verify_pdf das Ergebnis; findet es noch ein Original, gibt es ValueError."""
     import pymupdf
 
+    from .ocr import ist_scan, schwaerze_scanseiten
+
     pairs = sorted(((o, p) for o, p in pairs if o and len(o.strip()) >= 3), key=lambda t: -len(t[0]))
     originals = [o for o, _ in pairs]
     leak_rx = [_pdf_leak_regex(o) for o in originals]
@@ -636,16 +653,24 @@ def write_pdf(data: bytes, pairs: list[tuple[str, str]]) -> bytes:
         for page in doc:
             for w in list(page.widgets()):
                 page.delete_widget(w)
-            hits = _pdf_find_hits(page, pairs)
+            # Durchsuchbarer Scan (Bild + unsichtbare OCR-Schicht des Scanners): die Schicht fliegt raus,
+            # geschwärzt wird wie bei jedem Scan per eigener OCR auf dem Bild (schwaerze_scanseiten unten).
+            hits = [] if ist_scan(page) else _pdf_find_hits(page, pairs)
             for _ph, rects, _size in hits:
                 for r in rects:
                     page.add_redact_annot(r, fill=(1, 1, 1))
-            hidden = _pdf_hidden_rects(page)  # unsichtbarer Text (OCR-Schicht, Tr 3, Alpha 0)
-            for r in hidden:
-                page.add_redact_annot(r, cross_out=False)
-            if hits or hidden:
+            if hits:
                 page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_PIXELS,
                                       graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_COVERED,
+                                      text=pymupdf.PDF_REDACT_TEXT_REMOVE)
+            # Unsichtbarer Text (OCR-Schicht, Tr 3, Alpha 0) wird nur als Text entfernt. Die Bildpixel darunter
+            # bleiben, sonst wird bei einem durchsuchbaren Scan das ganze Schriftbild weiß.
+            hidden = _pdf_hidden_rects(page)
+            for r in hidden:
+                page.add_redact_annot(r, cross_out=False)
+            if hidden:
+                page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE,
+                                      graphics=pymupdf.PDF_REDACT_LINE_ART_NONE,
                                       text=pymupdf.PDF_REDACT_TEXT_REMOVE)
             while page.first_annot:
                 page.delete_annot(page.first_annot)
@@ -664,9 +689,7 @@ def write_pdf(data: bytes, pairs: list[tuple[str, str]]) -> bytes:
             norm = _pdf_norm(page_text)
             if any(rx.search(norm) for rx in leak_rx):
                 rasterize.append(page.number)
-        # Scan-Seiten (ohne Textebene): OCR + Pixel-Schwärzung + Gegenprüfung (anonymizer/ocr.py)
-        from .ocr import schwaerze_scanseiten
-
+        # Scan-Seiten (ohne sichtbare Textebene): OCR + Pixel-Schwärzung + Gegenprüfung (anonymizer/ocr.py)
         schwaerze_scanseiten(doc, pairs, key=_doc_key(data))
         # Fallback: Seiten, auf denen Text die Redaction überlebt hat (z. B. exotische
         # XObjects), werden gerastert und als Bild neu eingefügt.

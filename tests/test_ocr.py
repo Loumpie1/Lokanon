@@ -71,3 +71,34 @@ def test_scan_schwaerzen_und_gegenpruefung(scan_pdf):
         assert orig.lower() not in low, orig
     assert "fuehrerschein_1" in low.replace("[", "").replace("]", "")
     assert fio.verify_pdf(out, [o for o, _ in PAIRS]) == []
+
+
+def _durchsuchbarer_scan(scan_pdf: bytes) -> bytes:
+    """Wie ein Bürokopierer mit "durchsuchbarem PDF": Scanbild plus unsichtbare Textebene (render mode 3)."""
+    src = pymupdf.open(TEXT_PDF)
+    doc = pymupdf.open(stream=scan_pdf, filetype="pdf")
+    page = doc[0]
+    for block in src[0].get_text("dict")["blocks"]:
+        for line in block.get("lines", []):
+            for span in line["spans"]:
+                if span["text"].strip():
+                    page.insert_text(span["origin"], span["text"], fontsize=span["size"], render_mode=3)
+    return doc.tobytes(garbage=4, deflate=True)
+
+
+def test_durchsuchbarer_scan_bleibt_lesbar(scan_pdf):
+    """Scanner-OCR-Schicht darf das Bild nicht ausweißen: nur die Treffer verschwinden, der Rest bleibt sichtbar."""
+    data = _durchsuchbarer_scan(scan_pdf)
+    page = pymupdf.open(stream=data, filetype="pdf")[0]
+    assert "Bußgeldbescheid" in page.get_text() and ist_scan(page)
+    text, info = fio.read_document("Kopierer.pdf", data)
+    assert info["ocr_seiten"] == 1 and "Dr. Claudia Engel" in text
+    out = fio.write_pdf(data, PAIRS)
+    doc = pymupdf.open(stream=out, filetype="pdf")
+    assert fio._pdf_hidden_rects(doc[0]) == []  # Scanner-Schicht ist weg
+    low = erkenne_seite(doc[0]).text.lower()
+    for muss in ("bußgeldbescheid", "rechtsanwälte", "einspruch"):
+        assert muss in low, muss  # Schriftbild ist noch da
+    for orig, _ in PAIRS:
+        assert orig.lower() not in low, orig
+    assert fio.verify_pdf(out, [o for o, _ in PAIRS]) == []
