@@ -1,0 +1,192 @@
+{
+ "gesamt": {
+  "hit": 107,
+  "total": 107,
+  "found": 105,
+  "fp": 2,
+  "namensteile": 6,
+  "seiten": 6,
+  "dokumente": 6,
+  "recall": 1.0,
+  "precision": 0.9797979797979798,
+  "fehlalarme_je_seite": 0.3333333333333333
+ },
+ "familien": {
+  "kanzlei": {
+   "hit": 107,
+   "total": 107,
+   "found": 105,
+   "fp": 2,
+   "namensteile": 6,
+   "seiten": 6,
+   "dokumente": 6,
+   "recall": 1.0,
+   "precision": 0.9797979797979798,
+   "fehlalarme_je_seite": 0.3333333333333333
+  }
+ },
+ "recall_je_typ": {
+  "ADRESSE": [
+   12,
+   12
+  ],
+  "AKTENZEICHEN": [
+   5,
+   5
+  ],
+  "DATUM": [
+   7,
+   7
+  ],
+  "EMAIL_ADDRESS": [
+   4,
+   4
+  ],
+  "FIN": [
+   1,
+   1
+  ],
+  "FUEHRERSCHEIN": [
+   1,
+   1
+  ],
+  "GRUNDBUCH": [
+   1,
+   1
+  ],
+  "IBAN_CODE": [
+   5,
+   5
+  ],
+  "KFZ": [
+   7,
+   7
+  ],
+  "KONTONUMMER": [
+   2,
+   2
+  ],
+  "ORGANIZATION": [
+   3,
+   3
+  ],
+  "PERSON": [
+   39,
+   39
+  ],
+  "PLZ_ORT": [
+   11,
+   11
+  ],
+  "STEUERNUMMER": [
+   1,
+   1
+  ],
+  "STEUER_ID": [
+   1,
+   1
+  ],
+  "TELEFON": [
+   5,
+   5
+  ],
+  "VERSICHERUNGSNR": [
+   2,
+   2
+  ]
+ },
+ "precision_je_typ": {
+  "ADRESSE": [
+   12,
+   0
+  ],
+  "AKTENZEICHEN": [
+   5,
+   0
+  ],
+  "DATUM": [
+   8,
+   1
+  ],
+  "DE_TAX_ID": [
+   1,
+   0
+  ],
+  "DE_TAX_NUMBER": [
+   1,
+   0
+  ],
+  "EMAIL_ADDRESS": [
+   4,
+   0
+  ],
+  "FIN": [
+   1,
+   0
+  ],
+  "FUEHRERSCHEIN": [
+   1,
+   0
+  ],
+  "GRUNDBUCH": [
+   2,
+   1
+  ],
+  "IBAN_CODE": [
+   5,
+   0
+  ],
+  "KFZ": [
+   7,
+   0
+  ],
+  "KONTONUMMER": [
+   2,
+   0
+  ],
+  "ORGANIZATION": [
+   3,
+   0
+  ],
+  "PERSON": [
+   45,
+   0
+  ],
+  "PLZ_ORT": [
+   1,
+   0
+  ],
+  "TELEFON": [
+   5,
+   0
+  ],
+  "VERSICHERUNGSNR": [
+   2,
+   0
+  ]
+ },
+ "uebersehen": [],
+ "fehlalarme": [
+  [
+   "GRUNDBUCH",
+   "Flurstück 218",
+   "regel",
+   "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+  ],
+  [
+   "DATUM",
+   "17.06.2026",
+   "modell",
+   "Fall2_Erbrecht_Nachlassverzeichnis_Haverkamp.xlsx"
+  ]
+ ],
+ "typfehler": [],
+ "namensteile": [
+  "Essen",
+  "Hildegard",
+  "Jutta",
+  "Rhein"
+ ],
+ "tempo_s_je_1000": 2.0230888214411613,
+ "zeichen": 7114
+}

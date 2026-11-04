@@ -1,0 +1,648 @@
+{
+ "gesamt": {
+  "hit": 231,
+  "total": 275,
+  "found": 275,
+  "fp": 27,
+  "namensteile": 3,
+  "seiten": 22,
+  "dokumente": 22,
+  "recall": 0.84,
+  "precision": 0.9007352941176471,
+  "fehlalarme_je_seite": 1.2272727272727273
+ },
+ "familien": {
+  "arzt_gutachten": {
+   "hit": 48,
+   "total": 50,
+   "found": 60,
+   "fp": 9,
+   "namensteile": 3,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.96,
+   "precision": 0.8421052631578947,
+   "fehlalarme_je_seite": 2.25
+  },
+  "bescheid_formular": {
+   "hit": 43,
+   "total": 57,
+   "found": 52,
+   "fp": 6,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.7543859649122807,
+   "precision": 0.8846153846153846,
+   "fehlalarme_je_seite": 1.5
+  },
+  "lohn_konto_rechnung": {
+   "hit": 38,
+   "total": 47,
+   "found": 39,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.8085106382978723,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  },
+  "scans": {
+   "hit": 51,
+   "total": 65,
+   "found": 57,
+   "fp": 4,
+   "namensteile": 0,
+   "seiten": 6,
+   "dokumente": 6,
+   "recall": 0.7846153846153846,
+   "precision": 0.9298245614035088,
+   "fehlalarme_je_seite": 0.6666666666666666
+  },
+  "schriftsatz": {
+   "hit": 51,
+   "total": 56,
+   "found": 67,
+   "fp": 8,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.9107142857142857,
+   "precision": 0.8805970149253731,
+   "fehlalarme_je_seite": 2.0
+  }
+ },
+ "recall_je_typ": {
+  "ADRESSE": [
+   32,
+   33
+  ],
+  "AKTENZEICHEN": [
+   9,
+   9
+  ],
+  "DATUM": [
+   9,
+   12
+  ],
+  "DE_BSNR": [
+   2,
+   2
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   3
+  ],
+  "DE_LANR": [
+   2,
+   2
+  ],
+  "DE_SOCIAL_SECURITY": [
+   0,
+   3
+  ],
+  "DE_VAT_ID": [
+   1,
+   1
+  ],
+  "EMAIL_ADDRESS": [
+   0,
+   8
+  ],
+  "FIN": [
+   3,
+   3
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   2
+  ],
+  "IBAN_CODE": [
+   9,
+   10
+  ],
+  "KENNNUMMER": [
+   2,
+   8
+  ],
+  "KFZ": [
+   9,
+   9
+  ],
+  "ORGANIZATION": [
+   13,
+   17
+  ],
+  "PERSON": [
+   77,
+   90
+  ],
+  "PERSONALNR": [
+   3,
+   3
+  ],
+  "PLZ_ORT": [
+   31,
+   32
+  ],
+  "STEUERNUMMER": [
+   1,
+   1
+  ],
+  "STEUER_ID": [
+   1,
+   2
+  ],
+  "TELEFON": [
+   17,
+   17
+  ],
+  "VERSICHERUNGSNR": [
+   5,
+   8
+  ]
+ },
+ "precision_je_typ": {
+  "ADRESSE": [
+   35,
+   3
+  ],
+  "AKTENZEICHEN": [
+   7,
+   0
+  ],
+  "DATUM": [
+   12,
+   3
+  ],
+  "DE_BSNR": [
+   2,
+   0
+  ],
+  "DE_HANDELSREGISTER": [
+   2,
+   0
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   0
+  ],
+  "DE_LANR": [
+   2,
+   0
+  ],
+  "DE_TAX_ID": [
+   1,
+   0
+  ],
+  "DE_TAX_NUMBER": [
+   1,
+   0
+  ],
+  "DE_VAT_ID": [
+   1,
+   0
+  ],
+  "DIKTATZEICHEN": [
+   2,
+   0
+  ],
+  "FIN": [
+   3,
+   0
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   0
+  ],
+  "IBAN_CODE": [
+   8,
+   0
+  ],
+  "KFZ": [
+   9,
+   0
+  ],
+  "ORGANIZATION": [
+   20,
+   6
+  ],
+  "PERSON": [
+   96,
+   9
+  ],
+  "PERSONALNR": [
+   1,
+   0
+  ],
+  "PLZ_ORT": [
+   36,
+   5
+  ],
+  "TELEFON": [
+   21,
+   1
+  ],
+  "URL": [
+   4,
+   0
+  ],
+  "VERSICHERUNGSNR": [
+   7,
+   0
+  ]
+ },
+ "uebersehen": [
+  [
+   "EMAIL_ADDRESS",
+   "f.brueggemann@brueggemann-ra.example",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "PERSON",
+   "Fischer",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "sabine.engel@posteo.example",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "m.brenner@rrl-kessler.example",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "s.engel@rrl-kessler.example",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "KENNNUMMER",
+   "5.2026.4418.0731",
+   "B1_Bussgeldbescheid_Bauer.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "monika.schneider@web.example",
+   "B2_Schadenmeldung_Schneider.docx"
+  ],
+  [
+   "VERSICHERUNGSNR",
+   "KF 772-410933-2",
+   "B2_Schadenmeldung_Schneider.docx"
+  ],
+  [
+   "VERSICHERUNGSNR",
+   "26-41-118730-5",
+   "B2_Schadenmeldung_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Koch",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "PERSON",
+   "Wolf",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "PERSON",
+   "Stefanie",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "PERSON",
+   "Michael",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "m.wolf@gmx.example",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "VERSICHERUNGSNR",
+   "KH 4471 0092 31",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "PERSON",
+   "Koch, Stefanie",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "PERSON",
+   "Wolf, Lukas",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "DE_SOCIAL_SECURITY",
+   "12 250361 H 501",
+   "B4_Rentenbescheid_Hoffmann.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Seniorenzentrum Haus am Kahlenberg gGmbH",
+   "B4_Rentenbescheid_Hoffmann.pdf"
+  ],
+  [
+   "STEUER_ID",
+   "57 281 463 956",
+   "L1_Lohnabrechnung_Becker.pdf"
+  ],
+  [
+   "DE_SOCIAL_SECURITY",
+   "13 150380 B 120",
+   "L1_Lohnabrechnung_Becker.pdf"
+  ],
+  [
+   "DATUM",
+   "15.03.1980",
+   "L1_Lohnabrechnung_Becker.pdf"
+  ],
+  [
+   "KENNNUMMER",
+   "300-4471-882",
+   "L2_Kontoauszug_Wolf.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "info@sanitaer-hoffmann.example",
+   "L3_Rechnung_Sanitaer.docx"
+  ],
+  [
+   "PERSON",
+   "Monika Klein",
+   "L3_Rechnung_Sanitaer.docx"
+  ],
+  [
+   "KENNNUMMER",
+   "K-20419",
+   "L3_Rechnung_Sanitaer.docx"
+  ],
+  [
+   "PERSON",
+   "Yılmaz",
+   "L3_Rechnung_Sanitaer.docx"
+  ],
+  [
+   "PERSON",
+   "Kaiser",
+   "L4_Betriebskosten_Kaiser.xlsx"
+  ],
+  [
+   "KENNNUMMER",
+   "2026-118044",
+   "A1_Arztbrief_Fuchs.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Autohaus Rehbein & Söhne",
+   "A2_Kfz_Gutachten_Fischer.pdf"
+  ],
+  [
+   "DE_SOCIAL_SECURITY",
+   "13 150380 B 120",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "DATUM",
+   "15.03.1980",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "ADRESSE",
+   "Weseler Straße 301  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Rhein-Ruhr Logistik Kessler GmbH  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "PLZ_ORT",
+   "45478 Mülheim an der Ruhr  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "KENNNUMMER",
+   "300-4471-882",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "IBAN_CODE",
+   "DE41 3506 0190 0001 5200 33  (im gelesenen Text nicht auffindbar)",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "KENNNUMMER",
+   "5.2026.4418.0731",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ],
+  [
+   "DATUM",
+   "08.04.1996  (im gelesenen Text nicht auffindbar)",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Christoph Lange  (im gelesenen Text nicht auffindbar)",
+   "A3_AU_Bescheinigung_Engel_scan.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Autohaus Rehbein & Söhne",
+   "A2_Kfz_Gutachten_Fischer_scan.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "f.brueggemann@brueggemann-ra.example",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Fischer",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Vogel  (im gelesenen Text nicht auffindbar)",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ]
+ ],
+ "fehlalarme": [
+  [
+   "PLZ_ORT",
+   "45130 Essen",
+   "wiederholung",
+   "S1_Klage_Verkehrsunfall_Fischer.docx"
+  ],
+  [
+   "ADRESSE",
+   "Zweigertstraße 52",
+   "regel",
+   "S1_Klage_Verkehrsunfall_Fischer.docx"
+  ],
+  [
+   "PLZ_ORT",
+   "45130 Essen",
+   "regel",
+   "S1_Klage_Verkehrsunfall_Fischer.docx"
+  ],
+  [
+   "PLZ_ORT",
+   "45130 Essen",
+   "wiederholung",
+   "S1_Klage_Verkehrsunfall_Fischer.docx"
+  ],
+  [
+   "PERSON",
+   "Skoda Octavia",
+   "modell",
+   "S1_Klage_Verkehrsunfall_Fischer.docx"
+  ],
+  [
+   "ADRESSE",
+   "Rüttenscheider Straße 120",
+   "regel",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "PLZ_ORT",
+   "45130 Essen",
+   "regel",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Weitergeleitete",
+   "modell",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "DATUM",
+   "27.10.2026",
+   "regel",
+   "B1_Bussgeldbescheid_Bauer.pdf"
+  ],
+  [
+   "PERSON",
+   "Schadentag",
+   "modell",
+   "B2_Schadenmeldung_Schneider.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Fahrzeug A",
+   "wiederholung",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Fahrzeug A",
+   "modell",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "DATUM",
+   "01.09.1977",
+   "regel",
+   "B4_Rentenbescheid_Hoffmann.pdf"
+  ],
+  [
+   "DATUM",
+   "31.08.1980",
+   "regel",
+   "B4_Rentenbescheid_Hoffmann.pdf"
+  ],
+  [
+   "PERSON",
+   "Ileitis terminalis",
+   "modell",
+   "A1_Arztbrief_Fuchs.docx"
+  ],
+  [
+   "PERSON",
+   "Calprotectin",
+   "modell",
+   "A1_Arztbrief_Fuchs.docx"
+  ],
+  [
+   "PERSON",
+   "Familienpsychologisches",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Vaters",
+   "wiederholung",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Gespräch",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "FAST",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Child Behavior Checklist",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Vaters",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Ferienregelung",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Rhi i",
+   "modell",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "TELEFON",
+   "0190 0001 5200 33\n02",
+   "regel",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "ADRESSE",
+   "Rüttenscheider Straße 120",
+   "regel",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ],
+  [
+   "PLZ_ORT",
+   "45130 Essen",
+   "regel",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ]
+ ],
+ "typfehler": [],
+ "namensteile": [
+  "Mia"
+ ],
+ "tempo_s_je_1000": 0.10243713186716892,
+ "zeichen": 23342
+}
