@@ -1,0 +1,266 @@
+{
+ "gesamt": {
+  "hit": 100,
+  "total": 104,
+  "found": 93,
+  "fp": 5,
+  "namensteile": 0,
+  "seiten": 10,
+  "dokumente": 10,
+  "recall": 0.9615384615384616,
+  "precision": 0.946236559139785,
+  "fehlalarme_je_seite": 0.5
+ },
+ "familien": {
+  "arzt_gutachten": {
+   "hit": 20,
+   "total": 20,
+   "found": 21,
+   "fp": 3,
+   "namensteile": 0,
+   "seiten": 2,
+   "dokumente": 2,
+   "recall": 1.0,
+   "precision": 0.8571428571428571,
+   "fehlalarme_je_seite": 1.5
+  },
+  "bescheid_formular": {
+   "hit": 20,
+   "total": 22,
+   "found": 19,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 2,
+   "dokumente": 2,
+   "recall": 0.9090909090909091,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  },
+  "lohn_konto_rechnung": {
+   "hit": 18,
+   "total": 18,
+   "found": 15,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 2,
+   "dokumente": 2,
+   "recall": 1.0,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  },
+  "scans": {
+   "hit": 19,
+   "total": 20,
+   "found": 16,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 2,
+   "dokumente": 2,
+   "recall": 0.95,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  },
+  "schriftsatz": {
+   "hit": 23,
+   "total": 24,
+   "found": 22,
+   "fp": 2,
+   "namensteile": 0,
+   "seiten": 2,
+   "dokumente": 2,
+   "recall": 0.9583333333333334,
+   "precision": 0.9090909090909091,
+   "fehlalarme_je_seite": 1.0
+  }
+ },
+ "recall_je_typ": {
+  "ADRESSE": [
+   14,
+   14
+  ],
+  "AKTENZEICHEN": [
+   4,
+   4
+  ],
+  "DATUM": [
+   4,
+   6
+  ],
+  "DE_HEALTH_INSURANCE": [
+   1,
+   1
+  ],
+  "DE_SOCIAL_SECURITY": [
+   1,
+   1
+  ],
+  "EMAIL_ADDRESS": [
+   0,
+   1
+  ],
+  "FIN": [
+   2,
+   2
+  ],
+  "IBAN_CODE": [
+   3,
+   3
+  ],
+  "KENNNUMMER": [
+   1,
+   2
+  ],
+  "KFZ": [
+   5,
+   5
+  ],
+  "ORGANIZATION": [
+   6,
+   6
+  ],
+  "PERSON": [
+   38,
+   38
+  ],
+  "PLZ_ORT": [
+   15,
+   15
+  ],
+  "STEUER_ID": [
+   1,
+   1
+  ],
+  "TELEFON": [
+   4,
+   4
+  ],
+  "VERSICHERUNGSNR": [
+   1,
+   1
+  ]
+ },
+ "precision_je_typ": {
+  "ADRESSE": [
+   15,
+   1
+  ],
+  "AKTENZEICHEN": [
+   4,
+   0
+  ],
+  "DATUM": [
+   4,
+   0
+  ],
+  "DE_HEALTH_INSURANCE": [
+   1,
+   0
+  ],
+  "DE_KFZ": [
+   1,
+   1
+  ],
+  "DE_SOCIAL_SECURITY": [
+   1,
+   0
+  ],
+  "DE_TAX_ID": [
+   1,
+   0
+  ],
+  "FIN": [
+   2,
+   0
+  ],
+  "IBAN_CODE": [
+   3,
+   0
+  ],
+  "KENNNUMMER": [
+   2,
+   0
+  ],
+  "KFZ": [
+   4,
+   0
+  ],
+  "ORGANIZATION": [
+   7,
+   1
+  ],
+  "PERSON": [
+   41,
+   2
+  ],
+  "PLZ_ORT": [
+   2,
+   0
+  ],
+  "TELEFON": [
+   4,
+   0
+  ],
+  "VERSICHERUNGSNR": [
+   1,
+   0
+  ]
+ },
+ "uebersehen": [
+  [
+   "EMAIL_ADDRESS",
+   "schaden.leistung@provinzial-test.example",
+   "P2_EMail_Versicherung_Oberhaus.txt"
+  ],
+  [
+   "DATUM",
+   "14.03.2016",
+   "F2_PKH_Erklaerung_Kurz.docx"
+  ],
+  [
+   "DATUM",
+   "30.07.2019",
+   "F2_PKH_Erklaerung_Kurz.docx"
+  ],
+  [
+   "KENNNUMMER",
+   "K77013",
+   "R1_Werkstattrechnung_Rotthaus_scan.pdf"
+  ]
+ ],
+ "fehlalarme": [
+  [
+   "ADRESSE",
+   "König-Heinrich-Platz 1",
+   "regel",
+   "P1_Berufung_Nowak.docx"
+  ],
+  [
+   "DE_KFZ",
+   "hat am 14",
+   "regel",
+   "P2_EMail_Versicherung_Oberhaus.txt"
+  ],
+  [
+   "ORGANIZATION",
+   "Orthopädische Gemeinschaftspraxis",
+   "modell",
+   "M1_Befundbericht_Wittbrodt.pdf"
+  ],
+  [
+   "PERSON",
+   "Kellgren-Lawrence Grad",
+   "modell",
+   "M1_Befundbericht_Wittbrodt.pdf"
+  ],
+  [
+   "PERSON",
+   "Amtsgericht Duisburg",
+   "feld",
+   "M2_Feuchtegutachten_Nowak.docx"
+  ]
+ ],
+ "typfehler": [],
+ "namensteile": [],
+ "tempo_s_je_1000": 1.7293282366225213,
+ "zeichen": 8278
+}
