@@ -48,6 +48,10 @@ import csv
 import io
 from datetime import datetime
 
+# Trennzeichen zwischen Tabellenzellen bzw. Spalten im Erkennungstext. Treffer laufen nie darüber hinweg (engine.detect
+# teilt sie dort), deshalb steht es nie in einem Original und landet nie in einer Ausgabe.
+SPALTE = " | "
+
 
 def _doc_key(data: bytes) -> str:
     import hashlib
@@ -73,8 +77,7 @@ def read_document(name: str, data: bytes) -> tuple[str, dict]:
     if ext == "docx":
         import docx
 
-        d = docx.Document(io.BytesIO(data))
-        return "\n".join(p.text for p in _docx_paragraphs(d)), info
+        return _docx_text(docx.Document(io.BytesIO(data))), info
     if ext == "pdf":
         import pymupdf as fitz
 
@@ -97,11 +100,41 @@ def read_document(name: str, data: bytes) -> tuple[str, dict]:
         for ws in wb.worksheets:
             lines.append(f"## {ws.title}")
             for row in ws.iter_rows(values_only=True):
-                vals = [str(v) for v in row if v is not None]
-                if vals:
-                    lines.append(" | ".join(vals))
+                # Leere Zellen bleiben als leere Spalte stehen, damit Bezeichnung und Wert zusammenpassen
+                vals = ["" if v is None else str(v) for v in row]
+                while vals and not vals[-1].strip():
+                    vals.pop()
+                if any(v.strip() for v in vals):
+                    lines.append(SPALTE.join(vals))
         return "\n".join(lines), info
     raise ValueError(f"Dateityp .{ext} wird nicht unterstützt.")
+
+
+def _docx_text(d) -> str:
+    """Text in Dokumentreihenfolge. Eine Tabellenzeile wird eine Textzeile mit SPALTE zwischen den Zellen
+    (verbundene Zellen einmal); Absätze innerhalb einer Zelle ebenfalls durch SPALTE getrennt."""
+    from docx.table import Table
+
+    lines = []
+    for item in d.iter_inner_content():
+        if not isinstance(item, Table):
+            lines.append(item.text)
+            continue
+        for row in item.rows:
+            zellen, gesehen = [], []
+            for cell in row.cells:
+                if any(cell._tc is tc for tc in gesehen):
+                    continue
+                gesehen.append(cell._tc)
+                zellen.append(SPALTE.join(p.text for p in cell.paragraphs if p.text.strip()))
+            while zellen and not zellen[-1].strip():
+                zellen.pop()
+            if zellen:
+                lines.append(SPALTE.join(zellen))
+    for s in d.sections:
+        for part in (s.header, s.footer, s.first_page_header, s.first_page_footer):
+            lines.extend(p.text for p in part.paragraphs)
+    return "\n".join(lines)
 
 
 def _docx_paragraphs(d):
@@ -175,11 +208,16 @@ def write_xlsx(data: bytes, pairs) -> bytes:
 _PDF_MIN_FONTSIZE = 5.0
 
 
+_LIGATUREN = str.maketrans({"ﬀ": "ff", "ﬁ": "fi", "ﬂ": "fl", "ﬃ": "ffi", "ﬄ": "ffl", "ﬅ": "st", "ﬆ": "st"})
+
+
 def _pdf_norm(s: str) -> str:
-    """Kleinbuchstaben, Whitespace-Folgen (auch Zeilenumbrüche) zu einem Leerzeichen."""
+    """Kleinbuchstaben, Whitespace-Folgen (auch Zeilenumbrüche) zu einem Leerzeichen, Ligaturen aufgelöst
+    ("Hoﬀmann" -> "hoffmann"; sonst übersähe die Leck-Prüfung ein stehengebliebenes "Hoffmann"). Bewusst kein
+    unicodedata.normalize: verify_pdf normalisiert auch dekodierte Bild-Streams (mehrere MB), das wäre minutenlang."""
     import re
 
-    return re.sub(r"\s+", " ", s).strip().lower()
+    return re.sub(r"\s+", " ", s.translate(_LIGATUREN)).strip().lower()
 
 
 def _pdf_leak_regex(orig: str):
@@ -606,6 +644,70 @@ def _pdf_hidden_rects(page) -> list:
             if not r.is_empty and not r.is_infinite:
                 rects.append(r)
     return rects
+
+
+def pdf_zeilentext(page) -> str:
+    """Seitentext für die Erkennung: Textstücke auf gleicher Höhe bilden eine Zeile (eine Tabellenzeile bleibt
+    zusammen), größere waagerechte Lücken und Leerzeichenfolgen werden zu SPALTE. Ligaturen sind aufgelöst
+    ("ﬀ" -> "ff") wie in der Treffersuche (_pdf_page_chars)."""
+    import re
+
+    import pymupdf
+
+    flags = pymupdf.TEXT_PRESERVE_WHITESPACE | pymupdf.TEXT_MEDIABOX_CLIP
+    stuecke = []  # [y-Mitte, Höhe, x0, x1, Text, Unterkante]
+    for block in page.get_text("dict", flags=flags).get("blocks", []):
+        for line in block.get("lines", []):
+            waagerecht = abs(line.get("dir", (1, 0))[1]) < 0.1
+            teil = None
+            for s in line.get("spans", []):
+                if not s.get("text"):
+                    continue
+                x0, y0, x1, y1 = s["bbox"]
+                h = max(1.0, y1 - y0)
+                if teil and x0 - teil[3] <= h:
+                    luecke = x0 - teil[3] > 0.25 * h and not (teil[4].endswith(" ") or s["text"].startswith(" "))
+                    teil[4] += (" " if luecke else "") + s["text"]
+                    teil[3] = max(teil[3], x1)
+                    teil[5] = max(teil[5], y1)
+                else:
+                    if teil:
+                        stuecke.append(teil)
+                    teil = [(y0 + y1) / 2, h, x0, x1, s["text"], y1]
+            if teil and teil[4].strip():
+                if not waagerecht:
+                    teil[0] += 1e-6 * len(stuecke)  # senkrechter Text bildet eigene Zeilen
+                stuecke.append(teil)
+    stuecke = [s for s in stuecke if s[4].strip()]
+    stuecke.sort(key=lambda s: (s[0], s[2]))
+    zeilen: list[list] = []
+    for s in stuecke:
+        if zeilen and abs(zeilen[-1][0][0] - s[0]) < 0.5 * max(s[1], zeilen[-1][0][1]):
+            zeilen[-1].append(s)
+        else:
+            zeilen.append([s])
+    # Umbruch innerhalb einer Tabellenzelle: Die Folgezeile beginnt genau am linken Rand einer Zelle der vorigen
+    # Zeile und schließt ohne Abstand an (zwischen zwei Tabellenzeilen liegt Zellenabstand) -> an die Zelle anhängen
+    zusammen: list[list] = []
+    for z in zeilen:
+        z.sort(key=lambda s: s[2])
+        vor = zusammen[-1] if zusammen else None
+        if vor and len(vor) >= 2 and len(z) < len(vor):
+            ziele = [next((c for c in vor if abs(c[2] - s[2]) < 1.5), None) for s in z]
+            if all(ziele) and all(s[0] - s[1] / 2 - c[5] < 0.1 * s[1] for s, c in zip(z, ziele)):
+                for s, c in zip(z, ziele):
+                    c[4] = c[4].rstrip() + " " + s[4].strip()
+                    c[5] = max(c[5], s[5])
+                continue
+        zusammen.append(z)
+    out = []
+    for z in zusammen:
+        txt = z[0][4].strip()
+        for vor, s in zip(z, z[1:]):
+            # Zwei getrennte Textzeilen auf gleicher Höhe sind Spalten (Fließtext bildet eine Zeile)
+            txt += (SPALTE if s[2] - vor[3] > 0.3 * max(s[1], vor[1]) else " ") + s[4].strip()
+        out.append(re.sub(r"[ \t]{3,}", SPALTE, txt))
+    return "\n".join(out) + "\n"
 
 
 def pdf_sichtbarer_text(page) -> str:

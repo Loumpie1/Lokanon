@@ -15,13 +15,14 @@ from evaluate import analyzer_fuer, auswerten, lade_faelle  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Familie: (Recall, Precision) – Stand Basislinie 04.11.2026 (spaCy): 96/84, 75/88, 81/100, 78/93, 91/88
+# Familie: (Recall, Precision) – Basislinie 04.11.2026 (spaCy): 96/84, 75/88, 81/100, 78/93, 91/88
+# Nach Tabellenaufbau, Feldern, Wörterbuch und OCR ohne Zeilen-Drehklassifikation: 100/96, 96/98, 98/100, 92/98, 93/100
 MINDESTWERTE = {
-    "arzt_gutachten": (0.94, 0.82),
-    "bescheid_formular": (0.73, 0.86),
-    "lohn_konto_rechnung": (0.79, 0.97),
-    "scans": (0.76, 0.90),
-    "schriftsatz": (0.89, 0.86),
+    "arzt_gutachten": (0.98, 0.94),
+    "bescheid_formular": (0.94, 0.96),
+    "lohn_konto_rechnung": (0.96, 0.98),
+    "scans": (0.90, 0.96),
+    "schriftsatz": (0.91, 0.98),
 }
 
 

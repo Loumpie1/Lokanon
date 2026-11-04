@@ -43,6 +43,7 @@ class Seite:
     score: float = 0.0         # mittlere OCR-Sicherheit
     breite: float = 0.0        # Seitenmaße der aufrechten Ansicht in Punkten
     hoehe: float = 0.0
+    erkennungstext: str = ""   # wie text, aber Spaltenlücken als files.SPALTE (nur für die Erkennung)
 
 
 def engine():
@@ -93,7 +94,56 @@ def _rect(points, scale) -> tuple[float, float, float, float]:
 
 
 def _ocr_roh(img):
-    return engine()(img, return_word_box=True)
+    # Ohne Zeilen-Drehklassifikation: Sie hält manche lange, gerade Zeile für kopfstehend und liest sie gedreht
+    # ("Rhi i uhkr" statt "Rhein-Ruhr Logistik Kessler GmbH · …"). Kopfstehende Seiten erkennt ausrichtung().
+    return engine()(img, return_word_box=True, use_cls=False)
+
+
+def _korrekturwinkel(img) -> float:
+    """Winkel in Grad (gegen den Uhrzeigersinn, wie PIL.rotate), um den ein leicht schiefer Scan gedreht werden muss:
+    Projektionsprofil – bei gerader Seite sind die Zeilensummen am ungleichmäßigsten (Zeile/Zwischenraum)."""
+    import numpy as np
+    from PIL import Image
+
+    grau = Image.fromarray(img).convert("L")
+    f = 900 / max(grau.size)
+    klein = grau.resize((max(1, int(grau.width * f)), max(1, int(grau.height * f))))
+    schwarz = Image.fromarray(((np.asarray(klein) < 160) * 255).astype(np.uint8))
+
+    def schaerfe(a):
+        zeilen = np.asarray(schwarz.rotate(a, resample=Image.BILINEAR, fillcolor=0), dtype=np.float32).sum(axis=1)
+        return float(np.var(zeilen))
+
+    grob = max((a / 4 for a in range(-12, 13)), key=schaerfe)  # ±3° in 0,25°-Schritten
+    return max((grob + a / 20 for a in range(-5, 6)), key=schaerfe)  # fein: 0,05°
+
+
+def _begradigt(img, res):
+    """Leicht schiefer Scan (ab 0,2°): Bild gerade drehen und neu erkennen. Schon 0,6° Schräglage lässt RapidOCR
+    lange Zeilen verstümmeln ("Rhi i uhkr" statt des Briefkopfs). Rückgabe: (Ergebnis, Umrechnung der Bildpunkte
+    zurück ins Originalbild) oder (res, None), wenn nichts zu tun ist oder die Erkennung nicht besser wird."""
+    import math
+
+    import numpy as np
+    from PIL import Image
+
+    grad = _korrekturwinkel(img)
+    if abs(grad) < 0.2:
+        return res, None
+    h, w = img.shape[:2]
+    gerade = np.asarray(Image.fromarray(img).rotate(grad, resample=Image.BICUBIC, fillcolor=(255, 255, 255)))
+    res2 = _ocr_roh(np.ascontiguousarray(gerade))
+    if _guete(res2) < _guete(res):
+        return res, None
+    t = math.radians(grad)
+    cx, cy, c, s = w / 2, h / 2, math.cos(t), math.sin(t)
+
+    def zurueck(p):
+        # PIL dreht gegen den Uhrzeigersinn um die Bildmitte; hier die Umkehrung
+        x, y = float(p[0]) - cx, float(p[1]) - cy
+        return (x * c - y * s + cx, x * s + y * c + cy)
+
+    return res2, zurueck
 
 
 def _ist_gedreht(res) -> bool:
@@ -122,12 +172,18 @@ def _guete(res) -> float:
 def ausrichtung(page, dpi: int = DPI) -> tuple[int, object]:
     """Bestimmt, um wie viel Grad (im Uhrzeigersinn) die Seite gedreht werden muss, damit der Text aufrecht steht.
     Rückgabe: (rotation, OCR-Ergebnis der aufrechten Ansicht)."""
+    import numpy as np
+
     img, _, _ = _render(page, dpi, 0)
     res0 = _ocr_roh(img)
     if not _ist_gedreht(res0):
-        return 0, res0
-    # Senkrechte Zeilen = Seite liegt quer. Die Zeilenklassifikation von RapidOCR liest auch senkrechte Zeilen
-    # mit hoher Sicherheit, deshalb entscheidet nur der Vergleich 90° gegen 270°.
+        if res0.txts and float(np.mean(res0.scores)) >= 0.8:
+            return 0, res0
+        # Unsichere Erkennung: vielleicht steht die Seite auf dem Kopf
+        img_180, _, _ = _render(page, dpi, 180)
+        res_180 = _ocr_roh(img_180)
+        return (180, res_180) if _guete(res_180) > _guete(res0) else (0, res0)
+    # Senkrechte Zeilen = Seite liegt quer; der Vergleich 90° gegen 270° entscheidet.
     best = None
     for rot in (90, 270):
         img_r, _, _ = _render(page, dpi, rot)
@@ -138,8 +194,14 @@ def ausrichtung(page, dpi: int = DPI) -> tuple[int, object]:
     return best[0], best[1]
 
 
-def _seite_aus_ergebnis(nr: int, res, scale: float, rotation: int, breite: float, hoehe: float) -> Seite:
+def _seite_aus_ergebnis(nr: int, res, scale: float, rotation: int, breite: float, hoehe: float,
+                        zurueck=None) -> Seite:
+    """zurueck: Umrechnung der Bildpunkte eines begradigten Bildes ins Original (Wortboxen für die Schwärzung);
+    Zeilen und Spalten werden im begradigten Bild gebildet."""
     import numpy as np
+
+    def umgerechnet(points):
+        return _rect([zurueck(q) for q in points] if zurueck else points, scale)
 
     if not res.txts:
         return Seite(nr, rotation=rotation, breite=breite, hoehe=hoehe)
@@ -151,10 +213,10 @@ def _seite_aus_ergebnis(nr: int, res, scale: float, rotation: int, breite: float
         if wr:
             for w in wr:
                 if w[0] and str(w[0]).strip():
-                    words.append(Wort(str(w[0]).strip(), _rect(w[2], scale)))
+                    words.append(Wort(str(w[0]).strip(), umgerechnet(w[2])))
         if not words:
-            words.append(Wort(txt.strip(), (x0, y0, x1, y1)))
-        frags.append(((y0 + y1) / 2, x0, y1 - y0, words))
+            words.append(Wort(txt.strip(), umgerechnet(res.boxes[i]) if zurueck else (x0, y0, x1, y1)))
+        frags.append(((y0 + y1) / 2, x0, y1 - y0, words, x1))
     frags.sort(key=lambda f: (f[0], f[1]))
     rows: list[list] = []
     for f in frags:
@@ -162,17 +224,41 @@ def _seite_aus_ergebnis(nr: int, res, scale: float, rotation: int, breite: float
             rows[-1].append(f)
         else:
             rows.append([f])
-    lines, woerter = [], []
+    from .files import SPALTE
+
+    lines, woerter, zellenzeilen = [], [], []
     for zi, row in enumerate(rows):
         row.sort(key=lambda f: f[1])
-        zeile = []
+        zeile, zellen = [], []  # Zelle: [x0, x1, y-Mitte, Text, Höhe]
         for f in row:
             for w in f[3]:
                 w.zeile = zi
                 zeile.append(w)
+            ws = f[3]
+            txt = ws[0].text
+            for a, b in zip(ws, ws[1:]):  # auch innerhalb einer Textbox: große Wortlücke = Spalte
+                txt += (SPALTE if b.rect[0] - a.rect[2] > 0.6 * f[2] else " ") + b.text
+            if zellen and f[1] - zellen[-1][1] <= max(f[2], zellen[-1][4]):
+                zellen[-1][3] += " " + txt  # kleine Lücke zur vorigen Textbox: dieselbe Zelle
+                zellen[-1][1] = f[4]
+            else:
+                zellen.append([f[1], f[4], f[0], txt, f[2]])
         lines.append(" ".join(w.text for w in zeile))
         woerter.extend(zeile)
-    return Seite(nr, "\n".join(lines), woerter, len(rows), rotation, float(np.mean(res.scores)), breite, hoehe)
+        # Umbruch innerhalb einer Tabellenzelle (wie files.pdf_zeilentext): Die Folgezeile beginnt am linken Rand
+        # einer Zelle der vorigen Zeile und überlappt sie leicht (zwischen zwei Tabellenzeilen bleibt eine Lücke)
+        vor = zellenzeilen[-1] if zellenzeilen else None
+        if vor and len(vor) >= 2 and len(zellen) < len(vor):
+            ziele = [next((c for c in vor if abs(c[0] - z[0]) < 0.6 * z[4]), None) for z in zellen]
+            if all(ziele) and all((z[2] - z[4] / 2) - (c[2] + c[4] / 2) < -0.05 * z[4] for z, c in zip(zellen, ziele)):
+                for z, c in zip(zellen, ziele):
+                    c[3] += " " + z[3]
+                    c[2] = z[2]
+                continue
+        zellenzeilen.append(zellen)
+    erkennung = [SPALTE.join(c[3] for c in z) for z in zellenzeilen]
+    return Seite(nr, "\n".join(lines), woerter, len(rows), rotation, float(np.mean(res.scores)), breite, hoehe,
+                 "\n".join(erkennung))
 
 
 def erkenne_seite(page, dpi: int = DPI, rotation: int | None = None, key: str | None = None) -> Seite:
@@ -182,14 +268,16 @@ def erkenne_seite(page, dpi: int = DPI, rotation: int | None = None, key: str | 
         return _CACHE[(key, page.number)]
     if rotation is None:
         rotation, res = ausrichtung(page, dpi)
+        img, _, _ = _render(page, dpi, rotation)
     else:
         img, _, _ = _render(page, dpi, rotation)
         res = _ocr_roh(img)
+    res, zurueck = _begradigt(img, res)
     scale = 72.0 / dpi
     w, h = page.rect.width, page.rect.height
     if rotation in (90, 270):
         w, h = h, w
-    seite = _seite_aus_ergebnis(page.number, res, scale, rotation, w, h)
+    seite = _seite_aus_ergebnis(page.number, res, scale, rotation, w, h, zurueck)
     if key is not None and rotation is not None and len(_CACHE) < _CACHE_MAX:
         _CACHE[(key, page.number)] = seite
     return seite
@@ -197,13 +285,16 @@ def erkenne_seite(page, dpi: int = DPI, rotation: int | None = None, key: str | 
 
 def ocr_text(doc, key: str | None = None) -> tuple[list[str], int]:
     """Text aller Seiten; Scan-Seiten per OCR (mit Ausrichtung). Rückgabe: (Seitentexte, Anzahl OCR-Seiten)."""
+    from .files import pdf_zeilentext
+
     texte, n = [], 0
     for page in doc:
         if ist_scan(page):
-            texte.append(erkenne_seite(page, key=key).text)
+            seite = erkenne_seite(page, key=key)
+            texte.append(seite.erkennungstext or seite.text)
             n += 1
         else:
-            texte.append(page.get_text())
+            texte.append(pdf_zeilentext(page))
     return texte, n
 
 

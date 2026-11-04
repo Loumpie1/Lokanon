@@ -46,7 +46,7 @@ DATUM_ALLE_RX = r"\b\d{1,2}\.\s?\d{1,2}\.\s?(?:19|20)\d{2}\b|\b\d{1,2}\.\s?" + M
 # Rechtsformen für die Firmenerkennung
 RECHTSFORMEN = (
     r"GmbH(?:\s*&\s*Co\.?\s*KG)?|gGmbH|AG|KG|KGaA|OHG|GbR|UG(?:\s*\(haftungsbeschränkt\))?|mbH|"
-    r"e\.\s?V\.|SE|eG|PartG(?:mbB)?|Partnerschaft(?:sgesellschaft)?|Stiftung|Inc\.|Ltd\.|B\.V\.|S\.A\."
+    r"e\.\s?V\.|SE|eG|PartG(?:\s?mbB)?|Partnerschaft(?:sgesellschaft)?|Stiftung|Inc\.|Ltd\.|B\.V\.|S\.A\."
 )
 
 

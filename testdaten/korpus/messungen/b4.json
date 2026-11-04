@@ -1,0 +1,376 @@
+{
+ "gesamt": {
+  "hit": 261,
+  "total": 275,
+  "found": 243,
+  "fp": 6,
+  "namensteile": 3,
+  "seiten": 22,
+  "dokumente": 22,
+  "recall": 0.9490909090909091,
+  "precision": 0.975,
+  "fehlalarme_je_seite": 0.2727272727272727
+ },
+ "familien": {
+  "arzt_gutachten": {
+   "hit": 50,
+   "total": 50,
+   "found": 49,
+   "fp": 2,
+   "namensteile": 3,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 1.0,
+   "precision": 0.9565217391304348,
+   "fehlalarme_je_seite": 0.5
+  },
+  "bescheid_formular": {
+   "hit": 57,
+   "total": 57,
+   "found": 52,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 1.0,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  },
+  "lohn_konto_rechnung": {
+   "hit": 47,
+   "total": 47,
+   "found": 41,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 1.0,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  },
+  "scans": {
+   "hit": 53,
+   "total": 65,
+   "found": 50,
+   "fp": 3,
+   "namensteile": 0,
+   "seiten": 6,
+   "dokumente": 6,
+   "recall": 0.8153846153846154,
+   "precision": 0.94,
+   "fehlalarme_je_seite": 0.5
+  },
+  "schriftsatz": {
+   "hit": 54,
+   "total": 56,
+   "found": 51,
+   "fp": 1,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.9642857142857143,
+   "precision": 0.9803921568627451,
+   "fehlalarme_je_seite": 0.25
+  }
+ },
+ "recall_je_typ": {
+  "ADRESSE": [
+   32,
+   33
+  ],
+  "AKTENZEICHEN": [
+   9,
+   9
+  ],
+  "DATUM": [
+   10,
+   12
+  ],
+  "DE_BSNR": [
+   2,
+   2
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   3
+  ],
+  "DE_LANR": [
+   2,
+   2
+  ],
+  "DE_SOCIAL_SECURITY": [
+   3,
+   3
+  ],
+  "DE_VAT_ID": [
+   1,
+   1
+  ],
+  "EMAIL_ADDRESS": [
+   8,
+   8
+  ],
+  "FIN": [
+   3,
+   3
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   2
+  ],
+  "IBAN_CODE": [
+   9,
+   10
+  ],
+  "KENNNUMMER": [
+   7,
+   8
+  ],
+  "KFZ": [
+   9,
+   9
+  ],
+  "ORGANIZATION": [
+   14,
+   17
+  ],
+  "PERSON": [
+   86,
+   90
+  ],
+  "PERSONALNR": [
+   2,
+   3
+  ],
+  "PLZ_ORT": [
+   31,
+   32
+  ],
+  "STEUERNUMMER": [
+   1,
+   1
+  ],
+  "STEUER_ID": [
+   2,
+   2
+  ],
+  "TELEFON": [
+   17,
+   17
+  ],
+  "VERSICHERUNGSNR": [
+   8,
+   8
+  ]
+ },
+ "precision_je_typ": {
+  "ADRESSE": [
+   34,
+   1
+  ],
+  "AKTENZEICHEN": [
+   8,
+   0
+  ],
+  "DATUM": [
+   10,
+   0
+  ],
+  "DE_HANDELSREGISTER": [
+   4,
+   0
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   0
+  ],
+  "DE_LANR": [
+   2,
+   0
+  ],
+  "DE_SOCIAL_SECURITY": [
+   1,
+   0
+  ],
+  "DE_TAX_ID": [
+   2,
+   0
+  ],
+  "DE_TAX_NUMBER": [
+   1,
+   0
+  ],
+  "DE_VAT_ID": [
+   1,
+   0
+  ],
+  "DIKTATZEICHEN": [
+   2,
+   0
+  ],
+  "EMAIL_ADDRESS": [
+   8,
+   0
+  ],
+  "FIN": [
+   3,
+   0
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   0
+  ],
+  "IBAN_CODE": [
+   10,
+   1
+  ],
+  "KENNNUMMER": [
+   4,
+   0
+  ],
+  "KFZ": [
+   9,
+   0
+  ],
+  "ORGANIZATION": [
+   16,
+   2
+  ],
+  "PERSON": [
+   89,
+   1
+  ],
+  "PERSONALNR": [
+   2,
+   0
+  ],
+  "PLZ_ORT": [
+   3,
+   0
+  ],
+  "TELEFON": [
+   18,
+   1
+  ],
+  "VERSICHERUNGSNR": [
+   11,
+   0
+  ]
+ },
+ "uebersehen": [
+  [
+   "ORGANIZATION",
+   "Brüggemann Rechtsanwälte PartG mbB",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "PERSON",
+   "Fischer",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "PERSONALNR",
+   "004711",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "DATUM",
+   "15.03.1980",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "ADRESSE",
+   "Weseler Straße 301  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Rhein-Ruhr Logistik Kessler GmbH  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "PLZ_ORT",
+   "45478 Mülheim an der Ruhr  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "KENNNUMMER",
+   "300-4471-882",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "IBAN_CODE",
+   "DE41 3506 0190 0001 5200 33  (im gelesenen Text nicht auffindbar)",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "DATUM",
+   "08.04.1996  (im gelesenen Text nicht auffindbar)",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Christoph Lange  (im gelesenen Text nicht auffindbar)",
+   "A3_AU_Bescheinigung_Engel_scan.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Brüggemann Rechtsanwälte PartG mbB",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Fischer",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Vogel  (im gelesenen Text nicht auffindbar)",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ]
+ ],
+ "fehlalarme": [
+  [
+   "ORGANIZATION",
+   "Weitergeleitete",
+   "modell",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "PERSON",
+   "Calprotectin",
+   "modell",
+   "A1_Arztbrief_Fuchs.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Child Behavior Checklist",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "IBAN_CODE",
+   "DE41 3506",
+   "modell",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "TELEFON",
+   "0190 0001 5200 33\n02",
+   "regel",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "ADRESSE",
+   "Zimmer\n2.14",
+   "modell",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ]
+ ],
+ "typfehler": [],
+ "namensteile": [
+  "Mia"
+ ],
+ "tempo_s_je_1000": 1.998708555324158,
+ "zeichen": 24037
+}

@@ -23,4 +23,6 @@ python evaluate.py --config testdaten\kanzlei\config_eval.yaml --gegen testdaten
 ```
 
 `messungen/basis.json` ist die Basislinie vom 04.11.2026 (spaCy + GLiNER): Recall 89 %, Precision 87 %.
+Nach Erkennung v3 (`messungen/b5.json`): Recall 99 %, Precision 99 % – Achtung: an dieser Sammlung entwickelt,
+die unabhängige Messung steht in `testdaten/pruefung`.
 `tests/test_korpus.py` prüft Untergrenzen je Familie (nur spaCy).

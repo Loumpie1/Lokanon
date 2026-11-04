@@ -1,0 +1,358 @@
+{
+ "gesamt": {
+  "hit": 263,
+  "total": 275,
+  "found": 279,
+  "fp": 4,
+  "namensteile": 3,
+  "seiten": 22,
+  "dokumente": 22,
+  "recall": 0.9563636363636364,
+  "precision": 0.9855072463768116,
+  "fehlalarme_je_seite": 0.18181818181818182
+ },
+ "familien": {
+  "arzt_gutachten": {
+   "hit": 50,
+   "total": 50,
+   "found": 54,
+   "fp": 2,
+   "namensteile": 3,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 1.0,
+   "precision": 0.9607843137254902,
+   "fehlalarme_je_seite": 0.5
+  },
+  "bescheid_formular": {
+   "hit": 55,
+   "total": 57,
+   "found": 58,
+   "fp": 1,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.9649122807017544,
+   "precision": 0.9827586206896551,
+   "fehlalarme_je_seite": 0.25
+  },
+  "lohn_konto_rechnung": {
+   "hit": 46,
+   "total": 47,
+   "found": 46,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.9787234042553191,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  },
+  "scans": {
+   "hit": 60,
+   "total": 65,
+   "found": 61,
+   "fp": 1,
+   "namensteile": 0,
+   "seiten": 6,
+   "dokumente": 6,
+   "recall": 0.9230769230769231,
+   "precision": 0.9836065573770492,
+   "fehlalarme_je_seite": 0.16666666666666666
+  },
+  "schriftsatz": {
+   "hit": 52,
+   "total": 56,
+   "found": 60,
+   "fp": 0,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.9285714285714286,
+   "precision": 1.0,
+   "fehlalarme_je_seite": 0.0
+  }
+ },
+ "recall_je_typ": {
+  "ADRESSE": [
+   33,
+   33
+  ],
+  "AKTENZEICHEN": [
+   9,
+   9
+  ],
+  "DATUM": [
+   11,
+   12
+  ],
+  "DE_BSNR": [
+   2,
+   2
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   3
+  ],
+  "DE_LANR": [
+   2,
+   2
+  ],
+  "DE_SOCIAL_SECURITY": [
+   2,
+   3
+  ],
+  "DE_VAT_ID": [
+   1,
+   1
+  ],
+  "EMAIL_ADDRESS": [
+   0,
+   8
+  ],
+  "FIN": [
+   3,
+   3
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   2
+  ],
+  "IBAN_CODE": [
+   10,
+   10
+  ],
+  "KENNNUMMER": [
+   8,
+   8
+  ],
+  "KFZ": [
+   9,
+   9
+  ],
+  "ORGANIZATION": [
+   17,
+   17
+  ],
+  "PERSON": [
+   90,
+   90
+  ],
+  "PERSONALNR": [
+   2,
+   3
+  ],
+  "PLZ_ORT": [
+   32,
+   32
+  ],
+  "STEUERNUMMER": [
+   1,
+   1
+  ],
+  "STEUER_ID": [
+   1,
+   2
+  ],
+  "TELEFON": [
+   17,
+   17
+  ],
+  "VERSICHERUNGSNR": [
+   8,
+   8
+  ]
+ },
+ "precision_je_typ": {
+  "ADRESSE": [
+   33,
+   0
+  ],
+  "AKTENZEICHEN": [
+   7,
+   0
+  ],
+  "DATUM": [
+   13,
+   2
+  ],
+  "DE_BSNR": [
+   2,
+   0
+  ],
+  "DE_HANDELSREGISTER": [
+   2,
+   0
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   0
+  ],
+  "DE_LANR": [
+   2,
+   0
+  ],
+  "DE_SOCIAL_SECURITY": [
+   2,
+   0
+  ],
+  "DE_TAX_ID": [
+   1,
+   0
+  ],
+  "DE_TAX_NUMBER": [
+   1,
+   0
+  ],
+  "DE_VAT_ID": [
+   1,
+   0
+  ],
+  "DIKTATZEICHEN": [
+   2,
+   0
+  ],
+  "FIN": [
+   3,
+   0
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   0
+  ],
+  "IBAN_CODE": [
+   10,
+   0
+  ],
+  "KENNNUMMER": [
+   6,
+   0
+  ],
+  "KFZ": [
+   9,
+   0
+  ],
+  "ORGANIZATION": [
+   18,
+   1
+  ],
+  "PERSON": [
+   97,
+   1
+  ],
+  "PERSONALNR": [
+   2,
+   0
+  ],
+  "PLZ_ORT": [
+   32,
+   0
+  ],
+  "TELEFON": [
+   17,
+   0
+  ],
+  "URL": [
+   4,
+   0
+  ],
+  "VERSICHERUNGSNR": [
+   10,
+   0
+  ]
+ },
+ "uebersehen": [
+  [
+   "EMAIL_ADDRESS",
+   "f.brueggemann@brueggemann-ra.example",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "sabine.engel@posteo.example",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "m.brenner@rrl-kessler.example",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "s.engel@rrl-kessler.example",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "monika.schneider@web.example",
+   "B2_Schadenmeldung_Schneider.docx"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "m.wolf@gmx.example",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "info@sanitaer-hoffmann.example",
+   "L3_Rechnung_Sanitaer.docx"
+  ],
+  [
+   "PERSONALNR",
+   "004711",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "STEUER_ID",
+   "57 281 463 956",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "DE_SOCIAL_SECURITY",
+   "13 150380 B 120",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "DATUM",
+   "15.03.1980",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "EMAIL_ADDRESS",
+   "f.brueggemann@brueggemann-ra.example",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ]
+ ],
+ "fehlalarme": [
+  [
+   "DATUM",
+   "27.10.2026",
+   "regel",
+   "B1_Bussgeldbescheid_Bauer.pdf"
+  ],
+  [
+   "PERSON",
+   "Calprotectin",
+   "modell",
+   "A1_Arztbrief_Fuchs.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Child Behavior Checklist",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "DATUM",
+   "27.10.2026",
+   "regel",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ]
+ ],
+ "typfehler": [],
+ "namensteile": [
+  "Mia"
+ ],
+ "tempo_s_je_1000": 0.13019477889869005,
+ "zeichen": 24411
+}

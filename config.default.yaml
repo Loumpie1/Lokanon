@@ -38,6 +38,7 @@ entities:
 - DE_LANR
 - DE_BSNR
 - PERSONALNR
+- KENNNUMMER
 - DE_KFZ
 - KFZ
 - FIN

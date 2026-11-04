@@ -1,0 +1,477 @@
+{
+ "gesamt": {
+  "hit": 260,
+  "total": 275,
+  "found": 258,
+  "fp": 22,
+  "namensteile": 3,
+  "seiten": 22,
+  "dokumente": 22,
+  "recall": 0.9454545454545454,
+  "precision": 0.9137254901960784,
+  "fehlalarme_je_seite": 1.0
+ },
+ "familien": {
+  "arzt_gutachten": {
+   "hit": 50,
+   "total": 50,
+   "found": 56,
+   "fp": 9,
+   "namensteile": 3,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 1.0,
+   "precision": 0.8301886792452831,
+   "fehlalarme_je_seite": 2.25
+  },
+  "bescheid_formular": {
+   "hit": 57,
+   "total": 57,
+   "found": 57,
+   "fp": 5,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 1.0,
+   "precision": 0.9122807017543859,
+   "fehlalarme_je_seite": 1.25
+  },
+  "lohn_konto_rechnung": {
+   "hit": 46,
+   "total": 47,
+   "found": 42,
+   "fp": 2,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.9787234042553191,
+   "precision": 0.9523809523809523,
+   "fehlalarme_je_seite": 0.5
+  },
+  "scans": {
+   "hit": 53,
+   "total": 65,
+   "found": 51,
+   "fp": 4,
+   "namensteile": 0,
+   "seiten": 6,
+   "dokumente": 6,
+   "recall": 0.8153846153846154,
+   "precision": 0.9215686274509803,
+   "fehlalarme_je_seite": 0.6666666666666666
+  },
+  "schriftsatz": {
+   "hit": 54,
+   "total": 56,
+   "found": 52,
+   "fp": 2,
+   "namensteile": 0,
+   "seiten": 4,
+   "dokumente": 4,
+   "recall": 0.9642857142857143,
+   "precision": 0.9615384615384616,
+   "fehlalarme_je_seite": 0.5
+  }
+ },
+ "recall_je_typ": {
+  "ADRESSE": [
+   32,
+   33
+  ],
+  "AKTENZEICHEN": [
+   9,
+   9
+  ],
+  "DATUM": [
+   10,
+   12
+  ],
+  "DE_BSNR": [
+   2,
+   2
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   3
+  ],
+  "DE_LANR": [
+   2,
+   2
+  ],
+  "DE_SOCIAL_SECURITY": [
+   3,
+   3
+  ],
+  "DE_VAT_ID": [
+   1,
+   1
+  ],
+  "EMAIL_ADDRESS": [
+   8,
+   8
+  ],
+  "FIN": [
+   3,
+   3
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   2
+  ],
+  "IBAN_CODE": [
+   9,
+   10
+  ],
+  "KENNNUMMER": [
+   7,
+   8
+  ],
+  "KFZ": [
+   9,
+   9
+  ],
+  "ORGANIZATION": [
+   14,
+   17
+  ],
+  "PERSON": [
+   85,
+   90
+  ],
+  "PERSONALNR": [
+   2,
+   3
+  ],
+  "PLZ_ORT": [
+   31,
+   32
+  ],
+  "STEUERNUMMER": [
+   1,
+   1
+  ],
+  "STEUER_ID": [
+   2,
+   2
+  ],
+  "TELEFON": [
+   17,
+   17
+  ],
+  "VERSICHERUNGSNR": [
+   8,
+   8
+  ]
+ },
+ "precision_je_typ": {
+  "ADRESSE": [
+   34,
+   1
+  ],
+  "AKTENZEICHEN": [
+   8,
+   0
+  ],
+  "DATUM": [
+   11,
+   1
+  ],
+  "DE_HANDELSREGISTER": [
+   4,
+   0
+  ],
+  "DE_HEALTH_INSURANCE": [
+   3,
+   0
+  ],
+  "DE_LANR": [
+   2,
+   0
+  ],
+  "DE_SOCIAL_SECURITY": [
+   1,
+   0
+  ],
+  "DE_TAX_ID": [
+   2,
+   0
+  ],
+  "DE_TAX_NUMBER": [
+   2,
+   1
+  ],
+  "DE_VAT_ID": [
+   1,
+   0
+  ],
+  "DIKTATZEICHEN": [
+   2,
+   0
+  ],
+  "EMAIL_ADDRESS": [
+   8,
+   0
+  ],
+  "FIN": [
+   3,
+   0
+  ],
+  "FUEHRERSCHEIN": [
+   2,
+   0
+  ],
+  "IBAN_CODE": [
+   10,
+   1
+  ],
+  "KENNNUMMER": [
+   4,
+   0
+  ],
+  "KFZ": [
+   9,
+   0
+  ],
+  "ORGANIZATION": [
+   22,
+   8
+  ],
+  "PERSON": [
+   94,
+   7
+  ],
+  "PERSONALNR": [
+   3,
+   1
+  ],
+  "PLZ_ORT": [
+   3,
+   0
+  ],
+  "TELEFON": [
+   18,
+   1
+  ],
+  "VERSICHERUNGSNR": [
+   12,
+   1
+  ]
+ },
+ "uebersehen": [
+  [
+   "ORGANIZATION",
+   "Brüggemann Rechtsanwälte PartG mbB",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "PERSON",
+   "Fischer",
+   "S2_Schreiben_Gegenseite.pdf"
+  ],
+  [
+   "PERSON",
+   "Monika Klein",
+   "L3_Rechnung_Sanitaer.docx"
+  ],
+  [
+   "PERSONALNR",
+   "004711",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "DATUM",
+   "15.03.1980",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "ADRESSE",
+   "Weseler Straße 301  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Rhein-Ruhr Logistik Kessler GmbH  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "PLZ_ORT",
+   "45478 Mülheim an der Ruhr  (im gelesenen Text nicht auffindbar)",
+   "L1_Lohnabrechnung_Becker_scan.pdf"
+  ],
+  [
+   "KENNNUMMER",
+   "300-4471-882",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "IBAN_CODE",
+   "DE41 3506 0190 0001 5200 33  (im gelesenen Text nicht auffindbar)",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "DATUM",
+   "08.04.1996  (im gelesenen Text nicht auffindbar)",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Christoph Lange  (im gelesenen Text nicht auffindbar)",
+   "A3_AU_Bescheinigung_Engel_scan.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Brüggemann Rechtsanwälte PartG mbB",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Fischer",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ],
+  [
+   "PERSON",
+   "Vogel  (im gelesenen Text nicht auffindbar)",
+   "S2_Schreiben_Gegenseite_scan.pdf"
+  ]
+ ],
+ "fehlalarme": [
+  [
+   "PERSON",
+   "Skoda Octavia",
+   "modell",
+   "S1_Klage_Verkehrsunfall_Fischer.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Weitergeleitete",
+   "modell",
+   "S3_EMail_Kuendigung_Engel.txt"
+  ],
+  [
+   "DATUM",
+   "27.10.2026",
+   "modell",
+   "B1_Bussgeldbescheid_Bauer.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Stadtkasse Essen",
+   "modell",
+   "B1_Bussgeldbescheid_Bauer.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Fahrzeug A",
+   "wiederholung",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Fahrzeug A",
+   "modell",
+   "B3_Unfallbericht_Koch_Wolf.pdf"
+  ],
+  [
+   "PERSONALNR",
+   "28,0558",
+   "modell",
+   "B4_Rentenbescheid_Hoffmann.pdf"
+  ],
+  [
+   "DE_TAX_NUMBER",
+   "2140",
+   "modell",
+   "L4_Betriebskosten_Kaiser.xlsx"
+  ],
+  [
+   "VERSICHERUNGSNR",
+   "2455",
+   "modell",
+   "L4_Betriebskosten_Kaiser.xlsx"
+  ],
+  [
+   "PERSON",
+   "Ileitis terminalis",
+   "modell",
+   "A1_Arztbrief_Fuchs.docx"
+  ],
+  [
+   "PERSON",
+   "Calprotectin",
+   "modell",
+   "A1_Arztbrief_Fuchs.docx"
+  ],
+  [
+   "PERSON",
+   "Familienpsychologisches",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Vaters",
+   "wiederholung",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Gespräch",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "FAST",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Child Behavior Checklist",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "PERSON",
+   "Vaters",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "ORGANIZATION",
+   "Ferienregelung",
+   "modell",
+   "A4_Familiengutachten_Schneider.docx"
+  ],
+  [
+   "IBAN_CODE",
+   "DE41 3506",
+   "modell",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "TELEFON",
+   "0190 0001 5200 33\n02",
+   "regel",
+   "L2_Kontoauszug_Wolf_scan.pdf"
+  ],
+  [
+   "ADRESSE",
+   "Zimmer\n2.14",
+   "modell",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ],
+  [
+   "ORGANIZATION",
+   "Stadtkasse Essen",
+   "modell",
+   "B1_Bussgeldbescheid_Bauer_scan.pdf"
+  ]
+ ],
+ "typfehler": [],
+ "namensteile": [
+  "Mia"
+ ],
+ "tempo_s_je_1000": 1.9854324383828297,
+ "zeichen": 24037
+}

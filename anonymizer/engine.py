@@ -15,6 +15,8 @@ from presidio_analyzer.context_aware_enhancers import LemmaContextAwareEnhancer
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_analyzer.predefined_recognizers import SpacyRecognizer
 
+from . import lexikon
+from .felder import feld_treffer
 from .recognizers_de import DATUM_ALLE_RX, DATUM_KONTEXT, RECHTSFORMEN, german_recognizers
 
 DATUM_KONTEXT_KURZ = ["geb", "geburt", "verstorb", "versterb", "gestorb", "sterb", "tod"]
@@ -47,6 +49,7 @@ LABELS = {
     "DE_LANR": "LANR",
     "DE_BSNR": "BSNR",
     "PERSONALNR": "PersNr",
+    "KENNNUMMER": "Nummer",
     "DE_HANDELSREGISTER": "HRB",
     "DE_KFZ": "Kennzeichen",
     "KFZ": "Kennzeichen",
@@ -67,7 +70,7 @@ GRUPPEN = {
     "Akten und Verträge": ["AKTENZEICHEN", "DIKTATZEICHEN", "GRUNDBUCH", "VERSICHERUNGSNR", "DE_HANDELSREGISTER"],
     "Konto und Steuer": ["IBAN_CODE", "KONTONUMMER", "CREDIT_CARD", "DE_TAX_ID", "DE_TAX_NUMBER", "DE_VAT_ID"],
     "Ausweise und Nummern": ["DE_ID_CARD", "DE_PASSPORT", "DE_FUEHRERSCHEIN", "FUEHRERSCHEIN", "DE_SOCIAL_SECURITY",
-                             "DE_HEALTH_INSURANCE", "DE_LANR", "DE_BSNR", "PERSONALNR"],
+                             "DE_HEALTH_INSURANCE", "DE_LANR", "DE_BSNR", "PERSONALNR", "KENNNUMMER"],
     "Fahrzeug": ["DE_KFZ", "KFZ", "FIN"],
     "Datum": ["DATUM"],
     "Beruf und Gesundheit (indirekte Hinweise)": ["BERUF", "DIAGNOSE"],
@@ -107,6 +110,8 @@ NER_STOPWORDS = {
     "versicherungsnehmerin", "gläubiger", "schuldner", "mieter", "vermieter", "eigentümer", "zeugen", "anwalt", "anwältin",
     "rechtsanwalt", "rechtsanwältin", "notar", "notarin", "steuerberater", "steuerberaterin", "gegenseite",
     "netto", "brutto", "summe", "gesamt", "betrag", "rechnungsbetrag", "endbetrag", "zwischensumme",
+    # Kopfzeilen weitergeleiteter E-Mails ("Weitergeleitete Nachricht", "Ursprüngliche Nachricht")
+    "weitergeleitete", "weitergeleitet", "ursprüngliche", "nachricht",
     # Lohn- und Gehaltsabrechnung
     "avmg", "sv", "kv", "rv", "av", "pv", "kv/pv", "ges", "monat", "jahressummen", "steuerklasse", "konfession",
     "personalnummer", "personalabteilung", "abrechnung", "entgeltabrechnung", "berechnungsgrundlage",
@@ -139,13 +144,15 @@ _SUBSTANTIV_ENDUNGEN = ("farbe", "nummer", "hummer", "ungs", "ung", "heit", "kei
                         "preis", "kosten", "summe", "wert", "zahl", "steuer", "rechnung", "lieferung", "zahlung",
                         "menge", "stück", "artikel", "position", "bezeichnung", "beschreibung")
 _ORG_KLEIN = {"und", "&", "für", "von", "der", "die", "des", "am", "im", "in", "an", "zu", "zur", "zum", "e.v.", "e.", "v.",
-              "mbh", "co.", "co", "kg", "ohg", "gbr", "ag", "ug", "se", "gmbh", "gmbh.", "partner"}
+              "mbh", "mbb", "co.", "co", "kg", "ohg", "gbr", "ag", "ug", "se", "gmbh", "gmbh.", "partner"}
 # Typen, bei denen ein Modelltreffer ohne Ziffer kein echter Treffer sein kann
 NUMERISCHE_TYPEN = {"KFZ", "DE_KFZ", "FUEHRERSCHEIN", "DE_FUEHRERSCHEIN", "VERSICHERUNGSNR", "KONTONUMMER", "AKTENZEICHEN",
                     "FIN", "IBAN_CODE", "TELEFON", "DE_TAX_ID", "DE_TAX_NUMBER", "DE_VAT_ID", "DE_SOCIAL_SECURITY",
-                    "DE_HEALTH_INSURANCE", "DE_ID_CARD", "DE_PASSPORT", "DE_LANR", "DE_BSNR", "PERSONALNR", "DE_HANDELSREGISTER",
+                    "DE_HEALTH_INSURANCE", "DE_ID_CARD", "DE_PASSPORT", "DE_LANR", "DE_BSNR", "PERSONALNR", "KENNNUMMER", "DE_HANDELSREGISTER",
                     "ADRESSE", "PLZ_ORT", "CREDIT_CARD"}
 NER_ENTITIES = {"PERSON", "ORGANIZATION", "LOCATION"}
+# Numerische Typen, die auch mit wenigen Ziffern echt sind ("E-MW 710", "Kaiserstraße 9", "HRA 9921")
+_KURZE_NUMMERN = {"KFZ", "DE_KFZ", "ADRESSE", "PLZ_ORT", "AKTENZEICHEN", "DE_HANDELSREGISTER", "TELEFON"}
 
 # Einrichtungen, die im Kanzlei-/Praxisalltag meist stehen bleiben sollen (Profil-Option keep_institutions).
 # Lange Wörter als Wortbestandteil, kurze nur als ganzes Wort.
@@ -248,6 +255,23 @@ GLINER_MAPPING = {
 }
 
 
+class _KontextEnhancer(LemmaContextAwareEnhancer):
+    """Kontextwörter zählen nur als ganzes Wort, als Wortanfang oder als Ende eines zusammengesetzten Wortes
+    ("Geburtsdatum", "Kfz-Versicherung"), kurze (bis 3 Zeichen: "geb", "tel", "az") nur als ganzes Wort.
+    Presidios Teilwortsuche wertete "Arbeitgeber" als "geb." und machte Daten im Versicherungsverlauf zu
+    Geburtsdaten."""
+
+    @staticmethod
+    def _find_supportive_word_in_context(context_list, recognizer_context_list, matching_mode="substring"):
+        for kw in recognizer_context_list or []:
+            k = kw.lower().strip(".:")
+            for w in context_list or []:
+                w = w.lower().strip(".:,;()")
+                if w == k or (len(k) >= 4 and (w.startswith(k) or w.endswith(k))):
+                    return kw
+        return ""
+
+
 def build_analyzer(spacy_model: str = "de_core_news_lg", gliner_model: str | None = None,
                    gliner_threshold: float = 0.5, gliner_onnx_file: str = "") -> AnalyzerEngine:
     nlp_conf = {
@@ -281,7 +305,7 @@ def build_analyzer(spacy_model: str = "de_core_news_lg", gliner_model: str | Non
             chunk_size=1000, chunk_overlap=100,
         ))
     # Kontextwörter auch NACH dem Treffer berücksichtigen ("… ist am 02.09.2026 verstorben")
-    enhancer = LemmaContextAwareEnhancer(context_prefix_count=5, context_suffix_count=6)
+    enhancer = _KontextEnhancer(context_prefix_count=5, context_suffix_count=6)
     return AnalyzerEngine(nlp_engine=nlp_engine, registry=registry, supported_languages=["de"],
                           context_aware_enhancer=enhancer)
 
@@ -344,6 +368,74 @@ def _term_findings(text: str, terms: list[str], entity: str, quelle: str = "list
         for m in re.finditer(rf"(?<!\w){re.escape(t)}{suffix}(?!\w)", text, flags=re.IGNORECASE):
             out.append(Finding(m.start(), m.end(), entity, 1.0, m.group(), quelle=quelle))
     return out
+
+
+# Automarken: "Skoda Octavia", "Opel Corsa" sind keine Personen oder Firmen im Sinne der Anonymisierung
+AUTOMARKEN = {"audi", "bmw", "mercedes", "mercedes-benz", "vw", "volkswagen", "skoda", "škoda", "opel", "ford", "seat",
+              "cupra", "toyota", "honda", "mazda", "nissan", "hyundai", "kia", "renault", "peugeot", "citroën", "citroen",
+              "fiat", "volvo", "tesla", "porsche", "mini", "smart", "dacia", "suzuki", "mitsubishi", "jeep", "land",
+              "jaguar", "alfa", "lexus", "subaru", "byd", "polestar", "lancia", "chevrolet", "ssangyong", "mg"}
+_PARTIKEL_KLEIN = {"von", "van", "de", "del", "della", "di", "da", "du", "la", "le", "zu", "zur", "der", "den", "vom",
+                   "zum", "und", "ter", "ten", "el", "al", "bin", "ibn"}
+_VORNAME_RX = re.compile(r"(?<![\wäöüß\-])([A-ZÄÖÜ][a-zäöüßéèçñşğı]+(?:-[A-ZÄÖÜ][a-zäöüßéèçñşğı]+)?)[ \t]+"
+                         r"([A-ZÄÖÜ][a-zäöüßéèçñşğı]+(?:-[A-ZÄÖÜ][a-zäöüßéèçñşğı]+)?)(?![\wäöüß\-])")
+_STRASSEN_ENDEN = ("straße", "strasse", "str.", "weg", "allee", "platz", "ring", "gasse", "ufer", "damm", "chaussee")
+
+
+_ADRESSE_ANKER_RX = re.compile(
+    r"(?i)(?:stra(?:ß|ss)e|str\.|weg|allee|platz|ring|gasse|damm|ufer|chaussee|pfad|steig|markt|wall|graben|"
+    r"kamp|hof|berg|feld|garten|park|postfach)\b|\b\d{5}\b")
+# Parteien "Fischer ./. Hahn": bekannte Namen links und rechts vom Gegen-Zeichen
+_PARTEIEN_RX = re.compile(r"(?<![\wäöüß\-])([A-ZÄÖÜ][\wäöüß\-]+)[ \t]+\./\.[ \t]+([A-ZÄÖÜ][\wäöüß\-]+)(?![\wäöüß\-])")
+
+
+def _parteien(text: str) -> list[Finding]:
+    out = []
+    for m in _PARTEIEN_RX.finditer(text):
+        for g in (1, 2):
+            if lexikon.ist_name(m.group(g)):
+                out.append(Finding(m.start(g), m.end(g), "PERSON", 0.5, m.group(g), quelle="heuristik"))
+    return out
+
+
+def _vorname_personen(text: str) -> list[Finding]:
+    """Bekannter Vorname + großgeschriebener Nachname ("Monika Klein", "Werner Fuchs"), auch ohne Anrede."""
+    out = []
+    for m in _VORNAME_RX.finditer(text):
+        vor, nach = m.group(1), m.group(2)
+        if not lexikon.ist_vorname(vor) or nach.lower().endswith(_STRASSEN_ENDEN):
+            continue
+        if text[m.end():m.end() + 12].lstrip(" -").lower().startswith(_STRASSEN_ENDEN):
+            continue  # "Martin Luther Straße"
+        if lexikon.gewoehnlich(nach) or (lexikon.ist_wort(vor) and not lexikon.ist_nachname(nach)):
+            continue  # "Rosa Kleid", "Engel Gabriel"
+        out.append(Finding(m.start(), m.end(), "PERSON", 0.5, m.group(), quelle="heuristik"))
+    return out
+
+
+def _lexikon_plausibel(f: Finding) -> bool:
+    """Wörterbuch-Prüfung für Modelltreffer ohne weiteres Signal (Anrede, Feld, Rechtsform)."""
+    woerter = [w.strip(".,:;()\"'„“") for w in f.text.split()]
+    kern = [w for w in woerter if w and w.lower() not in TITLES and w.lower() not in _PARTIKEL_KLEIN and w != "&"]
+    if not kern:
+        return True
+    if kern[0].lower() in AUTOMARKEN:
+        return False  # "Skoda Octavia"
+    if f.entity == "PERSON":
+        if len(kern) == 1:
+            return not lexikon.gewoehnlich(kern[0])  # "Gespräch", "Vaters", "Ferienregelung"
+        if any(w[:1].islower() for w in kern):
+            return False  # "Ileitis terminalis": Namen bestehen aus großgeschriebenen Wörtern
+        return any(lexikon.ist_name(w) for w in kern) or not all(lexikon.gewoehnlich(w) for w in kern)
+    if f.entity == "ORGANIZATION" and not _RECHTSFORM_RX.search(f.text):
+        if len(kern) == 1:
+            w = kern[0]
+            if w.isupper() and len(w) <= 5:
+                return False  # "FAST", "CBCL": Abkürzungen von Testverfahren
+            return not lexikon.gewoehnlich(w)
+        # "Fahrzeug A", "Stadtkasse Essen" – nur gewöhnliche Wörter und einzelne Buchstaben
+        return not all(len(w) == 1 or lexikon.gewoehnlich(w) for w in kern)
+    return True
 
 
 def _heuristic_persons(text: str) -> list[Finding]:
@@ -435,9 +527,16 @@ def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
             return False  # "E-Mail-Anschrift"
         if f.quelle == "modell":
             if f.entity == "DATUM":
-                # Modell-Daten nur mit Personenbezug im Umfeld (wie bei der Regel)
-                umfeld = text[max(0, f.start - 60):f.end + 60].lower()
-                return any(k in umfeld for k in DATUM_KONTEXT_KURZ)
+                # Modell-Daten nur mit Personenbezug im Umfeld derselben Zeile, als Wortanfang ("geboren", nicht
+                # "Arbeitgeber")
+                zs = max(text.rfind("\n", 0, f.start) + 1, f.start - 60)
+                ze = text.find("\n", f.end)
+                if ze >= 0:  # danach auch die Folgezeile ("ist am 02.09.2026\nim Stift verstorben")
+                    ze = text.find("\n", ze + 1)
+                umfeld = text[zs:min(ze if ze >= 0 else len(text), f.end + 60)].lower()
+                return bool(re.search(r"(?<![\wäöüß])(?:" + "|".join(DATUM_KONTEXT_KURZ) + ")", umfeld))
+            if f.entity == "ADRESSE" and not _ADRESSE_ANKER_RX.search(f.text):
+                return False  # "Zimmer 2.14": eine Anschrift hat ein Straßenwort, eine Postleitzahl oder "Postfach"
             if f.entity in ("KFZ", "DE_KFZ") and not _KFZ_RX.fullmatch(f.text.strip()):
                 return False  # "BMW 320d" ist kein Kennzeichen
             if f.entity in ("FUEHRERSCHEIN", "DE_FUEHRERSCHEIN") and not re.fullmatch(r"[A-Z0-9]{8,14}", f.text.strip()):
@@ -446,6 +545,10 @@ def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
                 digits = sum(ch.isdigit() for ch in f.text)
                 if digits == 0 or (f.entity == "KONTONUMMER" and digits < 7):
                     return False
+                if digits < 5 and f.entity not in _KURZE_NUMMERN:
+                    return False  # "2140", "2455" in einer Tabelle sind keine Steuer-/Versicherungsnummern
+                if re.fullmatch(r"-?\d+,\d+", f.text.strip()):
+                    return False  # "28,0558" (Entgeltpunkte) ist eine Dezimalzahl
             if f.entity == "DE_HEALTH_INSURANCE" and not _KVNR_RX.fullmatch(f.text.strip()):
                 return False  # Krankenversichertennummer = Buchstabe + 9 Ziffern
         if f.entity in NUMERISCHE_TYPEN and f.quelle != "liste" and _BETRAG_RX.fullmatch(f.text.strip()):
@@ -464,6 +567,8 @@ def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
     if teile and all(p in NER_STOPWORDS or p in FUNKTIONSWOERTER or p.rstrip("n") in NER_STOPWORDS for p in teile):
         return False
     if any(ch.isdigit() for ch in t) or "\n" in f.text:
+        return False
+    if f.quelle == "modell" and not _lexikon_plausibel(f):
         return False
     if any(p.endswith(_LOHN_ENDUNGEN) or p.startswith(_LOHN_ANFAENGE) for p in teile) and not (
             f.entity == "ORGANIZATION" and _RECHTSFORM_RX.search(f.text)):
@@ -523,7 +628,8 @@ def _mentions(text: str, allowed, keep_institutions: bool) -> list[tuple[int, in
 
 
 def _belongs_to_mention(text: str, f: Finding, mentions: list[tuple[int, int]], abstand: int = 80,
-                        personen: list[tuple[int, int]] | None = None) -> bool:
+                        personen: list[tuple[int, int]] | None = None,
+                        kontakte: list[tuple[int, int]] | None = None) -> bool:
     """Kontaktdatum (Adresse, PLZ+Ort, Telefon, E-Mail) kurz nach einer Einrichtung/erlaubten Stelle in derselben
     Zeile (höchstens `abstand` Zeichen dazwischen – sonst frisst eine lange OCR-Zeile alles).
     Steht zwischen der Einrichtung und dem Kontaktdatum ein Personenname ("… ./. Allianz AG … unser Mandant
@@ -535,7 +641,34 @@ def _belongs_to_mention(text: str, f: Finding, mentions: list[tuple[int, int]], 
         if line_start <= ms and me <= f.start and f.start - me <= abstand:
             if not any(me <= ps and pe <= f.start for ps, pe in (personen or [])):
                 return True
+    # Anschriftblock unter der Einrichtung ("Amtsgericht Essen\nZweigertstraße 52\n45130 Essen"): Die Zeilen
+    # dazwischen dürfen nur aus Kontaktdaten bestehen, sonst gehört die Anschrift zu jemand anderem.
+    for _ in range(3):
+        if line_start == 0:
+            return False
+        vor_start = text.rfind("\n", 0, line_start - 1) + 1
+        vor_ende = line_start - 1
+        if any(vor_start <= ms < vor_ende for ms, _me in mentions):
+            return not any(vor_start <= ps and pe <= f.start for ps, pe in (personen or []))
+        rest = text[vor_start:vor_ende]
+        for ks, ke in sorted(kontakte or [], reverse=True):
+            if vor_start <= ks and ke <= vor_ende:
+                rest = rest[:ks - vor_start] + rest[ke - vor_start:]
+        if re.sub(r"(?i)tel(?:efon|efax|\.)?|fax|e-?mail|[\W\d_]", "", rest).strip():
+            return False
+        line_start = vor_start
     return False
+
+
+def _an_spalten_teilen(f: Finding) -> list[Finding]:
+    """Ein Treffer über eine Tabellenspalte hinweg ("Koch | Stefanie") wird in Teile zerlegt, Namen und Firmen auch am
+    Zeilenumbruch: Ein Modelltreffer "Brüggemann PartG mbB\\nKettwiger Straße" verdrängt sonst in Presidio den
+    richtigen kürzeren Regeltreffer und fiele danach selbst durch die Prüfung."""
+    trenner = r"[^|\n]+" if f.entity in NER_ENTITIES else r"[^|]+"
+    if "|" not in f.text and not (f.entity in NER_ENTITIES and "\n" in f.text):
+        return [f]
+    return [Finding(f.start + m.start(), f.start + m.end(), f.entity, f.score, m.group(), f.active, f.quelle)
+            for m in re.finditer(trenner, f.text) if m.group().strip()]
 
 
 # ---------------------------------------------------------------------------
@@ -574,6 +707,10 @@ def detect(
         quelle = "modell" if name in ("SpacyRecognizer", "GLiNERRecognizer") else "regel"
         findings.append(Finding(r.start, r.end, r.entity_type, r.score, text[r.start:r.end], quelle=quelle))
     findings += _heuristic_persons(text)
+    findings += _vorname_personen(text)
+    findings += _parteien(text)
+    findings += feld_treffer(text, entities)
+    findings = [t for f in findings for t in _an_spalten_teilen(f)]
     findings = [c for f in findings if (c := _clean_span(text, f))]
     # Wortarten für die Plausibilitätsprüfung (spaCy-Modell aus dem Analyzer wiederverwenden)
     wa = None
@@ -614,7 +751,10 @@ def detect(
     # Adresse/Telefon des Gerichts oder der eigenen Kanzlei in derselben Zeile bleiben stehen
     mentions = _mentions(text, allowed, keep_institutions)
     personen = [(f.start, f.end) for f in findings if f.entity == "PERSON"]
-    findings = [f for f in findings if not _belongs_to_mention(text, f, mentions, personen=personen)]
+    kontakte = [(f.start, f.end) for f in findings if f.entity in ("ADRESSE", "PLZ_ORT", "TELEFON", "EMAIL_ADDRESS",
+                                                                   "URL")]
+    findings = [f for f in findings if not _belongs_to_mention(text, f, mentions, personen=personen,
+                                                               kontakte=kontakte)]
 
     findings += _term_findings(text, deny_list or [], "EIGENE_BEGRIFFE")
     findings += _term_findings(text, manual_terms or [], "MANUELL")

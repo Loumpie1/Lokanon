@@ -35,7 +35,7 @@ GRUPPEN_ANZEIGE = {
     "Nummern und Kennzeichen": ["AKTENZEICHEN", "DIKTATZEICHEN", "GRUNDBUCH", "VERSICHERUNGSNR", "DE_HANDELSREGISTER",
                                 "IBAN_CODE", "KONTONUMMER", "CREDIT_CARD", "DE_TAX_ID", "DE_TAX_NUMBER", "DE_VAT_ID",
                                 "DE_ID_CARD", "DE_PASSPORT", "DE_FUEHRERSCHEIN", "FUEHRERSCHEIN", "DE_SOCIAL_SECURITY",
-                                "DE_HEALTH_INSURANCE", "DE_LANR", "DE_BSNR", "PERSONALNR", "DE_KFZ", "KFZ",
+                                "DE_HEALTH_INSURANCE", "DE_LANR", "DE_BSNR", "PERSONALNR", "KENNNUMMER", "DE_KFZ", "KFZ",
                                 "FIN"],
     "Daten und Sonstiges": ["DATUM", "BERUF", "DIAGNOSE", "EIGENE_BEGRIFFE", "MANUELL"],
 }
