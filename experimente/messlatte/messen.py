@@ -35,7 +35,9 @@ LER_DEV_N = 60  # Ausschnitt aus dem LER-Trainingsteil, damit ein Lauf in Minute
 
 def faelle(name):
     f = list(E.lade_faelle([SETS[name]]))
-    return f[:LER_DEV_N] if name == "ler_dev" else f
+    if name == "ler_dev":  # über alle Gerichte verteilt (LER ist nach Gericht sortiert)
+        return f[::max(1, len(f) // LER_DEV_N)][:LER_DEV_N]
+    return f
 
 
 def main(args):

@@ -41,6 +41,49 @@ Wie die Labels auf Lokanon übertragen werden, steht oben in `umwandeln.py`. Kur
     python experimente/messlatte/listen_bauen.py   # Wikidata → anonymizer/daten/medizin.txt.gz, vornamen_wikidata.txt.gz
     python experimente/messlatte/messen.py NAME [--gegen BASIS] [--sets …]
 
-## Ergebnisse
+## Ergebnisse (Recall / Precision)
 
-Siehe unten (wird nach jeder Messrunde ergänzt).
+Konfiguration `testdaten/kanzlei/config_eval.yaml` (spaCy + GLiNER). „vorher“ ist Stand 00cb35a, „jetzt“ ist
+Erkennung v4 mit den Nachbesserungen vom 05.11.2026.
+
+| Sammlung | vorher | jetzt |
+|---|---|---|
+| **Arztbriefe, Messteil** (21 Briefe, nie angesehen) | 79,4 / 31,8 | **96,9 / 61,1** |
+| **Urteile, Messteil** (139 Abschnitte, nie angesehen) | 55,0 / 19,4 | **56,3 / 25,4** |
+| Arztbriefe, Entwicklungsteil (42 Briefe) | 83,6 / 32,5 | 95,3 / 65,0 |
+| Urteile, Entwicklung, Arbeitsgericht (60 Abschnitte) | 40,2 / 21,3 | 62,4 / 70,8 |
+| Urteile, Entwicklung, alle Gerichte (60 Abschnitte) | – | 75,5 / 52,9 |
+| Prüfsammlung (eigene, unabhängig) | 96,2 / 94,6 | 96,2 / 95,6 |
+| Kanzleifälle | 100 / 99,0 | 100 / 99,0 |
+| Testsammlung | 99,6 / 99,2 | 99,6 / 99,2 |
+
+### Was die Messlatte gezeigt hat
+
+**Echte Fehler im Produkt:**
+- **„AG“ galt überall als Amtsgericht:** Jede Aktiengesellschaft („Siemens AG“) blieb stehen.
+- **„PIZ“ (Patienten-ID) galt als „PI“ (Polizeiinspektion):** Die Anschrift dahinter blieb stehen.
+- **GLiNER bekam die internen Kürzel** („DIKTATZEICHEN“, „EIGENE_BEGRIFFE“) als Suchbegriffe und markierte
+  Laborwerte und Befundsätze.
+
+**Lücken, für die es jetzt Regeln gibt:**
+- Geburtsdatum mit Stern
+- „Nachname, Vorname“
+- Titel mit Initialen
+- Unterschriften- und Richterblöcke
+- Postleitzahlen mit Landeskennung
+- Klinik-Kennnummern
+
+**Fehlalarme, für die es jetzt Filter gibt:**
+- Medikamente, Fachbegriffe und Abkürzungen in Arztbriefen
+- Tarifverträge und Gesetzeskürzel in Urteilen
+
+### Was offen bleibt
+
+- **Urteile, Messteil:** Die Precision bleibt niedrig.
+  - Der Messteil stammt aus anderen Gerichten (LER ist nach Gericht sortiert) als der erste Entwicklungsteil.
+  - Viele Fehlalarme sind Firmen- und Gesetzesbezeichnungen, die in veröffentlichten Urteilen schon
+    pseudonymisiert oder abgekürzt sind („H AG“, „BgA“).
+  - Für echte Schriftsätze ist das weniger aussagekräftig als die Arztbriefe.
+- **Arztbriefe:** Rund 100 Fehlalarme je 21 Briefe sind übrig, meist Handelsnamen von Medikamenten, die in keiner
+  freien Liste stehen. Der Zweitprüfer würde davon rund zwei Drittel verwerfen, siehe `experimente/kombi`.
+- **Eigenes Modell:** siehe `experimente/eigenes_modell`.

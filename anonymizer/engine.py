@@ -564,7 +564,9 @@ class _Wortarten:
 # Tarifverträge, Betriebsvereinbarungen, Ordnungen: Regelwerke, keine Firmen
 _REGELWERK_RX = re.compile(
     r"^(?:G?K?BV|MTV|E?TV|RTV|TVöD|TV-L|TVÜ|DVO|VO|AVR|EntgO|BAT|GBV|KBV|ETV|MTV)(?:[\s.\-]|$)|"
-    r"(?i:tarifvertrag|betriebsvereinbarung|dienstvereinbarung|richtlinien?$|verordnung|ordnung$|satzung$)")
+    r"(?i:tarifvertrag|betriebsvereinbarung|dienstvereinbarung|richtlinien?$|verordnung|ordnung$|satzung$)|"
+    # Gesetzeskürzel als ein Wort: "SGB", "BetrVG", "EStG", "StPO", "DGL-VO"
+    r"^[A-ZÄÖÜ][A-Za-zÄÖÜäöü\-]{0,8}(?:G|GB|VO|PO)$")
 
 
 # Häufige Endungen von Domains; "A.me", "c.et", "Neurolog.St" in Befunden sind Abkürzungen, keine Adressen

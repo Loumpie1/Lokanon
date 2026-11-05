@@ -53,7 +53,8 @@ _PLZ_ZEILE_RX = re.compile(r"^[ \t]*(?:(?:A|D|CH)-)?\d{4,5}[ \t]+" + _GROSS)
 _STRASSE_ZEILE_RX = re.compile(r"^[ \t]*(" + _GROSS + r"[A-Za-zÄÖÜäöüß.\-]*(?:[ \t]+[A-Za-zÄÖÜäöüß.\-]+){0,3}[ \t]+"
                                r"\d{1,4}[ \t]?[a-zA-Z]?)[ \t]*,?[ \t]*$")
 _FELDENDEN = ("nummer", "nr.", "nr", "klasse", "zeichen", "datum", "kennzahl", "tarif", "stufe", "gruppe", "seite", "summe")
-_NAMENSZEILE_RX = re.compile(r"^[ \t]*((?:" + _GROSS + r"\.[ \t]?)?" + _WORT + r"(?:[ \t]+" + _WORT + r")?)[ \t]*$")
+_NAMENSZEILE_RX = re.compile(r"^[ \t]*(?:(?:Dr|Prof)\.[ \t]?(?:-[ \t]?Ing\.[ \t]?)?)*((?:" + _GROSS + r"\.[ \t]?)?" + _WORT +
+                             r"(?:[ \t]+" + _WORT + r")?)[ \t]*$")
 _STOPP = {"zimmer", "station", "raum", "haus", "gebäude", "ebene", "seite", "anlage", "tel", "telefon", "fax", "durchwahl",
           "postfach", "befund", "diagnose", "therapie", "labor", "procedere", "visite", "kontrolle", "nachsorge"}
 

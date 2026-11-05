@@ -140,7 +140,7 @@
     <div class="card"><h4>Ihre Kanzlei</h4><p>Was nie ersetzt wird: Kanzleiname, Mitarbeitende, eigene Telefonnummern und E-Mail-Adressen, eine Angabe je Zeile. Darunter „Immer ersetzen“ für interne Kürzel oder Projektnamen. „Gelernte Begriffe“ zeigt, was Sie beim Prüfen dauerhaft festgelegt haben; „vergessen“ nimmt es zurück.</p></div>
     <div class="card"><h4>Erkennung</h4><p>Gerichte, Behörden, Versicherer und Kliniken stehen lassen (an); Ortsnamen ohne Adresse ersetzen (aus); Datumsangaben nur mit Personenbezug, alle oder keine; welche Gruppen erkannt werden.</p></div>
     <div class="card"><h4>Ausgabe</h4><p>Zusatz im Dateinamen, Ablageordner für Drag &amp; Drop, und ob zusätzlich eine reine Textfassung (<code>.md</code>) entstehen soll, mit der KI-Assistenten am besten arbeiten.</p></div>
-    <div class="card"><h4>Erweitert</h4><p>Drei Schalter, alle aus, bis Sie sie brauchen: Rückübersetzung, KI-Anweisung, Vorgangsordner. Siehe nächster Abschnitt.</p></div>
+    <div class="card"><h4>Erweitert</h4><p>Vier Schalter, alle aus, bis Sie sie brauchen: Rückübersetzung, KI-Anweisung, eigene Testfälle, Vorgangsordner. Siehe nächster Abschnitt.</p></div>
     <div class="card"><h4>Lokanon vorstellen</h4><p>Die Produktvorstellung und drei Filme (30 Sekunden, eine und zwei Minuten), etwa für Kolleginnen, Kollegen oder Mandanten. Läuft ohne Internet; dieselben Dateien stehen auch im Startmenü unter „Lokanon – Produktvorstellung“.</p></div>
   </div>
 </section>
@@ -151,6 +151,8 @@
   <p>Eingeschaltet, speichert Lokanon bei jedem Durchlauf einen verschlüsselten Schlüssel (Platzhalter → Original) und zeigt oben rechts „Antwort zurückübersetzen“. Dort fügen Sie die Antwort der KI ein; aus <code>[Person_1]</code> und <code>[Mandant]</code> werden wieder die echten Namen, auch wenn die KI „Person 1“ oder „[Person_1]s“ geschrieben hat. Das Passwort für die Schlüssel legen Sie einmal in den Einstellungen fest.</p>
   <h3>KI-Anweisung und Claude-Skill</h3>
   <p>Eingeschaltet, erscheint auf der Fertig-Seite „KI-Anweisung kopieren“: ein Text, den Sie einmal als Projekt-Anweisung in ChatGPT oder Claude einfügen. Die KI lässt die Platzhalter dann stehen und erfindet keine Namen. Für Claude gibt es die Anweisung auch als Skill zum Herunterladen.</p>
+  <h3>Geprüfte Vorgänge als eigene Testfälle</h3>
+  <p>Eingeschaltet, speichert Lokanon nach dem Anonymisieren den gelesenen Text und Ihre Entscheidungen beim Prüfen: was ersetzt wurde, was Sie nachgetragen und was Sie abgewählt haben. Die Datei liegt unter <code>Lokanon\testfaelle</code> und ist mit Ihrem Windows-Konto verschlüsselt; nur Sie können sie auf diesem PC lesen. Damit lässt sich jede neue Lokanon-Version an Ihren echten Dokumenten messen (<code>evaluate.py --eigene</code>, die Ausgabe zeigt keinen Klartext). „alle löschen“ in den Einstellungen entfernt die Testfälle.</p>
   <h3>Vorgangsordner mit Prüfbericht und Protokoll</h3>
   <p>Eingeschaltet, legt Lokanon je Durchlauf zusätzlich einen Ordner unter <code>Lokanon\Vorgaenge</code> an: Originale, Kopien, ein Prüfbericht mit allen Markierungen im Klartext (bleibt auf Ihrem PC) und ein Protokoll, was wann ersetzt wurde. Nützlich als Nachweis der Sorgfalt.</p>
 </section>

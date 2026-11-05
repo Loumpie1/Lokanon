@@ -1,0 +1,7302 @@
+{
+ "+gliner2": {
+  "grascco_train": {
+   "gesamt": {
+    "hit": 344,
+    "total": 359,
+    "found": 499,
+    "fp": 173,
+    "namensteile": 5,
+    "seiten": 53,
+    "dokumente": 42,
+    "recall": 0.958217270194986,
+    "precision": 0.6497975708502024,
+    "fehlalarme_je_seite": 3.2641509433962264
+   },
+   "uebersehen": [
+    [
+     "DATUM",
+     "01.02.2028",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "DATUM",
+     "2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "DATUM",
+     "14/3/2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ADRESSE",
+     "Am Hasenstall",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Dhayana dos Santos Aveiro",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PLZ_ORT",
+     "91022",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fuss, Flora",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "ORGANIZATION",
+     "BVA",
+     "GraSCCo-Joubert"
+    ],
+    [
+     "KENNNUMMER",
+     "H25440/51",
+     "GraSCCo-Osler"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 7758433",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 775-8447339",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43 333 7758-0",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "PERSON",
+     "Vroni",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Alpen-Adria-Universität Kragenfurt",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Weil, Klementine",
+     "GraSCCo-Weil"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "KFZ",
+     "LV-F 5",
+     "regel",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Klemmzeit",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "SM Schwelle",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Sono Pleura",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Angio-CCT",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Anend",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Dyspnö",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Punktionswürdige Pleuraergüße",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Normotone",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Toremperfusor",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Sono Pleura",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Pleura",
+     "namensteil",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Intraflow",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Prostata-Adenom-Enukleatio",
+     "modell",
+     "GraSCCo-Baastrup"
+    ],
+    [
+     "ORGANIZATION",
+     "Color",
+     "modell",
+     "GraSCCo-Boeck"
+    ],
+    [
+     "PERSON",
+     "Cosopt-S",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "ORGANIZATION",
+     "Ablatio",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "PERSON",
+     "Kalinor",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "ORGANIZATION",
+     "Tensio-Kontrolten",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_A"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_B"
+    ],
+    [
+     "PERSON",
+     "HAUPT-UND",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "ORGANIZATION",
+     "Cor: Herztöne",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "ORGANIZATION",
+     "Arteriosklerotischer Gefäßschaden",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "PERSON",
+     "HAUPT-UND",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "Folfox",
+     "wiederholung",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "RGs",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "PERSON",
+     "Harnsre",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "Med.TU",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "ORGANIZATION",
+     "RGs",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KFZ",
+     "CK-MB 64",
+     "regel",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "ORGANIZATION",
+     "PZ INr",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KENNNUMMER",
+     "CA19-9: 2.7",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "PERSON",
+     "Parkinson",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Bulbusmotilität",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Endstrecken",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Vorbefund",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Konstitutioneller Zwerchfellhochstand",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Flackerlichstimulation",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "CT Thorax",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Rectum-Npl",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Bulbusmotilität",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "THROMBO",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Dulcolax",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelbolus",
+     "heuristik",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Oralwärts",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Konstitutioneller Zwerchfellhochstand",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelbolus",
+     "namensteil",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelbolus",
+     "heuristik",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Oralwärts",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "ORGANIZATION",
+     "Rückoperation",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "PERSON",
+     "SIRS",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "ORGANIZATION",
+     "Rectum-CA",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "PERSON",
+     "Lasegue und Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "ORGANIZATION",
+     "NZN Lentigines/Rücken und Handrücken",
+     "modell",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Tumofr",
+     "modell",
+     "GraSCCo-Ehrenberger"
+    ],
+    [
+     "ORGANIZATION",
+     "TE Oberarm",
+     "modell",
+     "GraSCCo-Ehrenberger"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "modell",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "namensteil",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "PERSON",
+     "T. Fieber",
+     "modell",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fieber",
+     "namensteil",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Hartmann",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "ORGANIZATION",
+     "AP-Rückverlagerung",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "PERSON",
+     "Koloskopisch",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "PERSON",
+     "Meniskusrefixation",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Synovilias",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Meniskusrefixation",
+     "wiederholung",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "synovilias",
+     "namensteil",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "ORGANIZATION",
+     "Chrondromalziegrad Med. Fermur I-II",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Meniskusrefixation",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "ORGANIZATION",
+     "Bei Bewegungsvershclechterung KG",
+     "regel",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "ORGANIZATION",
+     "Beruhigungstbl",
+     "modell",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "wiederholung",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "ORGANIZATION",
+     "CT-Quot",
+     "modell",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "modell",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "PERSON",
+     "Niesanfälle",
+     "modell",
+     "GraSCCo-Joubert"
+    ],
+    [
+     "PERSON",
+     "Lymphknotenmeta",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Athroskopische Refixation",
+     "modell",
+     "GraSCCo-Leitner"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Leitner"
+    ],
+    [
+     "PERSON",
+     "Infrarenales Bauchaortenaneurysma",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "PERSON",
+     "Opstipation",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Tramal-Einnahme",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "HbE",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Durogesic",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Tramal",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Zeit Mehr Öfter",
+     "modell",
+     "GraSCCo-Neubauer"
+    ],
+    [
+     "ORGANIZATION",
+     "Child C",
+     "modell",
+     "GraSCCo-Osler"
+    ],
+    [
+     "ORGANIZATION",
+     "BE Diabetesdiät",
+     "modell",
+     "GraSCCo-Osler"
+    ],
+    [
+     "ORGANIZATION",
+     "CMV-DNA-PCR",
+     "modell",
+     "GraSCCo-Osler"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopffraktur",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "ORGANIZATION",
+     "KS Nierenlager",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopf",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopfes",
+     "wiederholung",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopffraktur",
+     "wiederholung",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "ORGANIZATION",
+     "Beruhigungstbl",
+     "modell",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "wiederholung",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "ORGANIZATION",
+     "CT-Quot",
+     "modell",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "modell",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "PERSON",
+     "Einund",
+     "modell",
+     "GraSCCo-Rieser"
+    ],
+    [
+     "PERSON",
+     "Nüchter",
+     "modell",
+     "GraSCCo-Rieser"
+    ],
+    [
+     "ORGANIZATION",
+     "NAHVISUS",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "NAHVISUS",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "Exo",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "Macula BA",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "PERSON",
+     "Romberg",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "PERSON",
+     "Zentrifugat",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "ORGANIZATION",
+     "Punktionsort LP",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "PERSON",
+     "B. Schreibmaschineschreiben",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Tibialis-SEP",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Tibialis-SEP",
+     "wiederholung",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Kleines",
+     "namensteil",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Ltd",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Fotoprint",
+     "modell",
+     "GraSCCo-Tupolev_1"
+    ],
+    [
+     "ORGANIZATION",
+     "Inoperabilität",
+     "modell",
+     "GraSCCo-Tupolev_4"
+    ],
+    [
+     "PERSON",
+     "Folfirinox",
+     "modell",
+     "GraSCCo-Tupolev_4"
+    ],
+    [
+     "AKTENZEICHEN",
+     "140/80",
+     "regel",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "PERSON",
+     "Cor",
+     "modell",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "ORGANIZATION",
+     "Höhergr",
+     "modell",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "PERSON",
+     "Infekexazerbation",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Ditec",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Oxis",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Oxis",
+     "namensteil",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Klemmzeit",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Vorhof EK",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Angio-CCT",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Op-Indikation",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Normotone",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Pulsation",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Unklassifiziert",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Krea-Clear",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Prot",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Digimerck",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Stationaärztin",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Dos/Das",
+     "modell",
+     "GraSCCo-Weil"
+    ],
+    [
+     "ORGANIZATION",
+     "MCL DD Innenmeniskusläsion",
+     "modell",
+     "GraSCCo-Weil"
+    ],
+    [
+     "PERSON",
+     "Mediastinalshift- Pleurapunktion",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelenhancement",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Insuspekte",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Cavum",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Insuspekte Faxverkalkungen",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Dzt",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "dzt",
+     "wiederholung",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis Anfallssemiologie",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritium",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "ORGANIZATION",
+     "RGs",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritium",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis",
+     "namensteil",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ]
+   ],
+   "sekunden": 951.4559688568115
+  },
+  "ler_dev": {
+   "gesamt": {
+    "hit": 118,
+    "total": 189,
+    "found": 184,
+    "fp": 65,
+    "namensteile": 0,
+    "seiten": 63,
+    "dokumente": 60,
+    "recall": 0.6243386243386243,
+    "precision": 0.6467391304347826,
+    "fehlalarme_je_seite": 1.0317460317460319
+   },
+   "uebersehen": [
+    [
+     "PERSON",
+     "Volk",
+     "LER-0002"
+    ],
+    [
+     "PERSON",
+     "Winzenried",
+     "LER-0016"
+    ],
+    [
+     "ORGANIZATION",
+     "K AG",
+     "LER-0023"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0025"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0036"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0036"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0057"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0058"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0062"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H AG firmierte",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H.",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V GmbH firmierend",
+     "LER-0066"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0070"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0074"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Fischermeier",
+     "LER-0107"
+    ],
+    [
+     "ADRESSE",
+     "„P-Platzes “",
+     "LER-0120"
+    ],
+    [
+     "PERSON",
+     "Th. Gans",
+     "LER-0125"
+    ],
+    [
+     "PERSON",
+     "Sieberts",
+     "LER-0131"
+    ],
+    [
+     "PERSON",
+     "C. Klar",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0139"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0139"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "AKTENZEICHEN",
+     "Nr. 5",
+     "modell",
+     "LER-0007"
+    ],
+    [
+     "DATUM",
+     "3. Oktober 1952",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "DATUM",
+     "1. August 1967",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "wiederholung",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "wiederholung",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "wiederholung",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "DATUM",
+     "1950",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1974",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1952",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "DATUM",
+     "1985",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "AKTENZEICHEN",
+     "492/2011",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "modell",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0048"
+    ],
+    [
+     "AKTENZEICHEN",
+     "02/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "DATUM",
+     "1. März 1971",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "Folgenden BV",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "PERSON",
+     "II. D",
+     "modell",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "Folgenden BV",
+     "modell",
+     "LER-0059"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0063"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0063"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "wiederholung",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "wiederholung",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Frau B",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Vorruhegeldempfänger",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Vorruhegeldempfänger",
+     "namensteil",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Vorruhegeldempfänger",
+     "namensteil",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "Vorruhestandes",
+     "wiederholung",
+     "LER-0070"
+    ],
+    [
+     "ORGANIZATION",
+     "Vorruhestandes",
+     "modell",
+     "LER-0070"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DATUM",
+     "Februar 1959",
+     "modell",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Ziff",
+     "namensteil",
+     "LER-0078"
+    ],
+    [
+     "PERSON",
+     "H. Ziff",
+     "modell",
+     "LER-0078"
+    ],
+    [
+     "PERSON",
+     "Unständige",
+     "modell",
+     "LER-0107"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "wiederholung",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "wiederholung",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "modell",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "modell",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "wiederholung",
+     "LER-0130"
+    ],
+    [
+     "DATUM",
+     "Mai 1967",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "DATUM",
+     "12. Dezember 1994",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "Anwendungs-TV Berlin",
+     "modell",
+     "LER-0139"
+    ],
+    [
+     "ORGANIZATION",
+     "EntgFG",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "EntgFG",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "DB Konzerns",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "FGr",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "FGr",
+     "modell",
+     "LER-0144"
+    ]
+   ],
+   "sekunden": 1066.8633210659027
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 101,
+    "total": 104,
+    "found": 92,
+    "fp": 4,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9711538461538461,
+    "precision": 0.9565217391304348,
+    "fehlalarme_je_seite": 0.4
+   },
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "ADRESSE",
+     "König-Heinrich-Platz 1",
+     "regel",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ]
+   ],
+   "sekunden": 52.13049054145813
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 103,
+    "fp": 1,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9896907216494846,
+    "fehlalarme_je_seite": 0.16666666666666666
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ]
+   ],
+   "sekunden": 41.397642374038696
+  },
+  "korpus": {
+   "gesamt": {
+    "hit": 275,
+    "total": 275,
+    "found": 249,
+    "fp": 3,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 1.0,
+    "precision": 0.9878048780487805,
+    "fehlalarme_je_seite": 0.13636363636363635
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "PERSON",
+     "BARMER",
+     "modell",
+     "B4_Rentenbescheid_Hoffmann.pdf"
+    ],
+    [
+     "PERSON",
+     "Calprotectin",
+     "modell",
+     "A1_Arztbrief_Fuchs.docx"
+    ],
+    [
+     "ORGANIZATION",
+     "Child Behavior Checklist",
+     "modell",
+     "A4_Familiengutachten_Schneider.docx"
+    ]
+   ],
+   "sekunden": 148.55850219726562
+  }
+ },
+ "+gliner2 + zweit 0.3": {
+  "grascco_train": {
+   "gesamt": {
+    "hit": 344,
+    "total": 359,
+    "found": 383,
+    "fp": 57,
+    "namensteile": 5,
+    "seiten": 53,
+    "dokumente": 42,
+    "recall": 0.958217270194986,
+    "precision": 0.8492063492063492,
+    "fehlalarme_je_seite": 1.0754716981132075
+   },
+   "uebersehen": [
+    [
+     "DATUM",
+     "01.02.2028",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "DATUM",
+     "2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "DATUM",
+     "14/3/2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ADRESSE",
+     "Am Hasenstall",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Dhayana dos Santos Aveiro",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PLZ_ORT",
+     "91022",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fuss, Flora",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "ORGANIZATION",
+     "BVA",
+     "GraSCCo-Joubert"
+    ],
+    [
+     "KENNNUMMER",
+     "H25440/51",
+     "GraSCCo-Osler"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 7758433",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 775-8447339",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43 333 7758-0",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "PERSON",
+     "Vroni",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Alpen-Adria-Universität Kragenfurt",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Weil, Klementine",
+     "GraSCCo-Weil"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "KFZ",
+     "LV-F 5",
+     "regel",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Sono Pleura",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Anend",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Pleura",
+     "namensteil",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_A"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_B"
+    ],
+    [
+     "PERSON",
+     "HAUPT-UND",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "Folfox",
+     "wiederholung",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "KFZ",
+     "CK-MB 64",
+     "regel",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KENNNUMMER",
+     "CA19-9: 2.7",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "PERSON",
+     "Parkinson",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "THROMBO",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Dulcolax",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Lasegue und Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "ORGANIZATION",
+     "NZN Lentigines/Rücken und Handrücken",
+     "modell",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "modell",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "namensteil",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fieber",
+     "namensteil",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Hartmann",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "ORGANIZATION",
+     "Bei Bewegungsvershclechterung KG",
+     "regel",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Leitner"
+    ],
+    [
+     "ORGANIZATION",
+     "Tramal",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopfes",
+     "wiederholung",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "ORGANIZATION",
+     "NAHVISUS",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "Macula BA",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "PERSON",
+     "Romberg",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "PERSON",
+     "Kleines",
+     "namensteil",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Ltd",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Folfirinox",
+     "modell",
+     "GraSCCo-Tupolev_4"
+    ],
+    [
+     "AKTENZEICHEN",
+     "140/80",
+     "regel",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "PERSON",
+     "Ditec",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "ORGANIZATION",
+     "Digimerck",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Stationaärztin",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Insuspekte",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis Anfallssemiologie",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis",
+     "namensteil",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ]
+   ],
+   "sekunden": 951.4559688568115
+  },
+  "ler_dev": {
+   "gesamt": {
+    "hit": 116,
+    "total": 189,
+    "found": 148,
+    "fp": 31,
+    "namensteile": 0,
+    "seiten": 63,
+    "dokumente": 60,
+    "recall": 0.6137566137566137,
+    "precision": 0.7905405405405406,
+    "fehlalarme_je_seite": 0.49206349206349204
+   },
+   "uebersehen": [
+    [
+     "PERSON",
+     "Volk",
+     "LER-0002"
+    ],
+    [
+     "PERSON",
+     "Winzenried",
+     "LER-0016"
+    ],
+    [
+     "ORGANIZATION",
+     "K AG",
+     "LER-0023"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0025"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0036"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0036"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0057"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0058"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0062"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H AG firmierte",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H.",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V GmbH firmierend",
+     "LER-0066"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0070"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0074"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Fieback",
+     "LER-0084"
+    ],
+    [
+     "PERSON",
+     "Fischermeier",
+     "LER-0107"
+    ],
+    [
+     "PERSON",
+     "Fieback",
+     "LER-0113"
+    ],
+    [
+     "ADRESSE",
+     "„P-Platzes “",
+     "LER-0120"
+    ],
+    [
+     "PERSON",
+     "Th. Gans",
+     "LER-0125"
+    ],
+    [
+     "PERSON",
+     "Sieberts",
+     "LER-0131"
+    ],
+    [
+     "PERSON",
+     "C. Klar",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0139"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0139"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "AKTENZEICHEN",
+     "Nr. 5",
+     "modell",
+     "LER-0007"
+    ],
+    [
+     "DATUM",
+     "3. Oktober 1952",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "DATUM",
+     "1. August 1967",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "DATUM",
+     "1950",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1974",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1952",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "DATUM",
+     "1985",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "AKTENZEICHEN",
+     "492/2011",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0048"
+    ],
+    [
+     "AKTENZEICHEN",
+     "02/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "DATUM",
+     "1. März 1971",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0063"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0063"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "wiederholung",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "wiederholung",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Frau B",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DATUM",
+     "Februar 1959",
+     "modell",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Ziff",
+     "namensteil",
+     "LER-0078"
+    ],
+    [
+     "PERSON",
+     "H. Ziff",
+     "modell",
+     "LER-0078"
+    ],
+    [
+     "DATUM",
+     "Mai 1967",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "DATUM",
+     "12. Dezember 1994",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "DB Konzerns",
+     "modell",
+     "LER-0144"
+    ]
+   ],
+   "sekunden": 1066.8633210659027
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 101,
+    "total": 104,
+    "found": 92,
+    "fp": 4,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9711538461538461,
+    "precision": 0.9565217391304348,
+    "fehlalarme_je_seite": 0.4
+   },
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "ADRESSE",
+     "König-Heinrich-Platz 1",
+     "regel",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ]
+   ],
+   "sekunden": 52.13049054145813
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 103,
+    "fp": 1,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9896907216494846,
+    "fehlalarme_je_seite": 0.16666666666666666
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ]
+   ],
+   "sekunden": 41.397642374038696
+  },
+  "korpus": {
+   "gesamt": {
+    "hit": 275,
+    "total": 275,
+    "found": 247,
+    "fp": 1,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 1.0,
+    "precision": 0.9959016393442623,
+    "fehlalarme_je_seite": 0.045454545454545456
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "PERSON",
+     "BARMER",
+     "modell",
+     "B4_Rentenbescheid_Hoffmann.pdf"
+    ]
+   ],
+   "sekunden": 148.55850219726562
+  }
+ },
+ "+gliner2 tief": {
+  "grascco_train": {
+   "gesamt": {
+    "hit": 344,
+    "total": 359,
+    "found": 513,
+    "fp": 187,
+    "namensteile": 5,
+    "seiten": 53,
+    "dokumente": 42,
+    "recall": 0.958217270194986,
+    "precision": 0.6318897637795275,
+    "fehlalarme_je_seite": 3.5283018867924527
+   },
+   "uebersehen": [
+    [
+     "DATUM",
+     "01.02.2028",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "DATUM",
+     "2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "DATUM",
+     "14/3/2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ADRESSE",
+     "Am Hasenstall",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Dhayana dos Santos Aveiro",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PLZ_ORT",
+     "91022",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fuss, Flora",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "ORGANIZATION",
+     "BVA",
+     "GraSCCo-Joubert"
+    ],
+    [
+     "KENNNUMMER",
+     "H25440/51",
+     "GraSCCo-Osler"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 7758433",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 775-8447339",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43 333 7758-0",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "PERSON",
+     "Vroni",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Alpen-Adria-Universität Kragenfurt",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Weil, Klementine",
+     "GraSCCo-Weil"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "KFZ",
+     "LV-F 5",
+     "regel",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Klemmzeit",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "SM Schwelle",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Sono Pleura",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Angio-CCT",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Anend",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Dyspnö",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Punktionswürdige Pleuraergüße",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Normotone",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Toremperfusor",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Sono Pleura",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "DE_KFZ",
+     "re ca 800",
+     "regel",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Pleura",
+     "namensteil",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Intraflow",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Prostata-Adenom-Enukleatio",
+     "modell",
+     "GraSCCo-Baastrup"
+    ],
+    [
+     "ORGANIZATION",
+     "Color",
+     "modell",
+     "GraSCCo-Boeck"
+    ],
+    [
+     "PERSON",
+     "Cosopt-S",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "ORGANIZATION",
+     "Ablatio",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "DE_KFZ",
+     "RA MD 4",
+     "regel",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "PERSON",
+     "Kalinor",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "ORGANIZATION",
+     "Tensio-Kontrolten",
+     "modell",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_A"
+    ],
+    [
+     "ORGANIZATION",
+     "Med.TU",
+     "modell",
+     "GraSCCo-Colon_Fake_A"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_B"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_B"
+    ],
+    [
+     "PERSON",
+     "HAUPT-UND",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "ORGANIZATION",
+     "Cor: Herztöne",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "ORGANIZATION",
+     "Arteriosklerotischer Gefäßschaden",
+     "modell",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "PERSON",
+     "HAUPT-UND",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "Folfox",
+     "wiederholung",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "RGs",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "PERSON",
+     "Harnsre",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "ORGANIZATION",
+     "Med.TU",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "ORGANIZATION",
+     "RGs",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KENNNUMMER",
+     "Thrombo 220000",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KFZ",
+     "CK-MB 64",
+     "regel",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "ORGANIZATION",
+     "PZ INr",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KENNNUMMER",
+     "CA19-9: 2.7",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "PERSON",
+     "Parkinson",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Bulbusmotilität",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Endstrecken",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Vorbefund",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Konstitutioneller Zwerchfellhochstand",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Flackerlichstimulation",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "CT Thorax",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Rectum-Npl",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Bulbusmotilität",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "THROMBO",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Dulcolax",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelbolus",
+     "heuristik",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Oralwärts",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Konstitutioneller Zwerchfellhochstand",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelbolus",
+     "namensteil",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelbolus",
+     "heuristik",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Oralwärts",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "ORGANIZATION",
+     "Rückoperation",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "PERSON",
+     "SIRS",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "ORGANIZATION",
+     "Rectum-CA",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "PERSON",
+     "Lasegue und Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "DE_KFZ",
+     "und Fr 10",
+     "regel",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "ORGANIZATION",
+     "NZN Lentigines/Rücken und Handrücken",
+     "modell",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Tumofr",
+     "modell",
+     "GraSCCo-Ehrenberger"
+    ],
+    [
+     "ORGANIZATION",
+     "TE Oberarm",
+     "modell",
+     "GraSCCo-Ehrenberger"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "modell",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "namensteil",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "PERSON",
+     "T. Fieber",
+     "modell",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "ORGANIZATION",
+     "Adeno- und Tonsillotomie",
+     "modell",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "DE_KFZ",
+     "LWS in 2",
+     "regel",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fieber",
+     "namensteil",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Hartmann",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "ORGANIZATION",
+     "AP-Rückverlagerung",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "PERSON",
+     "Koloskopisch",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "PERSON",
+     "Meniskusrefixation",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Synovilias",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Meniskusrefixation",
+     "wiederholung",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "synovilias",
+     "namensteil",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "ORGANIZATION",
+     "Chrondromalziegrad Med. Fermur I-II",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Meniskusrefixation",
+     "modell",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "ORGANIZATION",
+     "Bei Bewegungsvershclechterung KG",
+     "regel",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "ORGANIZATION",
+     "Beruhigungstbl",
+     "modell",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "wiederholung",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "ORGANIZATION",
+     "CT-Quot",
+     "modell",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "modell",
+     "GraSCCo-Jenninger"
+    ],
+    [
+     "PERSON",
+     "Niesanfälle",
+     "modell",
+     "GraSCCo-Joubert"
+    ],
+    [
+     "PERSON",
+     "Lymphknotenmeta",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Athroskopische Refixation",
+     "modell",
+     "GraSCCo-Leitner"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Leitner"
+    ],
+    [
+     "PERSON",
+     "Infrarenales Bauchaortenaneurysma",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "PERSON",
+     "Opstipation",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Tramal-Einnahme",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "HbE",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Durogesic",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Tramal",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "ORGANIZATION",
+     "Zeit Mehr Öfter",
+     "modell",
+     "GraSCCo-Neubauer"
+    ],
+    [
+     "ORGANIZATION",
+     "Child C",
+     "modell",
+     "GraSCCo-Osler"
+    ],
+    [
+     "ORGANIZATION",
+     "BE Diabetesdiät",
+     "modell",
+     "GraSCCo-Osler"
+    ],
+    [
+     "ORGANIZATION",
+     "CMV-DNA-PCR",
+     "modell",
+     "GraSCCo-Osler"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopffraktur",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "ORGANIZATION",
+     "KS Nierenlager",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopf",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopfes",
+     "wiederholung",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopffraktur",
+     "wiederholung",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "ORGANIZATION",
+     "Beruhigungstbl",
+     "modell",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "wiederholung",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "ORGANIZATION",
+     "CT-Quot",
+     "modell",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "PERSON",
+     "Sinusrhythm",
+     "modell",
+     "GraSCCo-Queisser"
+    ],
+    [
+     "PERSON",
+     "Einund",
+     "modell",
+     "GraSCCo-Rieser"
+    ],
+    [
+     "PERSON",
+     "Nüchter",
+     "modell",
+     "GraSCCo-Rieser"
+    ],
+    [
+     "ORGANIZATION",
+     "Augen FA",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "NAHVISUS",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "NAHVISUS",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "Exo",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "Macula BA",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "PERSON",
+     "Romberg",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "PERSON",
+     "Zentrifugat",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "ORGANIZATION",
+     "Punktionsort LP",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "PERSON",
+     "B. Schreibmaschineschreiben",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Lehrstuhl für Informatik",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Tibialis-SEP",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Tibialis-SEP",
+     "wiederholung",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Kleines",
+     "namensteil",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Ltd",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Fotoprint",
+     "modell",
+     "GraSCCo-Tupolev_1"
+    ],
+    [
+     "ORGANIZATION",
+     "Inoperabilität",
+     "modell",
+     "GraSCCo-Tupolev_4"
+    ],
+    [
+     "PERSON",
+     "Folfirinox",
+     "modell",
+     "GraSCCo-Tupolev_4"
+    ],
+    [
+     "AKTENZEICHEN",
+     "140/80",
+     "regel",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "PERSON",
+     "Cor",
+     "modell",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "ORGANIZATION",
+     "Höhergr",
+     "modell",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "PERSON",
+     "Infekexazerbation",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Ditec",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Oxis",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Oxis",
+     "namensteil",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "PERSON",
+     "Klemmzeit",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Vorhof EK",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Angio-CCT",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Op-Indikation",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Normotone",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Pulsation",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "DE_KFZ",
+     "re ca 800",
+     "regel",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Unklassifiziert",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Krea-Clear",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Prot",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Digimerck",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Stationaärztin",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Dos/Das",
+     "modell",
+     "GraSCCo-Weil"
+    ],
+    [
+     "ORGANIZATION",
+     "MCL DD Innenmeniskusläsion",
+     "modell",
+     "GraSCCo-Weil"
+    ],
+    [
+     "PERSON",
+     "Mediastinalshift- Pleurapunktion",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Kontrastmittelenhancement",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Insuspekte",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Cavum",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Insuspekte Faxverkalkungen",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Dzt",
+     "modell",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "dzt",
+     "wiederholung",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis Anfallssemiologie",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritium",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "ORGANIZATION",
+     "RGs",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritium",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis",
+     "namensteil",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ]
+   ],
+   "sekunden": 895.0219886302948
+  },
+  "ler_dev": {
+   "gesamt": {
+    "hit": 119,
+    "total": 189,
+    "found": 254,
+    "fp": 134,
+    "namensteile": 0,
+    "seiten": 63,
+    "dokumente": 60,
+    "recall": 0.6296296296296297,
+    "precision": 0.47244094488188976,
+    "fehlalarme_je_seite": 2.126984126984127
+   },
+   "uebersehen": [
+    [
+     "PERSON",
+     "Volk",
+     "LER-0002"
+    ],
+    [
+     "PERSON",
+     "Winzenried",
+     "LER-0016"
+    ],
+    [
+     "ORGANIZATION",
+     "K AG",
+     "LER-0023"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0025"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0036"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0036"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0057"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0058"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0062"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H AG firmierte",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H.",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V GmbH firmierend",
+     "LER-0066"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0070"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0074"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Fischermeier",
+     "LER-0107"
+    ],
+    [
+     "ADRESSE",
+     "„P-Platzes “",
+     "LER-0120"
+    ],
+    [
+     "PERSON",
+     "Th. Gans",
+     "LER-0125"
+    ],
+    [
+     "PERSON",
+     "Sieberts",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0139"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0139"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "DE_KFZ",
+     "der EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "der EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "die EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "die EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "ihr am 8",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "AKTENZEICHEN",
+     "Nr. 5",
+     "modell",
+     "LER-0007"
+    ],
+    [
+     "DATUM",
+     "25. Oktober 2006",
+     "regel",
+     "LER-0013"
+    ],
+    [
+     "DATUM",
+     "3. Oktober 1952",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "DATUM",
+     "1. August 1967",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "DE_TAX_ID",
+     "- 104 - 03 211/11",
+     "modell",
+     "LER-0016"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "wiederholung",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "wiederholung",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "wiederholung",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "ORGANIZATION",
+     "Nds. MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "PERSON",
+     "MasterVO-Lehr",
+     "modell",
+     "LER-0020"
+    ],
+    [
+     "GRUNDBUCH",
+     "S. 100",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1950",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1974",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "4. Dezember 2006",
+     "regel",
+     "LER-0024"
+    ],
+    [
+     "DE_KFZ",
+     "und ab 1996",
+     "regel",
+     "LER-0030"
+    ],
+    [
+     "DATUM",
+     "1952",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "DATUM",
+     "1985",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "ORGANIZATION",
+     "Diakonischen Werkes der EKD",
+     "modell",
+     "LER-0038"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 1",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "AKTENZEICHEN",
+     "492/2011",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "DE_KFZ",
+     "und ab 1",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "modell",
+     "LER-0048"
+    ],
+    [
+     "PERSON",
+     "DVO.EKD",
+     "namensteil",
+     "LER-0048"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0048"
+    ],
+    [
+     "AKTENZEICHEN",
+     "02/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "DE_KFZ",
+     "er am 30",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "DATUM",
+     "1. März 1971",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "Folgenden BV",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0056"
+    ],
+    [
+     "PERSON",
+     "II. D",
+     "modell",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "Folgenden BV",
+     "modell",
+     "LER-0059"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0063"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0063"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0065"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Frau B",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Vorruhegeldempfänger",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Vorruhegeldempfänger",
+     "namensteil",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Vorruhegeldempfänger",
+     "namensteil",
+     "LER-0065"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0068"
+    ],
+    [
+     "DE_KFZ",
+     "zur BV 2005",
+     "regel",
+     "LER-0068"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2005.03",
+     "modell",
+     "LER-0068"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 75",
+     "regel",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "Vorruhestandes",
+     "wiederholung",
+     "LER-0070"
+    ],
+    [
+     "ORGANIZATION",
+     "Vorruhestandes",
+     "modell",
+     "LER-0070"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2005",
+     "regel",
+     "LER-0070"
+    ],
+    [
+     "DE_KFZ",
+     "ein um 0",
+     "regel",
+     "LER-0071"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0071"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0072"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0072"
+    ],
+    [
+     "DE_KFZ",
+     "Die BV 2003",
+     "regel",
+     "LER-0072"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "Die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DATUM",
+     "Februar 1959",
+     "modell",
+     "LER-0075"
+    ],
+    [
+     "AKTENZEICHEN",
+     "Nr. 1",
+     "modell",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Ziff",
+     "namensteil",
+     "LER-0078"
+    ],
+    [
+     "PERSON",
+     "H. Ziff",
+     "modell",
+     "LER-0078"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 1",
+     "regel",
+     "LER-0078"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "§ 269 Abs. 2 Satz 4 ZPO",
+     "modell",
+     "LER-0084"
+    ],
+    [
+     "DE_KFZ",
+     "des am 29",
+     "regel",
+     "LER-0090"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0090"
+    ],
+    [
+     "DE_KFZ",
+     "IV B 2",
+     "regel",
+     "LER-0090"
+    ],
+    [
+     "DE_KFZ",
+     "bis zu 39",
+     "regel",
+     "LER-0102"
+    ],
+    [
+     "DE_KFZ",
+     "den am 5",
+     "regel",
+     "LER-0107"
+    ],
+    [
+     "PERSON",
+     "Unständige",
+     "modell",
+     "LER-0107"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "wiederholung",
+     "LER-0130"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "wiederholung",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "modell",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "modell",
+     "LER-0130"
+    ],
+    [
+     "ORGANIZATION",
+     "EinführungsTV KTD",
+     "wiederholung",
+     "LER-0130"
+    ],
+    [
+     "DATUM",
+     "Mai 1967",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "DATUM",
+     "12. Dezember 1994",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "DE_KFZ",
+     "dem ab 1",
+     "regel",
+     "LER-0132"
+    ],
+    [
+     "DE_KFZ",
+     "der EG 10",
+     "regel",
+     "LER-0139"
+    ],
+    [
+     "ORGANIZATION",
+     "Anwendungs-TV Berlin",
+     "modell",
+     "LER-0139"
+    ],
+    [
+     "DE_KFZ",
+     "der am 01",
+     "regel",
+     "LER-0139"
+    ],
+    [
+     "ORGANIZATION",
+     "EntgFG",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "EntgFG",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "DB Konzerns",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "FGr",
+     "modell",
+     "LER-0144"
+    ],
+    [
+     "ORGANIZATION",
+     "FGr",
+     "modell",
+     "LER-0144"
+    ]
+   ],
+   "sekunden": 910.3976137638092
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 101,
+    "total": 104,
+    "found": 94,
+    "fp": 6,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9711538461538461,
+    "precision": 0.9361702127659575,
+    "fehlalarme_je_seite": 0.6
+   },
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "ADRESSE",
+     "König-Heinrich-Platz 1",
+     "regel",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "C\nMP 2",
+     "regel",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "C\nMP 3",
+     "regel",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ]
+   ],
+   "sekunden": 42.9738667011261
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 105,
+    "fp": 3,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9696969696969697,
+    "fehlalarme_je_seite": 0.5
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ],
+    [
+     "KONTONUMMER",
+     "18432.17",
+     "modell",
+     "Fall2_Erbrecht_Nachlassverzeichnis_Haverkamp.xlsx"
+    ],
+    [
+     "DE_KFZ",
+     "der A 40",
+     "regel",
+     "Fall4_Verkehrsrecht_Einspruch_Bussgeld_Engel.pdf"
+    ]
+   ],
+   "sekunden": 36.76331400871277
+  },
+  "korpus": {
+   "gesamt": {
+    "hit": 275,
+    "total": 275,
+    "found": 252,
+    "fp": 6,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 1.0,
+    "precision": 0.9759036144578314,
+    "fehlalarme_je_seite": 0.2727272727272727
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "ORGANIZATION",
+     "Kfz-Haftpflicht / Kasko",
+     "modell",
+     "B2_Schadenmeldung_Schneider.docx"
+    ],
+    [
+     "PERSON",
+     "BARMER",
+     "modell",
+     "B4_Rentenbescheid_Hoffmann.pdf"
+    ],
+    [
+     "PERSON",
+     "Calprotectin",
+     "modell",
+     "A1_Arztbrief_Fuchs.docx"
+    ],
+    [
+     "KENNNUMMER",
+     "1000000",
+     "modell",
+     "A3_AU_Bescheinigung_Engel.pdf"
+    ],
+    [
+     "ORGANIZATION",
+     "Child Behavior Checklist",
+     "modell",
+     "A4_Familiengutachten_Schneider.docx"
+    ],
+    [
+     "KENNNUMMER",
+     "1000000",
+     "modell",
+     "A3_AU_Bescheinigung_Engel_scan.pdf"
+    ]
+   ],
+   "sekunden": 139.87848043441772
+  }
+ },
+ "+gliner2 tief + zweit 0.3": {
+  "grascco_train": {
+   "gesamt": {
+    "hit": 344,
+    "total": 359,
+    "found": 393,
+    "fp": 67,
+    "namensteile": 5,
+    "seiten": 53,
+    "dokumente": 42,
+    "recall": 0.958217270194986,
+    "precision": 0.8273195876288659,
+    "fehlalarme_je_seite": 1.2641509433962264
+   },
+   "uebersehen": [
+    [
+     "DATUM",
+     "01.02.2028",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "DATUM",
+     "2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "DATUM",
+     "14/3/2023",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ADRESSE",
+     "Am Hasenstall",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Dhayana dos Santos Aveiro",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PLZ_ORT",
+     "91022",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fuss, Flora",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "ORGANIZATION",
+     "BVA",
+     "GraSCCo-Joubert"
+    ],
+    [
+     "KENNNUMMER",
+     "H25440/51",
+     "GraSCCo-Osler"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 7758433",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43(0)333 775-8447339",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "TELEFON",
+     "+43 333 7758-0",
+     "GraSCCo-Schuh"
+    ],
+    [
+     "PERSON",
+     "Vroni",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "ORGANIZATION",
+     "Alpen-Adria-Universität Kragenfurt",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Weil, Klementine",
+     "GraSCCo-Weil"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "KFZ",
+     "LV-F 5",
+     "regel",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Sono Pleura",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "ORGANIZATION",
+     "Anend",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "DE_KFZ",
+     "re ca 800",
+     "regel",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Pleura",
+     "namensteil",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Amanda_Alzheimer"
+    ],
+    [
+     "DE_KFZ",
+     "RA MD 4",
+     "regel",
+     "GraSCCo-Cajal"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_A"
+    ],
+    [
+     "ORGANIZATION",
+     "DEKURS",
+     "modell",
+     "GraSCCo-Colon_Fake_B"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_B"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_D"
+    ],
+    [
+     "PERSON",
+     "HAUPT-UND",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "Folfox",
+     "wiederholung",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "ORGANIZATION",
+     "FOLFOX",
+     "modell",
+     "GraSCCo-Colon_Fake_E"
+    ],
+    [
+     "KFZ",
+     "MX G2",
+     "regel",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KENNNUMMER",
+     "Thrombo 220000",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KFZ",
+     "CK-MB 64",
+     "regel",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "KENNNUMMER",
+     "CA19-9: 2.7",
+     "modell",
+     "GraSCCo-Colon_Fake_G"
+    ],
+    [
+     "PERSON",
+     "Parkinson",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "namensteil",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "THROMBO",
+     "modell",
+     "GraSCCo-Colon_Fake_H"
+    ],
+    [
+     "ORGANIZATION",
+     "Dulcolax",
+     "modell",
+     "GraSCCo-Colon_Fake_J"
+    ],
+    [
+     "PERSON",
+     "Lasegue und Babinski",
+     "modell",
+     "GraSCCo-Colon_Fake_K"
+    ],
+    [
+     "DE_KFZ",
+     "und Fr 10",
+     "regel",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "ORGANIZATION",
+     "NZN Lentigines/Rücken und Handrücken",
+     "modell",
+     "GraSCCo-Dupuytren"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "modell",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "PERSON",
+     "Taxilan",
+     "namensteil",
+     "GraSCCo-Fleischmann"
+    ],
+    [
+     "DE_KFZ",
+     "LWS in 2",
+     "regel",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Fieber",
+     "namensteil",
+     "GraSCCo-Fuss"
+    ],
+    [
+     "PERSON",
+     "Hartmann",
+     "modell",
+     "GraSCCo-Haefner"
+    ],
+    [
+     "ORGANIZATION",
+     "Bei Bewegungsvershclechterung KG",
+     "regel",
+     "GraSCCo-Ilgner"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "modell",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Ery",
+     "wiederholung",
+     "GraSCCo-Koenig"
+    ],
+    [
+     "PERSON",
+     "Clexane",
+     "modell",
+     "GraSCCo-Leitner"
+    ],
+    [
+     "ORGANIZATION",
+     "Tramal",
+     "modell",
+     "GraSCCo-Meyr"
+    ],
+    [
+     "PERSON",
+     "M. Parkinson",
+     "modell",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "PERSON",
+     "Humeruskopfes",
+     "wiederholung",
+     "GraSCCo-Popovic"
+    ],
+    [
+     "ORGANIZATION",
+     "NAHVISUS",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "ORGANIZATION",
+     "Macula BA",
+     "modell",
+     "GraSCCo-Schielaug"
+    ],
+    [
+     "PERSON",
+     "Romberg",
+     "modell",
+     "GraSCCo-Stölzl"
+    ],
+    [
+     "PERSON",
+     "Kleines",
+     "namensteil",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Ltd",
+     "modell",
+     "GraSCCo-Theodor"
+    ],
+    [
+     "PERSON",
+     "Folfirinox",
+     "modell",
+     "GraSCCo-Tupolev_4"
+    ],
+    [
+     "AKTENZEICHEN",
+     "140/80",
+     "regel",
+     "GraSCCo-Vogler"
+    ],
+    [
+     "PERSON",
+     "Ditec",
+     "modell",
+     "GraSCCo-Waldenström"
+    ],
+    [
+     "DE_KFZ",
+     "re ca 800",
+     "regel",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Digimerck",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Meronem",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "ORGANIZATION",
+     "Stationaärztin",
+     "modell",
+     "GraSCCo-Weber"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Pleurapunktion",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Insuspekte",
+     "namensteil",
+     "GraSCCo-Ypsilanti"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis Anfallssemiologie",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Babinski",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Rasmussen-Enzephalitis",
+     "namensteil",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Panaritiums",
+     "wiederholung",
+     "GraSCCo-Zezelj"
+    ],
+    [
+     "PERSON",
+     "Emmert",
+     "modell",
+     "GraSCCo-Zezelj"
+    ]
+   ],
+   "sekunden": 895.0219886302948
+  },
+  "ler_dev": {
+   "gesamt": {
+    "hit": 117,
+    "total": 189,
+    "found": 217,
+    "fp": 99,
+    "namensteile": 0,
+    "seiten": 63,
+    "dokumente": 60,
+    "recall": 0.6190476190476191,
+    "precision": 0.543778801843318,
+    "fehlalarme_je_seite": 1.5714285714285714
+   },
+   "uebersehen": [
+    [
+     "PERSON",
+     "Volk",
+     "LER-0002"
+    ],
+    [
+     "PERSON",
+     "Winzenried",
+     "LER-0016"
+    ],
+    [
+     "ORGANIZATION",
+     "K AG",
+     "LER-0023"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0024"
+    ],
+    [
+     "ORGANIZATION",
+     "I AG",
+     "LER-0025"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0036"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0036"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0056"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0057"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0058"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0059"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0060"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0061"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0062"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0063"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H AG firmierte",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "H.",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V H Aktiengesellschaft",
+     "LER-0064"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0065"
+    ],
+    [
+     "ORGANIZATION",
+     "V GmbH firmierend",
+     "LER-0066"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0068"
+    ],
+    [
+     "ORGANIZATION",
+     "V AG",
+     "LER-0070"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H",
+     "LER-0071"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG",
+     "LER-0073"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG neu",
+     "LER-0074"
+    ],
+    [
+     "ORGANIZATION",
+     "H AG alt",
+     "LER-0074"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Fieback",
+     "LER-0084"
+    ],
+    [
+     "PERSON",
+     "Fischermeier",
+     "LER-0107"
+    ],
+    [
+     "PERSON",
+     "Fieback",
+     "LER-0113"
+    ],
+    [
+     "ADRESSE",
+     "„P-Platzes “",
+     "LER-0120"
+    ],
+    [
+     "PERSON",
+     "Th. Gans",
+     "LER-0125"
+    ],
+    [
+     "PERSON",
+     "Sieberts",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0131"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0133"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "ORGANIZATION",
+     "S AG",
+     "LER-0137"
+    ],
+    [
+     "PERSON",
+     "Zwanziger",
+     "LER-0139"
+    ],
+    [
+     "PERSON",
+     "Spinner",
+     "LER-0139"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "DE_KFZ",
+     "der EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "der EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "die EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "die EG 13",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "DE_KFZ",
+     "ihr am 8",
+     "regel",
+     "LER-0002"
+    ],
+    [
+     "AKTENZEICHEN",
+     "Nr. 5",
+     "modell",
+     "LER-0007"
+    ],
+    [
+     "DATUM",
+     "25. Oktober 2006",
+     "regel",
+     "LER-0013"
+    ],
+    [
+     "DATUM",
+     "3. Oktober 1952",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "DATUM",
+     "1. August 1967",
+     "modell",
+     "LER-0013"
+    ],
+    [
+     "DE_TAX_ID",
+     "- 104 - 03 211/11",
+     "modell",
+     "LER-0016"
+    ],
+    [
+     "GRUNDBUCH",
+     "S. 100",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1950",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "1974",
+     "modell",
+     "LER-0023"
+    ],
+    [
+     "DATUM",
+     "4. Dezember 2006",
+     "regel",
+     "LER-0024"
+    ],
+    [
+     "DE_KFZ",
+     "und ab 1996",
+     "regel",
+     "LER-0030"
+    ],
+    [
+     "DATUM",
+     "1952",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "DATUM",
+     "1985",
+     "modell",
+     "LER-0037"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 1",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "AKTENZEICHEN",
+     "492/2011",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "DE_KFZ",
+     "und ab 1",
+     "regel",
+     "LER-0039"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0048"
+    ],
+    [
+     "AKTENZEICHEN",
+     "02/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "wiederholung",
+     "LER-0049"
+    ],
+    [
+     "AKTENZEICHEN",
+     "01/2014",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "DE_KFZ",
+     "er am 30",
+     "regel",
+     "LER-0049"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "DATUM",
+     "1. März 1971",
+     "modell",
+     "LER-0056"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0056"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0063"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0063"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0065"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0065"
+    ],
+    [
+     "PERSON",
+     "Frau B",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2005.03",
+     "modell",
+     "LER-0065"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0068"
+    ],
+    [
+     "DE_KFZ",
+     "zur BV 2005",
+     "regel",
+     "LER-0068"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2005.03",
+     "modell",
+     "LER-0068"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 75",
+     "regel",
+     "LER-0068"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2005",
+     "regel",
+     "LER-0070"
+    ],
+    [
+     "DE_KFZ",
+     "ein um 0",
+     "regel",
+     "LER-0071"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0071"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0072"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0072"
+    ],
+    [
+     "DE_KFZ",
+     "Die BV 2003",
+     "regel",
+     "LER-0072"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "KENNNUMMER",
+     "BV 2003.13",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2003",
+     "regel",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DATUM",
+     "Juli 1950",
+     "modell",
+     "LER-0073"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "BV 2003.13",
+     "wiederholung",
+     "LER-0073"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "Die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DE_KFZ",
+     "die BV 2005",
+     "regel",
+     "LER-0074"
+    ],
+    [
+     "DATUM",
+     "Februar 1959",
+     "modell",
+     "LER-0075"
+    ],
+    [
+     "AKTENZEICHEN",
+     "Nr. 1",
+     "modell",
+     "LER-0075"
+    ],
+    [
+     "PERSON",
+     "Ziff",
+     "namensteil",
+     "LER-0078"
+    ],
+    [
+     "PERSON",
+     "H. Ziff",
+     "modell",
+     "LER-0078"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 1",
+     "regel",
+     "LER-0078"
+    ],
+    [
+     "DE_SOCIAL_SECURITY",
+     "§ 269 Abs. 2 Satz 4 ZPO",
+     "modell",
+     "LER-0084"
+    ],
+    [
+     "DE_KFZ",
+     "des am 29",
+     "regel",
+     "LER-0090"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0090"
+    ],
+    [
+     "DE_KFZ",
+     "IV B 2",
+     "regel",
+     "LER-0090"
+    ],
+    [
+     "DE_KFZ",
+     "bis zu 39",
+     "regel",
+     "LER-0102"
+    ],
+    [
+     "DE_KFZ",
+     "den am 5",
+     "regel",
+     "LER-0107"
+    ],
+    [
+     "DE_KFZ",
+     "der am 1",
+     "regel",
+     "LER-0130"
+    ],
+    [
+     "DATUM",
+     "Mai 1967",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "DATUM",
+     "12. Dezember 1994",
+     "modell",
+     "LER-0131"
+    ],
+    [
+     "DE_KFZ",
+     "dem ab 1",
+     "regel",
+     "LER-0132"
+    ],
+    [
+     "DE_KFZ",
+     "der EG 10",
+     "regel",
+     "LER-0139"
+    ],
+    [
+     "DE_KFZ",
+     "der am 01",
+     "regel",
+     "LER-0139"
+    ],
+    [
+     "ORGANIZATION",
+     "DB Konzerns",
+     "modell",
+     "LER-0144"
+    ]
+   ],
+   "sekunden": 910.3976137638092
+  },
+  "pruefung": {
+   "gesamt": {
+    "hit": 101,
+    "total": 104,
+    "found": 94,
+    "fp": 6,
+    "namensteile": 0,
+    "seiten": 10,
+    "dokumente": 10,
+    "recall": 0.9711538461538461,
+    "precision": 0.9361702127659575,
+    "fehlalarme_je_seite": 0.6
+   },
+   "uebersehen": [
+    [
+     "EMAIL_ADDRESS",
+     "schaden.leistung@provinzial-test.example",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "DATUM",
+     "14.03.2016",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ],
+    [
+     "DATUM",
+     "30.07.2019",
+     "F2_PKH_Erklaerung_Kurz.docx"
+    ]
+   ],
+   "fehlalarme": [
+    [
+     "ADRESSE",
+     "König-Heinrich-Platz 1",
+     "regel",
+     "P1_Berufung_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "hat am 14",
+     "regel",
+     "P2_EMail_Versicherung_Oberhaus.txt"
+    ],
+    [
+     "PERSON",
+     "Kellgren-Lawrence Grad",
+     "modell",
+     "M1_Befundbericht_Wittbrodt.pdf"
+    ],
+    [
+     "PERSON",
+     "Amtsgericht Duisburg",
+     "feld",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "C\nMP 2",
+     "regel",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ],
+    [
+     "DE_KFZ",
+     "C\nMP 3",
+     "regel",
+     "M2_Feuchtegutachten_Nowak.docx"
+    ]
+   ],
+   "sekunden": 42.9738667011261
+  },
+  "kanzlei": {
+   "gesamt": {
+    "hit": 107,
+    "total": 107,
+    "found": 105,
+    "fp": 3,
+    "namensteile": 6,
+    "seiten": 6,
+    "dokumente": 6,
+    "recall": 1.0,
+    "precision": 0.9696969696969697,
+    "fehlalarme_je_seite": 0.5
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "GRUNDBUCH",
+     "Flurstück 218",
+     "regel",
+     "Fall1_Erbrecht_Testamentsanfechtung_Brinkhoff.docx"
+    ],
+    [
+     "KONTONUMMER",
+     "18432.17",
+     "modell",
+     "Fall2_Erbrecht_Nachlassverzeichnis_Haverkamp.xlsx"
+    ],
+    [
+     "DE_KFZ",
+     "der A 40",
+     "regel",
+     "Fall4_Verkehrsrecht_Einspruch_Bussgeld_Engel.pdf"
+    ]
+   ],
+   "sekunden": 36.76331400871277
+  },
+  "korpus": {
+   "gesamt": {
+    "hit": 275,
+    "total": 275,
+    "found": 250,
+    "fp": 4,
+    "namensteile": 3,
+    "seiten": 22,
+    "dokumente": 22,
+    "recall": 1.0,
+    "precision": 0.9838056680161943,
+    "fehlalarme_je_seite": 0.18181818181818182
+   },
+   "uebersehen": [],
+   "fehlalarme": [
+    [
+     "ORGANIZATION",
+     "Kfz-Haftpflicht / Kasko",
+     "modell",
+     "B2_Schadenmeldung_Schneider.docx"
+    ],
+    [
+     "PERSON",
+     "BARMER",
+     "modell",
+     "B4_Rentenbescheid_Hoffmann.pdf"
+    ],
+    [
+     "KENNNUMMER",
+     "1000000",
+     "modell",
+     "A3_AU_Bescheinigung_Engel.pdf"
+    ],
+    [
+     "KENNNUMMER",
+     "1000000",
+     "modell",
+     "A3_AU_Bescheinigung_Engel_scan.pdf"
+    ]
+   ],
+   "sekunden": 139.87848043441772
+  }
+ }
+}
