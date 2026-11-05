@@ -1,6 +1,6 @@
 # Lokanon – Hinweise zum Pilottest
 
-Stand: 31.10.2026 · Pilotversion 0.2.0
+Stand: 05.11.2026 · Pilotversion 0.3.0
 
 Vielen Dank, dass Sie Lokanon ausprobieren. Dieses Blatt sagt in drei Minuten, was das Programm kann, was es nicht
 kann, und was wir von Ihnen zurückbrauchen.
@@ -29,7 +29,7 @@ Internet braucht Lokanon nur bei der Installation. Danach verlässt nichts den P
 
 ## Installation
 
-1. `Lokanon-Setup-0.2.0.exe` doppelklicken. Windows zeigt eine SmartScreen-Warnung, weil die Pilotversion noch nicht
+1. `Lokanon-Setup-0.3.0.exe` doppelklicken. Windows zeigt eine SmartScreen-Warnung, weil die Pilotversion noch nicht
    signiert ist: „Weitere Informationen“ → „Trotzdem ausführen“.
 2. Die Installation braucht etwa 2,8 GB, keine Administratorrechte und kein Internet. Sie gilt nur für Ihr
    Windows-Benutzerkonto.

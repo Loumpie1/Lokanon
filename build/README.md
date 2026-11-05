@@ -66,3 +66,10 @@ uvicorn / webview importierbar). Bundle 2,77 GB (GLiNER 1,1 GB, spaCy-Modell 0,6
 Installer `Lokanon-Setup-0.1.0.exe` 1,43 GB. Bekannte Abweichungen: pip lädt das spaCy-Wheel von GitHub-Releases als
 leere Datei, daher lädt `build.py` es selbst herunter; Streamlit ist nicht im Bundle; der Installer ist unsigniert.
 Nach Fertigstellung der Oberfläche den Build wiederholen: `python build\build.py --installer`.
+
+## Stand 05.11.2026
+
+Lokanon 0.3.0: `--nur-schritt projekt --installer` (keine neuen Pakete), Rauchtest einzeln nachgeholt
+(`smoke_test.py`, der Projekt-Schritt führt ihn nicht aus). Installer 1,47 GB, sha256 `fd7dbbc3…`. Still über 0.2.0
+installiert und über die API mit leerem `LOKANON_HOME` abgenommen: Analyse, Bezeichnung, Markieren und Rückgängig, PDF,
+Leck-Test, eigene Testfälle, Protokoll ohne Klartext, Rückübersetzung; nur Loopback-Verbindungen.

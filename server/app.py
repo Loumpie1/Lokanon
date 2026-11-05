@@ -22,7 +22,7 @@ from server.dienst import GRUPPEN_ANZEIGE, Modelle, Sitzung
 APP_DIR = Path(__file__).resolve().parents[1]
 UI_DIR = APP_DIR / "ui"
 VERSION = next((p.read_text(encoding="utf-8").strip() for p in (APP_DIR / "VERSION", APP_DIR / "build" / "VERSION")
-                if p.exists()), "0.2.0-dev")
+                if p.exists()), "0.3.0-dev")
 
 app = FastAPI(title="Lokanon", docs_url=None, redoc_url=None, openapi_url=None)
 _cfg = est.laden()

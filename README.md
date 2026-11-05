@@ -2,7 +2,7 @@
 
 Erkennt und ersetzt personenbezogene und vertrauliche Daten **lokal**, bevor Dateien an eine KI (ChatGPT, Claude, Gemini)
 gehen. Kein Cloud-Dienst, keine API: Presidio + spaCy + GLiNER + RapidOCR + eigene Regeln, eigene Oberfläche im
-Programmfenster (FastAPI + pywebview). Version 0.2.0 (Pilot).
+Programmfenster (FastAPI + pywebview). Version 0.3.0 (Pilot).
 
 **Für Endanwender:** fertiger Installer und Pilot-Paket unter
 [Releases](https://github.com/Loumpie1/Lokanon/releases) (Installer ca. 1,4 GB, enthält alle Sprachmodelle). Anleitung in

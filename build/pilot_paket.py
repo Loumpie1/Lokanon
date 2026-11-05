@@ -1,6 +1,6 @@
 """Pilot-Paket zusammenstellen.
 
-    python build\\pilot_paket.py [--version 0.2.0] [--installer <Pfad zur Setup.exe>]
+    python build\\pilot_paket.py [--version 0.3.0] [--installer <Pfad zur Setup.exe>]
                                  [--ziel %USERPROFILE%\\Lokanon\\Pilot] [--work %USERPROFILE%\\Lokanon\\build]
 
 Legt unter <ziel> die Ordner 1-6 plus LIESMICH.txt an und packt alles außer dem Installer nach
@@ -246,7 +246,8 @@ def paket(version: str, installer: Path | None, ziel: Path, work: Path) -> Path:
     # 3 Pilot-Unterlagen
     d3 = ziel / "3 Pilot-Unterlagen"
     _leeren(d3)
-    for quelle, name in (("Pilot-Hinweis.md", "Pilot-Hinweis"), ("Rueckmeldebogen.md", "Rückmeldebogen")):
+    for quelle, name in (("Pilot-Hinweis.md", "Pilot-Hinweis"), ("Rueckmeldebogen.md", "Rückmeldebogen"),
+                         ("Neu-in-0.3.0.md", "Neu in 0.3.0")):
         md = (ROOT / "docs" / "pilot" / quelle).read_text(encoding="utf-8")
         (d3 / f"{name}.md").write_text(md, encoding="utf-8")
         md_nach_docx(md, d3 / f"{name}.docx", name)

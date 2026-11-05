@@ -1,6 +1,6 @@
 # Lokanon – Rückmeldebogen Pilottest
 
-Kanzlei / Praxis: ________________________   Datum: ____________   Lokanon-Version: 0.2.0 (Pilot)
+Kanzlei / Praxis: ________________________   Datum: ____________   Lokanon-Version: 0.3.0 (Pilot)
 
 Bitte keine echten Mandanten- oder Patientendaten eintragen. Beispiele gern abstrahiert („ein Nachname“, „eine Handynummer“).
 
