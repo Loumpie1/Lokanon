@@ -23,6 +23,7 @@ from anonymizer.vault import decrypt_mapping, encrypt_mapping
 from anonymizer.vorgang import (LESBARE_TYPEN, Vorgang, dateien_im_ordner, mapping_aus_schluessel, markiert_html,
                                 pruefbericht_html, sicherer_name)
 from server import einstellungen as est
+from server.protokoll import Protokoll
 
 APP_DIR = Path(__file__).resolve().parents[1]
 ANWEISUNG_PATH = APP_DIR / "ki-anweisung" / "projekt-anweisung.md"
@@ -123,6 +124,7 @@ class Sitzung:
         self.cfg_laden = cfg_laden
         self.cfg_speichern = cfg_speichern
         self.modelle = modelle
+        self.protokoll = Protokoll(est.daten_ordner)
         self.leeren()
 
     def leeren(self) -> dict:
@@ -206,6 +208,9 @@ class Sitzung:
             self.fortschritt.prozent = prozent
 
     def _analyse_lauf(self) -> None:
+        prot = self.protokoll
+        prot.neuer_lauf("Analyse", [d.name for d in self.docs], self.ordner)
+        prot.geheimnisse([(m, "<nachgetragen>") for m in self.manual])
         try:
             cfg = self.cfg_laden()
             self.modelle.warten()
@@ -213,31 +218,53 @@ class Sitzung:
             n = len(self.docs)
             for i, d in enumerate(self.docs):
                 self._melde("Lese", d.name, int(5 + 45 * i / n))
+                t0 = time.time()
                 if d.data is None and d.pfad:
                     d.data = Path(d.pfad).read_bytes()
                 if d.name.lower().endswith(".txt") and d.text:
                     d.info = {}
                 else:
                     d.text, d.info = fio.read_document(d.name, d.data or b"")
+                prot.notiere("info", f"{d.name}: gelesen, {len(d.data or b'') // 1024} KB, "
+                                     f"{d.info.get('seiten', 0)} Seiten, {d.info.get('ocr_seiten', 0)} per Texterkennung, "
+                                     f"{len(d.text)} Zeichen, {time.time() - t0:.1f} s")
+                if not d.text.strip():
+                    prot.notiere("warnung", f"{d.name}: kein Text gelesen")
             for i, d in enumerate(self.docs):
                 self._melde("Erkenne Personendaten", d.name, int(50 + 45 * i / n))
+                t0 = time.time()
                 d.findings = detect(analyzer, d.text, cfg["entities"], float(cfg.get("threshold", 0.4)),
                                     est.erlaubt_liste(cfg), est.ersetzen_liste(cfg), self.manual,
                                     cfg.get("propagate_repeats", True), cfg.get("include_name_parts", True),
                                     cfg.get("mask_locations", False), cfg.get("keep_institutions", True),
                                     cfg.get("datum_modus", "kontext"))
+                prot.notiere("info", f"{d.name}: {len(d.findings)} Treffer ({_zaehle(d.findings)}), "
+                                     f"{time.time() - t0:.1f} s")
             self._melde("Gleiche Namen über alle Dateien ab", "", 96)
             neu = propagate_vorgang([d.text for d in self.docs], [d.findings for d in self.docs],
                                     est.erlaubt_liste(cfg), cfg.get("include_name_parts", True))
             for d, fs in zip(self.docs, neu):
                 d.findings = fs
             self._pseudonymisieren()
+            self._protokoll_geheimnisse()
+            prot.notiere("info", f"Analyse fertig: {len(self.mapping)} Identitäten")
             self._melde("Fertig", "", 100)
             self.fortschritt.fertig = True
         except Exception as e:
-            self.fortschritt.fehler = f"{e}"
+            wo = f"{self.fortschritt.schritt} „{self.fortschritt.datei}“" if self.fortschritt.datei else self.fortschritt.schritt
+            self._protokoll_geheimnisse()
+            prot.ausnahme(f"Analyse, Schritt {wo}", e)
+            self.fortschritt.fehler = f"Beim Schritt „{wo}“: {e}"
         finally:
             self.fortschritt.laeuft = False
+
+    def _protokoll_geheimnisse(self) -> None:
+        """Alle erkannten Originale (auch abgewählte) für das Protokoll durch ihren Platzhalter ersetzen."""
+        paare = [(orig, f"[{ph}]") for ph, orig in self.mapping.items()]
+        for d in self.docs:
+            paare += [(f.text, f"[{d.schluessel.get(i) or LABELS.get(f.entity, f.entity)}]")
+                      for i, f in enumerate(d.findings)]
+        self.protokoll.geheimnisse(paare)
 
     def _pseudonymisieren(self) -> None:
         """Zwei Durchgänge: erst alle Treffer (stabile Nummern und Zuordnung), dann nur die aktiven."""
@@ -391,7 +418,9 @@ class Sitzung:
                          "seiten": d.info.get("seiten", 0), "ocr": d.info.get("ocr_seiten", 0)} for d in self.docs],
             "fortschritt": self.fortschritt.__dict__,
             "identitaeten": self.identitaeten() if self.fortschritt.fertig else [],
-            "dokumente": [{"name": d.name, "markiert_html": markiert_html(d.text, d.findings, d.platzhalter),
+            "dokumente": [{"name": d.name, "markiert_html": markiert_html(
+                               d.text, d.findings, d.platzhalter,
+                               {(f.start, f.end): d.schluessel.get(i, "") for i, f in enumerate(d.findings)}),
                            "anonym": d.anonym, "ersetzt": sum(1 for f in d.findings if f.active)}
                           for d in self.docs] if self.fortschritt.fertig else [],
             "ergebnis": self.ergebnis,
@@ -400,6 +429,18 @@ class Sitzung:
         }
 
     # ------------------------------------------------------------------ Anonymisieren
+    def zurueck_zum_pruefen(self) -> dict:
+        """Vom Ergebnis zurück in die Prüfung: Erkennung und Entscheidungen bleiben, das Ergebnis wird verworfen.
+        Beim nächsten Anonymisieren werden die Kopien neu geschrieben."""
+        if self.fortschritt.laeuft:
+            raise ValueError("Bitte warten, bis Lokanon fertig ist.")
+        if not self.docs or not any(d.findings or d.text for d in self.docs):
+            raise ValueError("Es gibt keine Prüfung, zu der Lokanon zurückkehren kann.")
+        self.ergebnis = None
+        self.fortschritt = Fortschritt(fertig=True, schritt="Fertig", prozent=100)
+        self.protokoll.notiere("info", "Zurück zum Prüfen")
+        return self.zustand()
+
     def anonymisieren(self) -> None:
         if not self.fortschritt.fertig or self.fortschritt.laeuft:
             raise ValueError("Bitte zuerst die Analyse abschließen.")
@@ -412,6 +453,9 @@ class Sitzung:
         return ausgabe_ordner(cfg)
 
     def _anonymisieren_lauf(self) -> None:
+        prot = self.protokoll
+        prot.neuer_lauf("Anonymisieren", [d.name for d in self.docs], self.ordner, neu=False)
+        self._protokoll_geheimnisse()
         try:
             cfg = self.cfg_laden()
             suffix = cfg.get("suffix") or "_anonymisiert"
@@ -431,26 +475,42 @@ class Sitzung:
                     neu, k = f"{stamm} ({k}){endung}", k + 1
                 vergeben.add(neu.lower())
                 eintrag = {"name": d.name, "ausgabe": neu, "pfad": str(ziel / neu), "status": "ok", "hinweis": "",
-                           "ersetzt": sum(1 for f in d.findings if f.active)}
+                           "ersetzt": sum(1 for f in d.findings if f.active), "funde": [], "rat": ""}
+                rest = aus.leck_test(d.anonym, [f.text for f in d.findings if f.active])
                 try:
+                    if rest:  # schon der Text ist nicht sauber: keine Kopie schreiben
+                        raise fio.PdfLeck([(r, "im anonymisierten Text") for r in rest])
                     inhalt = aus.erzeuge(d.name, d.data, d.anonym, pairs)
                     (ziel / neu).write_bytes(inhalt)
                     if vorgang is not None:
                         vorgang.schreibe(d.name, inhalt, neu.rsplit(".", 1)[-1], Path(neu).stem)
+                    prot.notiere("info", f"{d.name}: Kopie geschrieben, {eintrag['ersetzt']} Stellen ersetzt")
+                except fio.PdfLeck as e:
+                    eintrag["status"] = "fehler"
+                    eintrag["funde"] = [{"text": o, "ort": ort} for o, ort in e.funde]
+                    eintrag["hinweis"] = "Nicht erzeugt: Die Gegenprüfung fand danach noch Originaltext."
+                    eintrag["rat"] = _rat(e.funde)
+                    for o, ort in e.funde:
+                        prot.notiere("fehler", f"{d.name}: Gegenprüfung fand {o} {ort}")
+                    hinweise.append(f"{d.name}: Gegenprüfung fand noch Originaltext")
                 except Exception as e:
                     eintrag["status"] = "fehler"
-                    eintrag["hinweis"] = (f"Datei nicht erzeugt: {e}" if "noch" not in str(e) else
-                                          "Nicht erzeugt: Die Gegenprüfung fand noch Originaltext. "
-                                          "Bitte die Textfassung verwenden oder die Stelle nachtragen.")
+                    eintrag["hinweis"] = f"Datei nicht erzeugt: {e}"
+                    eintrag["rat"] = ("Bitte das Protokoll unter „Details“ ansehen. Die Textfassung ist trotzdem "
+                                      "nutzbar, sofern sie erzeugt wurde.")
+                    prot.ausnahme(f"Kopie von {d.name}", e)
                     hinweise.append(f"{d.name}: {e}")
-                rest = aus.leck_test(d.anonym, [f.text for f in d.findings if f.active])
-                if rest and eintrag["status"] == "ok":
-                    eintrag["status"] = "fehler"
-                    eintrag["hinweis"] = "Noch lesbar: " + ", ".join(rest) + ". Bitte Begriff nachtragen."
-                if cfg.get("ki_textfassung") and d.name.lower().rsplit(".", 1)[-1] in ("pdf", "docx", "xlsx", "csv"):
+                ext = d.name.lower().rsplit(".", 1)[-1]
+                # Textfassung: auf Wunsch immer, und als Ersatz, wenn die Kopie im Originalformat scheitert
+                # (der Text hat den Leck-Test bestanden).
+                if ext in ("pdf", "docx", "xlsx", "csv") and not rest and (
+                        cfg.get("ki_textfassung") or eintrag["status"] == "fehler"):
                     md = Path(neu).stem + ".md"
                     (ziel / md).write_text(d.anonym, encoding="utf-8")
                     eintrag["textfassung"] = md
+                    if eintrag["status"] == "fehler":
+                        eintrag["ersatz"] = True
+                        prot.notiere("info", f"{d.name}: Textfassung als Ersatz geschrieben")
                 if vorgang is not None:
                     vorgang.notiere_treffer(d.name, d.findings, len(d.text), True)
                 dateien.append(eintrag)
@@ -469,8 +529,11 @@ class Sitzung:
                              "schluessel_pfad": schluessel_pfad, "vorgang": vorgang.basis if vorgang else "",
                              "zeit": datetime.now().isoformat(timespec="seconds")}
             self.schluessel_pfad = schluessel_pfad
+            ok = sum(1 for e in dateien if e["status"] == "ok")
+            prot.notiere("info" if ok == len(dateien) else "warnung", f"Anonymisieren fertig: {ok} von {len(dateien)} Kopien")
             self._melde("Fertig", "", 100)
         except Exception as e:
+            prot.ausnahme("Anonymisieren", e)
             self.fortschritt.fehler = f"{e}"
         finally:
             self.fortschritt.laeuft = False
@@ -550,6 +613,28 @@ class Sitzung:
 
 
 _ANREDEN = {"herr", "herrn", "frau", "prof", "dr", "dres", "von", "van", "der", "den"}
+
+
+def _zaehle(findings: list[Finding]) -> str:
+    n: dict[str, int] = {}
+    for f in findings:
+        k = f"{LABELS.get(f.entity, f.entity)}/{f.quelle}"
+        n[k] = n.get(k, 0) + 1
+    return ", ".join(f"{k} {v}" for k, v in sorted(n.items())) or "keine"
+
+
+def _rat(funde: list[tuple[str, str]]) -> str:
+    """Was die Nutzerin tun kann, je nach Fundort der Gegenprüfung."""
+    orte = " ".join(o for _, o in funde)
+    if "sichtbaren Text" in orte or "anonymisierten Text" in orte:
+        return ("Die Stelle steht noch sichtbar da, meist in einer anderen Schreibweise (getrennt, in Großbuchstaben, "
+                "mit Bindestrich). „Zurück zum Prüfen“, den Begriff genau so nachtragen und erneut anonymisieren.")
+    if "gescannten Seite" in orte:
+        return ("Die Texterkennung liest die Stelle nach dem Schwärzen noch. „Zurück zum Prüfen“ und die Schreibweise "
+                "nachtragen, oder die Textfassung verwenden.")
+    return ("Der Text steckt in einem unsichtbaren Teil der PDF, den Lokanon nicht bereinigen konnte. Die Textfassung "
+            "(.md) ist sauber und liegt im Ausgabeordner. Wer eine PDF braucht: Original über „Drucken → Microsoft "
+            "Print to PDF“ neu erzeugen und diese Datei ablegen.")
 
 
 def _ist_ausgabe(p: Path, suffix: str) -> bool:

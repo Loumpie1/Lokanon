@@ -37,7 +37,8 @@ async def _value_error(_: Request, exc: ValueError):
 
 
 @app.exception_handler(Exception)
-async def _any_error(_: Request, exc: Exception):
+async def _any_error(req: Request, exc: Exception):
+    sitzung.protokoll.ausnahme(f"Anfrage {req.url.path}", exc)
     return JSONResponse({"fehler": f"Unerwarteter Fehler: {type(exc).__name__}: {exc}"}, status_code=500)
 
 
@@ -189,6 +190,17 @@ def nachtragen(body: BegriffeBody):
 def anonymisieren():
     sitzung.anonymisieren()
     return sitzung.fortschritt.__dict__
+
+
+@app.post("/api/zurueck-zum-pruefen")
+def zurueck_zum_pruefen():
+    return sitzung.zurueck_zum_pruefen()
+
+
+@app.get("/api/protokoll")
+def protokoll():
+    """Einträge des letzten Durchlaufs (ohne Klartext) und der Ordner mit den Protokolldateien."""
+    return {"eintraege": sitzung.protokoll.eintraege, "ordner": str(sitzung.protokoll.ordner)}
 
 
 # ---------------------------------------------------------------- Erweitert: Rückübersetzung, KI-Anweisung

@@ -41,11 +41,19 @@ Hidden-Text-Flächen abschneiden kann. Dieser Durchlauf entfernt nur Text, keine
 Bildpixel: Bei einem durchsuchbaren Scan (Bild + unsichtbare Scanner-OCR) wäre sonst das
 ganze Schriftbild weiß. Solche Seiten gelten als Scan (ocr.ist_scan) und werden per eigener
 OCR gelesen und geschwärzt. Nicht abgedeckt: Text, der nur als Grafikpfade vorliegt.
+
+Strukturbaum und Ersatztexte: Tagged PDFs (Word, InDesign) tragen Texte außerhalb der Seite – Alternativtexte von
+Bildern (/Alt, z. B. der Dateiname eines Firmenlogos), /ActualText (oft das ganze Wort bei Silbentrennung), Titel
+(/T) und Expansionen (/E), dazu Seitenbeschriftungen (/PageLabels). Der Strukturbaum wird deshalb ganz entfernt (StructTreeRoot, MarkInfo, StructParents);
+die Kopie ist danach nicht mehr barrierefrei getaggt. /Alt, /ActualText und /E in übrigen Objekten und in den
+Markierungen der Seiteninhalte (BDC) werden geleert, Ebenen (OCG) heißen danach „Ebene 1“ usw. verify_pdf prüft
+Hex-Zeichenketten in Objekten (UTF-16 mit BOM) entschlüsselt mit.
 """
 from __future__ import annotations
 
 import csv
 import io
+import re
 from datetime import datetime
 
 # Trennzeichen zwischen Tabellenzellen bzw. Spalten im Erkennungstext. Treffer laufen nie darüber hinweg (engine.detect
@@ -733,6 +741,40 @@ def _pdf_ensure_font(page) -> None:
     doc.xref_set_key(cur, "/".join(prefix + ["helv"]), f"{xref} 0 R")
 
 
+_ERSATZTEXT_RX = re.compile(rb"(/(?:ActualText|Alt|E)\s*)(\((?:\\.|[^\\()]|\((?:\\.|[^\\()])*\))*\)|<[0-9A-Fa-f\s]*>)")
+
+
+def _pdf_strukturtexte_entfernen(doc) -> None:
+    """Strukturbaum entfernen und Ersatztexte (/Alt, /ActualText, /E) leeren (siehe Modulbeschreibung)."""
+    kat = doc.pdf_catalog()
+    for key in ("StructTreeRoot", "MarkInfo", "PageLabels"):
+        doc.xref_set_key(kat, key, "null")
+    # Ebenen (Optional Content) tragen sprechende Namen wie „Logo Firma X“: neutral umbenennen
+    for k, x in enumerate(sorted(doc.get_ocgs() or {}), 1):
+        doc.xref_set_key(x, "Name", f"(Ebene {k})")
+    for page in doc:
+        doc.xref_set_key(page.xref, "StructParents", "null")
+    for x in range(1, doc.xref_length()):
+        try:
+            keys = doc.xref_get_keys(x)
+        except Exception:
+            continue
+        for key in ("Alt", "ActualText", "E"):
+            if key in keys and doc.xref_get_key(x, key)[0] == "string":
+                doc.xref_set_key(x, key, "null")
+        if keys and "StructParent" in keys:
+            doc.xref_set_key(x, "StructParent", "null")
+    inhalte = {c for page in doc for c in page.get_contents()}
+    inhalte |= {x for x in range(1, doc.xref_length()) if doc.xref_is_stream(x)
+                and doc.xref_get_key(x, "Subtype") == ("name", "/Form")}
+    for x in inhalte:
+        raw = doc.xref_stream(x)
+        if raw and (b"/ActualText" in raw or b"/Alt" in raw or b"/E" in raw):
+            neu = _ERSATZTEXT_RX.sub(rb"\1()", raw)
+            if neu != raw:
+                doc.update_stream(x, neu)
+
+
 def write_pdf(data: bytes, pairs: list[tuple[str, str]]) -> bytes:
     """Geschwärzte PDF-Sichtkopie: Originale werden als Redaction entfernt, der Platz-
     halter an ihre Stelle geschrieben, alles Beiwerk (Metadaten, Anhänge, Formulare,
@@ -815,19 +857,91 @@ def write_pdf(data: bytes, pairs: list[tuple[str, str]]) -> bytes:
                   javascript=True, metadata=True, redactions=True, remove_links=True,
                   reset_fields=True, reset_responses=True, thumbnails=True, xml_metadata=True)
         doc.set_metadata({})
+        _pdf_strukturtexte_entfernen(doc)
         out = doc.tobytes(garbage=4, deflate=True, clean=True)
     finally:
         doc.close()
-    leaked = verify_pdf(out, originals)
-    if leaked:
-        raise ValueError(f"PDF enthält nach der Schwärzung noch Originaltext: {leaked}")
+    funde = pdf_fundorte(out, originals)
+    if funde:
+        raise PdfLeck(funde)
     return out
 
 
-def verify_pdf(data: bytes, originals: list[str]) -> list[str]:
-    """Sucht jedes Original (Groß-/Kleinschreibung egal, Whitespace normalisiert, als
-    ganzes Wort wie in _replace_all) im Seitentext, in allen Objekten/Streams
-    (dekomprimiert) und in den Metadaten. Rückgabe: noch gefundene Originale; leer = sauber."""
+class PdfLeck(ValueError):
+    """Die Gegenprüfung fand nach dem Schwärzen noch Originaltext. funde: [(Original, Fundort)]."""
+
+    def __init__(self, funde: list[tuple[str, str]]):
+        self.funde = funde
+        super().__init__(f"PDF enthält nach der Schwärzung noch Originaltext: {sorted({o for o, _ in funde})}")
+
+
+def _pdf_objektart(obj: str) -> str:
+    """Grobe, für Nutzer verständliche Einordnung eines PDF-Objekts, in dem ein Original gefunden wurde."""
+    if "/PageLabels" in obj:
+        return "in den Seitenbeschriftungen der PDF (nicht sichtbar)"
+    if "/StructElem" in obj or re.search(r"/(?:StructTreeRoot|Alt|ActualText)\s*[(<\d]", obj):
+        return "im Strukturbaum der PDF (Alternativtext oder Ersatztext, nicht sichtbar)"
+    if any(k in obj for k in ("/Widget", "/FT", "/AcroForm")):
+        return "in einem Formularfeld (nicht sichtbar)"
+    if "/Annot" in obj:
+        return "in einer Anmerkung (nicht sichtbar)"
+    if "/OCG" in obj:
+        return "im Namen einer PDF-Ebene (nicht sichtbar)"
+    if "/Title" in obj or "/Outlines" in obj:
+        return "in einem Lesezeichen oder Titel (nicht sichtbar)"
+    if "/FontDescriptor" in obj or "/FontFile" in obj or "/Font" in obj:
+        return "in einer eingebetteten Schrift (nicht sichtbar)"
+    return "in einem inneren PDF-Objekt (nicht sichtbar)"
+
+
+_HEX_RX = re.compile(r"<([0-9A-Fa-f\s]{4,})>")
+
+
+def _pdf_hex_text(h: str) -> str:
+    try:
+        b = bytes.fromhex("".join(h.split()))
+    except ValueError:
+        return ""
+    if b[:2] == b"\xfe\xff":
+        return b[2:].decode("utf-16-be", errors="ignore")
+    if b[:2] == b"\xff\xfe":
+        return b[2:].decode("utf-16-le", errors="ignore")
+    return b.decode("latin-1")
+
+
+def _pdf_teile(doc) -> list[tuple[str, str]]:
+    """(Fundort, Text) für Seitentext, Metadaten und alle Objekte/Streams (dekomprimiert)."""
+    teile = [(f"im sichtbaren Text auf Seite {page.number + 1}", page.get_text()) for page in doc]
+    teile.extend(("in den Dokumenteigenschaften (Metadaten)", str(v)) for v in (doc.metadata or {}).values() if v)
+    try:
+        teile.append(("in den XMP-Metadaten", doc.get_xml_metadata() or ""))
+    except Exception:
+        pass
+    for x in range(1, doc.xref_length()):
+        try:
+            obj = doc.xref_object(x) or ""
+        except Exception:
+            obj = ""
+        art = _pdf_objektart(obj)
+        if obj:
+            teile.append((art, obj))
+            # Zeichenketten in Objekten stehen oft als Hex, Unicode als UTF-16 (<FEFF…>): entschlüsselt mitprüfen
+            klar = [_pdf_hex_text(h) for h in _HEX_RX.findall(obj)]
+            if any(klar):
+                teile.append((art, "\n".join(klar)))
+        try:
+            raw = doc.xref_stream(x)
+        except Exception:
+            raw = None
+        if raw:
+            ort = "im Seiteninhalt (z. B. versteckte Textmarkierung)" if art.startswith("in einem inneren") else art
+            teile.append((ort, raw.decode("latin-1")))
+            teile.append((ort, raw.decode("utf-16", errors="ignore")))
+    return teile
+
+
+def pdf_fundorte(data: bytes, originals: list[str]) -> list[tuple[str, str]]:
+    """Wie verify_pdf, aber mit Fundort je Original: [(Original, Fundort)], je Original der erste Fundort."""
     import pymupdf
 
     needles = [(o, _pdf_leak_regex(o)) for o in originals if o and len(o.strip()) >= 3]
@@ -835,32 +949,23 @@ def verify_pdf(data: bytes, originals: list[str]) -> list[str]:
         return []
     doc = pymupdf.open(stream=data, filetype="pdf")
     try:
-        parts = [page.get_text() for page in doc]
-        parts.extend(str(v) for v in (doc.metadata or {}).values() if v)
-        try:
-            parts.append(doc.get_xml_metadata() or "")
-        except Exception:
-            pass
-        for x in range(1, doc.xref_length()):
-            for getter in (doc.xref_object, doc.xref_stream):
-                try:
-                    raw = getter(x)
-                except Exception:
-                    continue
-                if not raw:
-                    continue
-                if isinstance(raw, bytes):
-                    parts.append(raw.decode("latin-1"))
-                    parts.append(raw.decode("utf-16", errors="ignore"))
-                else:
-                    parts.append(str(raw))
+        teile = [(ort, _pdf_norm(t)) for ort, t in _pdf_teile(doc) if t]
     finally:
         doc.close()
-    hay = _pdf_norm("\n".join(parts))
     seen: set = set()
-    found = []
+    funde = []
     for orig, rx in needles:
-        if rx.pattern not in seen and rx.search(hay):
+        if rx.pattern in seen:
+            continue
+        ort = next((o for o, t in teile if rx.search(t)), None)
+        if ort:
             seen.add(rx.pattern)
-            found.append(orig)
-    return found
+            funde.append((orig, ort))
+    return funde
+
+
+def verify_pdf(data: bytes, originals: list[str]) -> list[str]:
+    """Sucht jedes Original (Groß-/Kleinschreibung egal, Whitespace normalisiert, als
+    ganzes Wort wie in _replace_all) im Seitentext, in allen Objekten/Streams
+    (dekomprimiert) und in den Metadaten. Rückgabe: noch gefundene Originale; leer = sauber."""
+    return [o for o, _ in pdf_fundorte(data, originals)]

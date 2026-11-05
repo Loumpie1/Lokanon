@@ -213,3 +213,35 @@ def test_ordner_modus_und_fehler(client):
     assert r.status_code == 400 and "nicht gefunden" in r.json()["fehler"]
     r = client.post("/api/system/oeffnen", json={"pfad": r"C:\gibt\es\nicht"})
     assert r.status_code == 400
+
+
+def test_fehlerfall_rueckweg_und_protokoll_ohne_klartext(client, monkeypatch):
+    """Scheitert die Gegenprüfung, sagt das Ergebnis wo und was zu tun ist; „Zurück zum Prüfen“ behält die Prüfung;
+    das Protokoll nennt nur Platzhalter und Dateinummern."""
+    from anonymizer import files as fio
+    from server import dienst
+
+    client.post("/api/leeren")
+    client.post("/api/dateien", files=[("datei", ("Schreiben Weber.txt", TEXT.encode("utf-8"), "text/plain"))])
+    client.post("/api/analyse", json={"begriffe": []})
+    warte(client)
+    n_ids = len(client.get("/api/zustand").json()["identitaeten"])
+
+    def scheitert(*_a, **_k):
+        raise fio.PdfLeck([("Thomas Weber", "im Strukturbaum der PDF (Alternativtext oder Ersatztext, nicht sichtbar)")])
+    monkeypatch.setattr(dienst.aus, "erzeuge", scheitert)
+    client.post("/api/anonymisieren")
+    warte(client)
+    d = client.get("/api/zustand").json()["ergebnis"]["dateien"][0]
+    assert d["status"] == "fehler" and d["funde"][0]["text"] == "Thomas Weber" and "Strukturbaum" in d["funde"][0]["ort"]
+    assert "Textfassung" in d["rat"]
+
+    z = client.post("/api/zurueck-zum-pruefen").json()
+    assert z["ergebnis"] is None and z["fortschritt"]["fertig"] and len(z["identitaeten"]) == n_ids
+
+    p = client.get("/api/protokoll").json()
+    text = "\n".join(e["text"] for e in p["eintraege"])
+    assert "Analyse gestartet" in text and "Gegenprüfung fand [Person_1]" in text and "Datei 1 (.txt)" in text
+    datei = "\n".join(f.read_text(encoding="utf-8") for f in Path(p["ordner"]).glob("*.log"))
+    for klar in ("Weber", "Goethestraße", "Krause", "Nolte", "0201 5551234"):
+        assert klar not in text and klar not in datei, klar

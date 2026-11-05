@@ -227,6 +227,40 @@ def test_placeholder_font_on_xobject_page():
     assert fonts == {"Helvetica"}, fonts
 
 
+
+def _getaggte_pdf() -> bytes:
+    """Wie eine Word-/InDesign-PDF: Logo mit Alternativtext (Dateiname mit Firmenname) im Strukturbaum,
+    Silbentrennung mit /ActualText in den Seiteninhalten, Ebene und Seitenbeschriftung mit Firmennamen. Firma erfunden."""
+    doc = pymupdf.open()
+    page = doc.new_page()
+    page.insert_text((72, 100), "Kundenerklärung der Parfümerie Brandauer GmbH", fontname="helv", fontsize=11)
+    page.insert_text((72, 130), "Ihre Ansprechpartnerin: Frau Brandauer", fontname="helv", fontsize=11)
+    inhalt = page.get_contents()[0]
+    doc.update_stream(inhalt, doc.xref_stream(inhalt)
+                      + b"\n/Span <</ActualText (Brandauer-Logistik)>> BDC EMC\n")
+    kat = doc.pdf_catalog()
+    wurzel, figur = doc.get_new_xref(), doc.get_new_xref()
+    doc.update_object(figur, f"<< /Type /StructElem /S /Figure /P {wurzel} 0 R "
+                             "/Alt (projekte:kunde:brandauer:logo:brandauer_logo_rgb.pdf) /T (Logo Brandauer) >>")
+    doc.update_object(wurzel, f"<< /Type /StructTreeRoot /K [{figur} 0 R] >>")
+    doc.xref_set_key(kat, "StructTreeRoot", f"{wurzel} 0 R")
+    doc.xref_set_key(kat, "MarkInfo", "<< /Marked true >>")
+    doc.add_ocg("Logo Parfümerie Brandauer", on=True)  # Ebenenname, als UTF-16-Hex gespeichert
+    doc.set_page_labels([{"startpage": 0, "prefix": "Brandauer-", "style": "D", "firstpagenum": 1}])
+    return doc.tobytes()
+
+
+def test_alternativtexte_und_strukturbaum_werden_entfernt():
+    data = _getaggte_pdf()
+    assert verify_pdf(data, ["Brandauer"]) == ["Brandauer"]
+    out = write_pdf(data, [("Parfümerie Brandauer GmbH", "[Firma_1]"), ("Brandauer", "[Firma_1]")])
+    assert verify_pdf(out, ["Brandauer"]) == []
+    with pymupdf.open(stream=out, filetype="pdf") as d:
+        assert d.xref_get_key(d.pdf_catalog(), "StructTreeRoot")[0] == "null"
+        assert "[Firma_1]" in d[0].get_text()
+        assert "Kundenerklärung" in d[0].get_text()
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     failed = 0

@@ -147,8 +147,13 @@ textarea.input { min-height: 110px; resize: vertical; }
 
 /* ---------- Zustand 2: Prüfen ---------- */
 .pruefen { display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); gap: 20px; align-items: start; }
-@media (max-width: 940px) { .pruefen { grid-template-columns: 1fr; } }
-.summary { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.pruefen.ohne-doc { grid-template-columns: minmax(0, 1fr); max-width: 900px; margin: 0 auto; }
+.liste-sp { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.liste-sp > .toolbar, .liste-sp > .filter, .liste-sp > .nachtrag-immer { margin: 0 !important; }
+@media (max-width: 940px) { .pruefen { grid-template-columns: minmax(0, 1fr); } }
+.summary { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.summary .doc-schalter { margin-left: auto; padding: 6px 12px; }
+.tipp { margin-top: -2px; }
 .summary h1 { font-size: 1.55rem; }
 .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
 .toolbar .input { flex: 1; min-width: 220px; }
@@ -161,7 +166,14 @@ textarea.input { min-height: 110px; resize: vertical; }
 .group-title .count { color: var(--muted); font-weight: 500; font-size: .9rem; }
 .cards { display: grid; gap: 10px; }
 .ident { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 8px;
-  border-left: 4px solid var(--g, var(--line-2)); animation: card-in 260ms var(--ease) both; animation-delay: calc(var(--i, 0) * 18ms); transition: opacity var(--t); }
+  grid-template-columns: minmax(0, 1fr); min-width: 0; overflow-wrap: anywhere; cursor: pointer;
+  border-left: 4px solid var(--g, var(--line-2)); animation: card-in 260ms var(--ease) both; animation-delay: calc(var(--i, 0) * 18ms);
+  transition: opacity var(--t), box-shadow var(--t), border-color var(--t); }
+.ident:hover { border-color: var(--line-2); }
+.ident.gewaehlt { box-shadow: 0 0 0 2px var(--action); }
+.ident.blitz { animation: blitz 900ms var(--ease); }
+@keyframes blitz { 0%, 60% { background: var(--action-soft); } 100% { background: var(--surface); } }
+.stellezeile { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
 .ident.aus { opacity: .6; }
 @keyframes card-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ident .head { display: flex; align-items: center; gap: 10px; }
@@ -199,11 +211,21 @@ textarea.input { min-height: 110px; resize: vertical; }
 .switch input:focus-visible + .track { outline: 2px solid var(--action); outline-offset: 2px; }
 .swlabel { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: .78rem; color: var(--muted); min-width: 84px; }
 
-.docpanel { position: sticky; top: 72px; }
-.doctabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
-.doctabs button { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 10px; font-size: .86rem; cursor: pointer; font-weight: 600; color: var(--ink-2); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Dokumentbereich: feste Höhe zwischen Kopfleiste und Aktionsleiste, nur der Text darin scrollt.
+   Dateireiter in einer Zeile (waagerecht scrollbar), damit der Bereich nie über die Aktionsleiste wächst. */
+.docpanel { position: sticky; top: 72px; height: calc(100vh - 72px - 100px); min-height: 320px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.dockopf { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dockopf > b { margin-right: auto; }
+.docname { font-size: .86rem; color: var(--muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doctabs { display: flex; gap: 4px; flex-wrap: nowrap; overflow-x: auto; flex: none; padding-bottom: 2px; }
+.doctabs button { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 10px; font-size: .86rem; cursor: pointer; font-weight: 600; color: var(--ink-2); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .doctabs button.on { border-color: var(--action); color: var(--action); background: var(--action-soft); }
-.docview { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; max-height: calc(100vh - 260px); overflow: auto; white-space: pre-wrap; line-height: 1.75; font-size: .95rem; }
+.docview { position: relative; flex: 1; min-height: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.75; font-size: .95rem; }
+@media (max-width: 940px) { .docpanel { position: static; height: 70vh; } }
+.docview [data-ph] { cursor: pointer; }
+.docview [data-ph].mit { box-shadow: 0 0 0 1px var(--action); }
+.docview [data-ph].aktuell { box-shadow: 0 0 0 2px var(--action); animation: stelle 1.2s var(--ease); }
+@keyframes stelle { 0%, 40% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--action) 35%, transparent); } 100% { box-shadow: 0 0 0 2px var(--action); } }
 .docview mark { padding: 0 3px; border-radius: 3px; color: inherit; }
 .docview mark sup { font-family: var(--font-mono); font-size: .66em; color: var(--action); margin-left: 2px; }
 .docview span[title^="bleibt"] { border: 1px dashed var(--muted); border-radius: 3px; padding: 0 3px; color: var(--muted); }
@@ -224,6 +246,20 @@ textarea.input { min-height: 110px; resize: vertical; }
 .result-file:first-child { border-top: none; }
 .result-file .st { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: none; font-weight: 700; }
 .st.ok { background: var(--ok-soft); color: var(--ok); } .st.fehler { background: var(--danger-soft); color: var(--danger); }
+.result-file.fehl { background: var(--danger-soft); border-radius: var(--radius-sm); padding: 12px; border-top: none; margin-bottom: 6px; }
+.result-file.fehl + .result-file { border-top: none; }
+.funde { margin: 6px 0; padding-left: 18px; font-size: .92rem; }
+.rat { margin-top: 6px; font-size: .92rem; color: var(--ink); }
+.ersatz { margin-top: 6px; color: var(--ok); }
+.warnsym { width: 64px; height: 64px; margin: 0 auto 10px; display: block; fill: none; stroke: var(--warn); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.protokoll { max-height: 50vh; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: .86rem; }
+.pz { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 10px; padding: 6px 10px; border-top: 1px solid var(--line); align-items: baseline; }
+.pz:first-child { border-top: none; }
+.pz .zeit { font-family: var(--font-mono); color: var(--muted); }
+.pz .stufe { font-weight: 700; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.pz.fehler { background: var(--danger-soft); } .pz.fehler .stufe { color: var(--danger); }
+.pz.warnung .stufe { color: var(--warn); }
+.pz .t { overflow-wrap: anywhere; }
 .pathbox { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border-radius: var(--radius-sm); padding: 8px 12px; font-family: var(--font-mono); font-size: .86rem; min-width: 0; }
 .pathbox span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 pre.anweisung { background: var(--surface-2); border-radius: var(--radius-sm); padding: 14px; white-space: pre-wrap; font-family: var(--font-ui); font-size: .92rem; max-height: 300px; overflow: auto; margin: 0; }

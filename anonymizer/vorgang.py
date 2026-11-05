@@ -316,9 +316,12 @@ FARBEN = {"PERSON": "#ffd6d6", "ORGANIZATION": "#d6e4ff", "LOCATION": "#d9f2e3",
           "ADRESSE": "#d9f2e3", "EIGENE_BEGRIFFE": "#f3d9ff", "MANUELL": "#f3d9ff", "DATUM": "#ffe9c4"}
 
 
-def markiert_html(text: str, findings: list[Finding], platzhalter: dict[tuple[int, int], str] | None = None) -> str:
+def markiert_html(text: str, findings: list[Finding], platzhalter: dict[tuple[int, int], str] | None = None,
+                   schluessel: dict[tuple[int, int], str] | None = None) -> str:
     """Original mit farbigen Markierungen. Aktive Treffer zeigen den Platzhalter als kleines Etikett,
-    abgewählte Treffer bekommen einen gestrichelten Rahmen („bleibt stehen“)."""
+    abgewählte Treffer bekommen einen gestrichelten Rahmen („bleibt stehen“).
+    schluessel: (start, ende) -> Identität ("Person_1"); wird als data-ph gesetzt, damit die Oberfläche von einer
+    Karte zur Stelle springen kann und umgekehrt."""
     import html as _h
 
     parts, pos = [], 0
@@ -329,13 +332,15 @@ def markiert_html(text: str, findings: list[Finding], platzhalter: dict[tuple[in
         lab = LABELS.get(f.entity, f.entity)
         c = FARBEN.get(f.entity, "#fff3c4")
         ph = (platzhalter or {}).get((f.start, f.end), "")
+        key = (schluessel or {}).get((f.start, f.end), "")
+        attr = f' data-ph="{_h.escape(key)}"' if key else ""
         if f.active:
-            parts.append(f'<mark style="background:{c};padding:0 3px;border-radius:3px" title="{lab}">'
+            parts.append(f'<mark style="background:{c};padding:0 3px;border-radius:3px" title="{lab}"{attr}>'
                          f"{_h.escape(text[f.start:f.end])}"
                          f'<sup style="font-size:.7em;color:#1f5fa8;margin-left:2px">{_h.escape(ph or lab)}</sup></mark>')
         else:
             parts.append(f'<span style="border:1px dashed #94a3b8;padding:0 3px;border-radius:3px;color:#475569" '
-                         f'title="bleibt stehen ({lab})">{_h.escape(text[f.start:f.end])}</span>')
+                         f'title="bleibt stehen ({lab})"{attr}>{_h.escape(text[f.start:f.end])}</span>')
         pos = f.end
     parts.append(_h.escape(text[pos:]))
     return "".join(parts)

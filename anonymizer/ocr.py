@@ -435,6 +435,8 @@ def schwaerze_scanseiten(doc, pairs: list[tuple[str, str]], dpi: int = DPI, key:
             kontrolle = _norm(erkenne_seite(page, dpi, rotation=0).text)
             rest = [o for o in originals if _needle(o).search(kontrolle)]
             if rest:
-                raise ValueError(f"Scan-Seite {pno + 1}: nach der Schwärzung noch lesbar: {rest}")
+                from .files import PdfLeck
+
+                raise PdfLeck([(o, f"auf der gescannten Seite {pno + 1} (nach der Schwärzung noch lesbar)") for o in rest])
         pno += 1
     return ergebnis
