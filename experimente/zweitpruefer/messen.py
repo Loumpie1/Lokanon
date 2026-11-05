@@ -20,7 +20,7 @@ import evaluate as E  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).parent))
 from beispiele import GEPRUEFT, QUELLEN, umgebung  # noqa: E402
-from trainieren import ART, MAX_LEN, MODELL  # noqa: E402
+from trainieren import ART, MAX_LEN, MODELL, kontext_sauber  # noqa: E402
 
 SAMMLUNGEN = {"pruefung": ROOT / "testdaten/pruefung/referenz.jsonl",
               "kanzlei": ROOT / "testdaten/kanzlei/referenz_markierungen.jsonl",
@@ -47,7 +47,7 @@ def main():
                     continue
                 with torch.no_grad():
                     enc = tok([f"{ART[f.entity]}: {f.text}" for f in pruef],
-                              [umgebung(text, f.start, f.end) for f in pruef],
+                              [kontext_sauber(f.text, umgebung(text, f.start, f.end)) for f in pruef],
                               truncation="only_second", max_length=MAX_LEN, padding=True, return_tensors="pt")
                     wk = torch.softmax(model(**enc).logits, -1)[:, 1].tolist()
                 for f, x in zip(pruef, wk):
@@ -65,11 +65,21 @@ def main():
                 E.detect_fall = lambda _a, _c, text: gef[text]
                 r = E.auswerten(None, c, faelle)
                 g = r["gesamt"]
+                # Verworfene Namensteile ("Mia" zu "Mia Schneider") zählt evaluate.py weder als Treffer noch als
+                # Fehlalarm - für den Zweitprüfer sind sie aber ein Verlust (Leck), also eigens zählen.
+                namensteile_weg = []
+                for case in faelle:
+                    namen = {w.strip(".,").lower() for a, b, lab in case["spans"] if lab == "PERSON"
+                             for w in case["text"][a:b].split()}
+                    behalten = {(f.start, f.end) for f in gef[case["text"]]}
+                    namensteile_weg += [f.text for f in roh[case["text"]] if f.entity == "PERSON"
+                                        and (f.start, f.end) not in behalten and f.text.strip(".,").lower() in namen]
                 name = f"{lauf} " + ("ohne Zweitprüfer" if s is None else f"Zweitprüfer {s}")
                 ergebnis[f"{sname}/{name}"] = {"recall": g["recall"], "precision": g["precision"], "fp": g["fp"],
-                                               "uebersehen": r["uebersehen"], "fehlalarme": r["fehlalarme"]}
+                                               "uebersehen": r["uebersehen"], "fehlalarme": r["fehlalarme"],
+                                               "namensteile_verworfen": namensteile_weg}
                 print(f"{sname:<9}{name:<28} recall {g['recall']:.1%}  precision {g['precision']:.1%}  "
-                      f"fehlalarme {g['fp']:3d}", flush=True)
+                      f"fehlalarme {g['fp']:3d}  namensteile verworfen {len(namensteile_weg)}", flush=True)
                 if s == schwellen[0]:
                     for t, fs in roh.items():
                         for f in fs:

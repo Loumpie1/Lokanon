@@ -95,6 +95,11 @@ def label(case, f):
         return 1
     if any(min(e, f.end) > max(s, f.start) for s, e in frei):
         return None
+    # Einzelner Namensteil eines markierten Namens ("Mia" zu "Mia Schneider"): Die Referenz markiert ihn nicht
+    # eigens, er ist aber ein Name (evaluate.py zählt ihn ebenfalls nicht als Fehlalarm).
+    namen = {w.strip(".,").lower() for s, e, lab in case["spans"] if lab == "PERSON" for w in case["text"][s:e].split()}
+    if f.entity == "PERSON" and f.text.strip(".,").lower() in namen:
+        return 1
     return 0
 
 

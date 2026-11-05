@@ -13,7 +13,7 @@ from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoTokenizer, BertForSequenceClassification
 
 HIER = Path(__file__).resolve().parent
 DATEN = HIER / "daten"
@@ -23,8 +23,14 @@ ART = {"PERSON": "Person", "ORGANIZATION": "Firma"}
 MAX_LEN = 128
 
 
+def kontext_sauber(text, kontext):
+    """Nur der Vorschlag selbst bleibt mit « » markiert (Wiktionary setzt Stichwörter ebenfalls in « »)."""
+    return (kontext.replace(f"«{text}»", "\x00", 1).replace("«", '"').replace("»", '"')
+            .replace("\x00", f"«{text}»"))
+
+
 def eingabe(b):
-    return f"{ART[b['entity']]}: {b['text']}", b["kontext"]
+    return f"{ART[b['entity']]}: {b['text']}", kontext_sauber(b["text"], b["kontext"])
 
 
 def laden():
@@ -66,14 +72,14 @@ def kennzahlen(p, daten, schwelle=0.5):
 
 
 def main():
-    epochen = int(sys.argv[1]) if len(sys.argv) > 1 else 2
+    epochen = int(sys.argv[1]) if len(sys.argv) > 1 else 3
     torch.manual_seed(0)
     torch.set_num_threads(6)
     train, test = laden()
     print(f"Training {len(train)} ({sum(b['label'] for b in train)} echt), Test {len(test)} "
           f"({sum(b['label'] for b in test)} echt)", flush=True)
-    tok = AutoTokenizer.from_pretrained(BASIS)
-    model = AutoModelForSequenceClassification.from_pretrained(BASIS, num_labels=2)
+    tok = AutoTokenizer.from_pretrained(DATEN / "tokenizer")  # aus tokenizer_bauen.py
+    model = BertForSequenceClassification.from_pretrained(BASIS, num_labels=2)  # config.json ohne model_type
     opt = torch.optim.AdamW(model.parameters(), lr=3e-5, weight_decay=0.01)
     schritte = epochen * ((len(train) + 15) // 16)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / (0.1 * schritte)) * max(0.0, 1 - s / schritte))
