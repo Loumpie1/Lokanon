@@ -194,6 +194,24 @@ def ausrichtung(page, dpi: int = DPI) -> tuple[int, object]:
     return best[0], best[1]
 
 
+def _nach_spalten(woerter: list[Wort], vor: list[list]) -> list[list]:
+    """Wertezeile an den Spaltenanfängen der Kopfzeile darüber trennen. In engen Tabellen (Lohnscan: Werte unter
+    „Steuer-ID | SV-Nummer | Krankenkasse“) sind die Lücken zu klein für die Spaltenerkennung; ein Wort, das genau
+    unter einem Spaltenanfang beginnt und vom vorigen Wort abgesetzt ist, beginnt dann eine neue Zelle."""
+    anfaenge = [c[5] for c in vor[1:]]
+    zellen: list[list] = []
+    for w in woerter:
+        x0, y0, x1, y1 = w.rect
+        h = y1 - y0
+        neu = not zellen or (x0 - zellen[-1][1] > 0.25 * h and any(abs(x0 - a) < 0.6 * h for a in anfaenge))
+        if neu:
+            zellen.append([x0, x1, (y0 + y1) / 2, w.text, h, x0])
+        else:
+            zellen[-1][3] += " " + w.text
+            zellen[-1][1] = x1
+    return zellen
+
+
 def _seite_aus_ergebnis(nr: int, res, scale: float, rotation: int, breite: float, hoehe: float,
                         zurueck=None) -> Seite:
     """zurueck: Umrechnung der Bildpunkte eines begradigten Bildes ins Original (Wortboxen für die Schwärzung);
@@ -242,7 +260,7 @@ def _seite_aus_ergebnis(nr: int, res, scale: float, rotation: int, breite: float
                 zellen[-1][3] += " " + txt  # kleine Lücke zur vorigen Textbox: dieselbe Zelle
                 zellen[-1][1] = f[4]
             else:
-                zellen.append([f[1], f[4], f[0], txt, f[2]])
+                zellen.append([f[1], f[4], f[0], txt, f[2], ws[0].rect[0]])
         lines.append(" ".join(w.text for w in zeile))
         woerter.extend(zeile)
         # Umbruch innerhalb einer Tabellenzelle (wie files.pdf_zeilentext): Die Folgezeile beginnt am linken Rand
@@ -255,6 +273,10 @@ def _seite_aus_ergebnis(nr: int, res, scale: float, rotation: int, breite: float
                     c[3] += " " + z[3]
                     c[2] = z[2]
                 continue
+        if vor and len(vor) >= 3 and len(zellen) < len(vor):
+            geteilt = _nach_spalten(zeile, vor)
+            if len(geteilt) > len(zellen):
+                zellen = geteilt
         zellenzeilen.append(zellen)
     erkennung = [SPALTE.join(c[3] for c in z) for z in zellenzeilen]
     return Seite(nr, "\n".join(lines), woerter, len(rows), rotation, float(np.mean(res.scores)), breite, hoehe,

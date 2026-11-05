@@ -140,3 +140,16 @@ def test_formular_ausfuellzeilen_und_firmenname_als_vorname():
     fs = _firmenteile_umdeuten(text, fs)
     assert [f.entity for f in fs] == ["ORGANIZATION", "ORGANIZATION", "PERSON"]
     assert "Teil der Firma" in fs[0].grund
+
+
+def test_enge_wertezeile_wird_an_spaltenkoepfen_getrennt():
+    """Lohnscan: Unter „Steuer-ID | SV-Nummer | Krankenkasse“ stehen die Werte zu eng für die Lückenerkennung."""
+    from anonymizer.ocr import Wort, _nach_spalten
+
+    def w(text, x0, x1):
+        return Wort(text, (x0, 217.0, x1, 229.6))
+    kopf = [[61.9, 103.7, 208, "Steuer-ID", 13, 61.9], [135.7, 192.6, 207, "SV-Nummer", 13, 135.7],
+            [217.4, 281.9, 206, "Krankenkasse", 13, 217.4]]
+    werte = [w("57", 61.6, 73.4), w("281", 74.5, 90.4), w("956", 112.3, 128.5), w("13", 136.1, 148.0),
+             w("150380", 150.8, 181.8), w("AOK", 218.9, 237.2), w("Rheinland", 240.1, 290.0)]
+    assert [z[3] for z in _nach_spalten(werte, kopf)] == ["57 281 956", "13 150380", "AOK Rheinland"]
