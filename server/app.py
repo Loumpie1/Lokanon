@@ -192,6 +192,50 @@ def anonymisieren():
     return sitzung.fortschritt.__dict__
 
 
+class AuswahlBody(BaseModel):
+    dok: int
+    s: int
+    e: int
+    art: str | None = None
+
+
+@app.post("/api/auswahl")
+def auswahl(body: AuswahlBody):
+    """Markierte Stelle: ausgerichtet, Art-Vorschlag und alle Fundstellen im Vorgang (noch nichts angewendet)."""
+    return sitzung.auswahl(body.dok, body.s, body.e, body.art)
+
+
+class MarkierenBody(BaseModel):
+    begriff: str
+    art: str
+    stellen: list[dict]
+    ursprung: dict | None = None
+    gehoert_zu: str = ""
+    lernen: bool = False
+
+
+@app.post("/api/markieren")
+def markieren(body: MarkierenBody):
+    return sitzung.markieren(body.begriff, body.art, body.stellen, body.ursprung, body.gehoert_zu, body.lernen)
+
+
+class StelleBody(BaseModel):
+    dok: int
+    s: int
+    e: int
+    aktion: str
+
+
+@app.post("/api/stelle")
+def stelle(body: StelleBody):
+    return sitzung.stelle(body.dok, body.s, body.e, body.aktion)
+
+
+@app.post("/api/rueckgaengig")
+def rueckgaengig():
+    return sitzung.rueckgaengig()
+
+
 @app.post("/api/zurueck-zum-pruefen")
 def zurueck_zum_pruefen():
     return sitzung.zurueck_zum_pruefen()

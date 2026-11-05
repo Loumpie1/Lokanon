@@ -105,6 +105,19 @@
   <p>Lokanon ersetzt im Zweifel. Angaben, bei denen es sich nicht sicher ist, markiert es und erklärt warum („nur über die Anrede erkannt“, „einzelnes Wort“, „Nachname passt zu mehreren Personen“). Ein Klick auf den gelben Hinweis zeigt nur diese Karten. Was kein Personenbezug ist, schalten Sie aus.</p>
   <h3>Das Dokument rechts</h3>
   <p>„Original mit Markierungen“ zeigt jede Stelle farbig mit ihrem Platzhalter als kleinem Etikett: <mark class="p">Sabine Winter</mark> Person, <mark class="f">Autohaus Krause GmbH</mark> Firma, <mark class="o">Eppinghofer Straße 47</mark> Adresse, <mark class="n">14 VI 512/26</mark> Nummer. Gestrichelt umrandet heißt „bleibt stehen“. „Anonymisiert“ zeigt den Text, wie ihn die KI bekommt. Bei mehreren Dateien wechseln Sie über die Reiter.</p>
+  <h3>Karte und Stelle</h3>
+  <p>Ein Klick auf eine Karte zeigt die Stelle im Dokument; jeder weitere Klick die nächste, auch in anderen Dateien („Stelle 2 von 5“). Umgekehrt zeigt ein Klick auf eine Markierung im Dokument die passende Karte. Mit „Dokument ausblenden“ bekommt die Liste die ganze Breite; Lokanon merkt sich die Wahl.</p>
+  <h3>Im Dokument markieren und im Rest suchen</h3>
+  <p>Hat Lokanon etwas übersehen, markieren Sie es mit der Maus im Dokument. Daneben erscheint „Anonymisieren als …“ mit einem Vorschlag für die Art (Person, Firma, Adresse …) und der Zahl der Fundstellen im ganzen Vorgang. Gefunden werden auch gebeugte Formen („Noltes“), Trennungen am Zeilenende („Spedi-tion“) und bei Personen die einzelnen Namensteile.</p>
+  <table>
+    <tr><th>Knopf</th><th>Wirkung</th></tr>
+    <tr><td>Alle anwenden</td><td>Alle Fundstellen in allen Dateien bekommen denselben Platzhalter.</td></tr>
+    <tr><td>Einzeln ansehen</td><td>Liste aller Fundstellen mit Satzausschnitt, alle vorausgewählt und einzeln abwählbar. Ein Klick auf den Text zeigt die Stelle.</td></tr>
+    <tr><td>Nur hier</td><td>Nur die markierte Stelle.</td></tr>
+    <tr><td>gehört zu …</td><td>Die Stelle bekommt den Platzhalter einer schon erkannten Person oder Firma.</td></tr>
+    <tr><td>künftig in allen Dokumenten suchen</td><td>Der Begriff wird gelernt (Einstellungen → Gelernte Begriffe); ohne Haken gilt er nur für diesen Durchlauf.</td></tr>
+  </table>
+  <p>Ein Klick auf eine Markierung bietet die Gegenrichtung an: <b>nicht anonymisieren</b> – nur hier, im ganzen Vorgang oder künftig immer. „Nur hier“ wirkt in der Textfassung genau an dieser Stelle; in der PDF- oder Word-Kopie wird derselbe Text überall ersetzt. Jede dieser Aktionen lässt sich mit <kbd>Strg</kbd>+<kbd>Z</kbd> oder „Rückgängig“ zurücknehmen. Bei mehr als 50 Fundstellen warnt Lokanon, weil der Begriff dann meist zu allgemein ist.</p>
   <div class="box warn">Die Prüfung ist Teil der Arbeit, nicht Beiwerk: Keine Erkennung ist vollständig. Was Lokanon übersieht, tragen Sie nach; was es zu viel erkennt, schalten Sie aus. Erst dann anonymisieren.</div>
 </section>
 
@@ -168,8 +181,9 @@
   <table>
     <tr><th>Problem</th><th>Was hilft</th></tr>
     <tr><td>Beim Start erscheint lange „Lokanon wird gestartet …“</td><td>Beim ersten Start nach der Installation laden die Sprachmodelle ein bis zwei Minuten. Startet Lokanon gar nicht, steht der Grund in <code>Lokanon\lokanon.log</code> in Ihrem Benutzerordner.</td></tr>
-    <tr><td>Eine PDF wurde nicht erzeugt</td><td>Die Gegenprüfung hat noch Originaltext gefunden, meist in einem Scan. Tragen Sie den Begriff oben nach oder schalten Sie in den Einstellungen die Textfassung ein.</td></tr>
-    <tr><td>Ein Name wurde nicht erkannt</td><td>„Fehlt etwas?“ oben in der Prüfliste. Lokanon merkt sich das für diesen Durchlauf in allen Dateien.</td></tr>
+    <tr><td>Eine Datei wurde nicht erzeugt</td><td>Die Ergebnisseite sagt, wo die Gegenprüfung noch Originaltext gefunden hat (sichtbarer Text, Scan-Seite oder ein unsichtbarer Teil der PDF) und was Sie tun können. „Zurück zum Prüfen“ behält Ihre Prüfung; Stelle markieren oder nachtragen, dann erneut anonymisieren. Statt der PDF entsteht eine geprüfte Textfassung (.md).</td></tr>
+    <tr><td>Etwas lief schief und Sie brauchen Hilfe</td><td>„Protokoll“ auf der Ergebnisseite oder unter dem Zahnrad. Es enthält keine Namen, nur Platzhalter und Dateinummern, und lässt sich kopieren und weitergeben. Ältere Protokolle liegen im Ordner <code>protokolle</code> Ihres Lokanon-Datenordners (30 Tage).</td></tr>
+    <tr><td>Ein Name wurde nicht erkannt</td><td>Im Dokument markieren: Lokanon sucht ihn in allen Dateien. Oder „Fehlt etwas?“ oben in der Prüfliste.</td></tr>
     <tr><td>Der Kanzleiname wird ersetzt</td><td>Unter dem Zahnrad bei „Ihre Kanzlei“ eintragen.</td></tr>
     <tr><td>Zwei Karten sind dieselbe Person</td><td>Auf einer Karte „gehört zu …“ wählen.</td></tr>
   </table>

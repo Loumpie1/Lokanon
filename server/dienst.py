@@ -23,6 +23,7 @@ from anonymizer.vault import decrypt_mapping, encrypt_mapping
 from anonymizer.vorgang import (LESBARE_TYPEN, Vorgang, dateien_im_ordner, mapping_aus_schluessel, markiert_html,
                                 pruefbericht_html, sicherer_name)
 from server import einstellungen as est
+from server import markieren as mk
 from server.protokoll import Protokoll
 
 APP_DIR = Path(__file__).resolve().parents[1]
@@ -42,7 +43,8 @@ GRUPPEN_ANZEIGE = {
     "Daten und Sonstiges": ["DATUM", "BERUF", "DIAGNOSE", "EIGENE_BEGRIFFE", "MANUELL"],
 }
 QUELLE_TEXT = {"modell": "Sprachmodell", "regel": "Muster", "heuristik": "Anrede oder Unterschrift", "feld": "Formularfeld",
-               "liste": "Ihre Liste", "wiederholung": "Wiederholung", "namensteil": "Namensteil", "vorgang": "andere Datei"}
+               "liste": "Ihre Liste", "wiederholung": "Wiederholung", "namensteil": "Namensteil", "vorgang": "andere Datei",
+               "firmenteil": "Teil eines Firmennamens", "manuell": "von Ihnen markiert"}
 VORSCHLAEGE = {
     "PERSON": ["Mandant", "Mandantin", "Gegner", "Gegnerin", "Zeuge", "Zeugin", "Erblasser", "Erblasserin"],
     "ORGANIZATION": ["Gegnerfirma", "Arbeitgeber", "Versicherung", "Werkstatt", "Bank"],
@@ -135,6 +137,8 @@ class Sitzung:
         self.bezeichnungen: dict[str, str] = {}  # "Person_1" -> "Mandant"
         self.aliases: dict[str, str] = {}        # "günther" -> "Cornelia Günther" (gehört zu …)
         self.getrennt: set[str] = set()          # Schreibweisen, die eine eigene Identität bleiben
+        self.aus_stellen: set[tuple[int, int, int]] = set()  # einzelne Stellen, die stehen bleiben (Datei, Start, Ende)
+        self.verlauf: list[tuple[str, dict]] = []  # Rückgängig-Stapel: (was, Zustand davor)
         self.mapping: dict[str, str] = {}
         self.zuordnung: dict[str, str] = {}
         self.fortschritt = Fortschritt()
@@ -190,6 +194,7 @@ class Sitzung:
         self.fortschritt = Fortschritt()
         self.ergebnis = None
         self.mapping, self.zuordnung = {}, {}
+        self.aus_stellen, self.verlauf = set(), []
 
     # ------------------------------------------------------------------ Analyse (Hintergrund mit Fortschritt)
     def analysieren(self, manual: list[str] | None = None) -> None:
@@ -245,6 +250,7 @@ class Sitzung:
                                     est.erlaubt_liste(cfg), cfg.get("include_name_parts", True))
             for d, fs in zip(self.docs, neu):
                 d.findings = fs
+            self.verlauf = []
             self._pseudonymisieren()
             self._protokoll_geheimnisse()
             prot.notiere("info", f"Analyse fertig: {len(self.mapping)} Identitäten")
@@ -277,10 +283,10 @@ class Sitzung:
             mapping, zuordnung = res.mapping, {**zuordnung, **res.zuordnung}
         self.mapping, self.zuordnung = mapping, zuordnung
         fest = {t: mapping[ph] for t, ph in zuordnung.items() if ph in mapping}  # Entscheidung festhalten
-        for d in self.docs:
+        for di, d in enumerate(self.docs):
             d.schluessel = platzhalter_schluessel(d.findings, mapping, zuordnung)
             for i, f in enumerate(d.findings):
-                f.active = d.schluessel.get(i, "") not in self.disabled
+                f.active = d.schluessel.get(i, "") not in self.disabled and (di, f.start, f.end) not in self.aus_stellen
             res = pseudonymize(d.text, d.findings, mapping, self.bezeichnungen, fest, self.getrennt)
             d.anonym = res.anonymized
             paare = dict(replacement_pairs(d.text, d.findings, mapping, self.bezeichnungen, zuordnung))
@@ -290,6 +296,7 @@ class Sitzung:
     def identitaet(self, ph: str, aktiv: bool | None = None, bezeichnung: str | None = None,
                    gehoert_zu: str | None = None, trennen: str | None = None,
                    zuordnen: dict | None = None) -> dict:
+        self._sichern("Änderung an einer Karte")
         if aktiv is not None:
             (self.disabled.discard if aktiv else self.disabled.add)(ph)
         if bezeichnung is not None:
@@ -315,6 +322,118 @@ class Sitzung:
                 raise ValueError("Die Zielperson wurde nicht gefunden.")
             self.aliases[zuordnen["text"].lower()] = ziel
             self.getrennt.discard(zuordnen["text"].lower())
+        self._pseudonymisieren()
+        return self.zustand()
+
+    # ------------------------------------------------------------------ Markieren und im Rest suchen, Rückgängig
+    def _dok(self, i: int) -> Dokument:
+        if not (0 <= i < len(self.docs)):
+            raise ValueError("Diese Datei gibt es in der Prüfung nicht.")
+        return self.docs[i]
+
+    def _sichern(self, was: str) -> None:
+        import copy
+
+        self.verlauf.append((was, copy.deepcopy({
+            "findings": [d.findings for d in self.docs], "disabled": self.disabled, "bezeichnungen": self.bezeichnungen,
+            "aliases": self.aliases, "getrennt": self.getrennt, "aus_stellen": self.aus_stellen, "manual": self.manual})))
+        self.verlauf = self.verlauf[-40:]
+
+    def rueckgaengig(self) -> dict:
+        """Letzte Aktion beim Prüfen zurücknehmen (Karten und Dokumentansicht). Gelernte Einträge in den
+        Einstellungen bleiben; sie lassen sich unter Einstellungen → Gelernte Begriffe löschen."""
+        if not self.verlauf:
+            raise ValueError("Es gibt nichts zum Rückgängigmachen.")
+        was, st = self.verlauf.pop()
+        for d, fs in zip(self.docs, st["findings"]):
+            d.findings = fs
+        self.disabled, self.bezeichnungen, self.aliases = st["disabled"], st["bezeichnungen"], st["aliases"]
+        self.getrennt, self.aus_stellen, self.manual = st["getrennt"], st["aus_stellen"], st["manual"]
+        self._pseudonymisieren()
+        self.protokoll.notiere("info", f"Rückgängig: {was}")
+        return {**self.zustand(), "rueckgaengig": was}
+
+    def auswahl(self, dok: int, s: int, e: int, art: str | None = None) -> dict:
+        """Markierte Stelle: an Wortgrenzen ausrichten, Art vorschlagen, alle Vorkommen im Vorgang suchen."""
+        import re
+
+        d = self._dok(dok)
+        s, e = mk.ausrichten(d.text, int(s), int(e))
+        begriff = " ".join(re.sub(r"(?<=\w)-[ \t]*\n[ \t]*(?=\w)", "", d.text[s:e]).split())
+        if len(begriff) < 2:
+            raise ValueError("Bitte mindestens zwei Zeichen markieren.")
+        art = art if art in dict(mk.ARTEN) else mk.art_vorschlag(d.text, s, e)
+        return {"dok": dok, "s": s, "e": e, "arten": mk.ARTEN, **mk.fundstellen(self.docs, begriff, art)}
+
+    def markieren(self, begriff: str, art: str, stellen: list[dict], ursprung: dict | None = None,
+                  gehoert_zu: str = "", lernen: bool = False) -> dict:
+        """Ausgewählte Fundstellen als eigene Treffer anlegen (Quelle „manuell“). Stellen, die schon zu einem
+        aktiven Treffer gehören, werden nicht doppelt angelegt. gehoert_zu: Platzhalter einer bestehenden Identität."""
+        if gehoert_zu:
+            ziel = self.mapping.get(gehoert_zu)
+            if ziel is None:
+                raise ValueError("Die Identität wurde nicht gefunden.")
+            art = next((g["entity"] for g in self.identitaeten() if g["ph"] == gehoert_zu), art)
+        if art not in dict(mk.ARTEN):
+            raise ValueError("Unbekannte Art.")
+        self._sichern(f"Markierung „{begriff}“")
+        neu = 0
+        for st in stellen:
+            di, s, e = int(st["dok"]), int(st["s"]), int(st["e"])
+            d = self._dok(di)
+            if not (0 <= s < e <= len(d.text)) or any(f.active and s < f.end and e > f.start for f in d.findings):
+                continue
+            d.findings = [f for f in d.findings if not (s < f.end and e > f.start)]  # abgewählte Teiltreffer ersetzen
+            self.aus_stellen.discard((di, s, e))
+            eigen = bool(ursprung) and int(ursprung.get("dok", -1)) == di and int(ursprung.get("s", -1)) == s
+            d.findings.append(Finding(s, e, art, 1.0, d.text[s:e], quelle="manuell",
+                                      grund="von Ihnen markiert" if eigen else "wie von Ihnen markiert"))
+            d.findings.sort(key=lambda f: f.start)
+            if gehoert_zu:
+                self.aliases[d.text[s:e].lower()] = ziel
+                self.getrennt.discard(d.text[s:e].lower())
+            elif d.text[s:e].lower() != begriff.lower():
+                self.aliases[d.text[s:e].lower()] = begriff  # Schreibvariante (getrennt, gebeugt): gleicher Platzhalter
+            neu += 1
+        if not neu:
+            self.verlauf.pop()
+            raise ValueError("Alle gewählten Stellen sind schon markiert.")
+        if begriff.lower() not in (m.lower() for m in self.manual):
+            self.manual.append(begriff)  # bleibt bei einer erneuten Analyse erhalten
+        if lernen:
+            self.cfg_speichern(est.lernen(self.cfg_laden(), "immer_ersetzen", [begriff]))
+        self._pseudonymisieren()
+        self._protokoll_geheimnisse()
+        self.protokoll.notiere("info", f"Markiert: {neu} Stellen als {LABELS.get(art, art)}"
+                                       + (", künftig immer suchen" if lernen else ""))
+        return {**self.zustand(), "neu": neu}
+
+    def stelle(self, dok: int, s: int, e: int, aktion: str) -> dict:
+        """Eine markierte Stelle im Dokument: "hier" (nur diese Stelle stehen lassen), "vorgang" (die Identität im
+        ganzen Vorgang), "immer" (dazu dauerhaft lernen), "wieder" (doch anonymisieren)."""
+        d = self._dok(dok)
+        i = next((k for k, f in enumerate(d.findings) if f.start == int(s) and f.end == int(e)), None)
+        if i is None:
+            raise ValueError("Diese Stelle ist nicht markiert.")
+        ph = d.schluessel.get(i, "")
+        key = (dok, int(s), int(e))
+        if aktion == "wieder":
+            self._sichern("Stelle wieder anonymisiert")
+            self.aus_stellen.discard(key)
+            self.disabled.discard(ph)
+        elif aktion == "hier":
+            self._sichern("Stelle bleibt stehen")
+            self.aus_stellen.add(key)
+        elif aktion in ("vorgang", "immer"):
+            self._sichern("Angabe bleibt stehen")
+            if ph:
+                self.disabled.add(ph)
+            else:
+                self.aus_stellen.add(key)
+            if aktion == "immer":
+                self.cfg_speichern(est.lernen(self.cfg_laden(), "stehen_lassen", self._varianten(ph) if ph else [d.findings[i].text]))
+        else:
+            raise ValueError("Unbekannte Aktion.")
         self._pseudonymisieren()
         return self.zustand()
 
@@ -377,6 +496,8 @@ class Sitzung:
         out = []
         for g in groups.values():
             g["aktiv"] = g["ph"] not in self.disabled
+            g["aus_einzeln"] = sum(1 for di, d in enumerate(self.docs) for i, f in enumerate(d.findings)
+                                   if d.schluessel.get(i) == g["ph"] and (di, f.start, f.end) in self.aus_stellen)
             g["gelernt"] = any(v.lower() in stehen for v in g["varianten"])
             g["sicherheit"] = sicherheit(g["score"])
             gruende = []
@@ -420,10 +541,11 @@ class Sitzung:
             "identitaeten": self.identitaeten() if self.fortschritt.fertig else [],
             "dokumente": [{"name": d.name, "markiert_html": markiert_html(
                                d.text, d.findings, d.platzhalter,
-                               {(f.start, f.end): d.schluessel.get(i, "") for i, f in enumerate(d.findings)}),
+                               {(f.start, f.end): d.schluessel.get(i, "") for i, f in enumerate(d.findings)}, klassen=True),
                            "anonym": d.anonym, "ersetzt": sum(1 for f in d.findings if f.active)}
                           for d in self.docs] if self.fortschritt.fertig else [],
             "ergebnis": self.ergebnis,
+            "rueckgaengig": self.verlauf[-1][0] if self.verlauf else "",
             "ausgabe_ordner": self.ordner or str(self._ausgabe_ordner(cfg)),
             "erweitert": cfg.get("erweitert", {}),
         }
@@ -477,6 +599,8 @@ class Sitzung:
                 eintrag = {"name": d.name, "ausgabe": neu, "pfad": str(ziel / neu), "status": "ok", "hinweis": "",
                            "ersetzt": sum(1 for f in d.findings if f.active), "funde": [], "rat": ""}
                 rest = aus.leck_test(d.anonym, [f.text for f in d.findings if f.active])
+                bewusst = {f.text.lower() for f in d.findings if not f.active}  # „nur hier stehen lassen“
+                rest = [r for r in rest if r.lower() not in bewusst]
                 try:
                     if rest:  # schon der Text ist nicht sauber: keine Kopie schreiben
                         raise fio.PdfLeck([(r, "im anonymisierten Text") for r in rest])

@@ -125,3 +125,31 @@ mit denselben Optionen: nur hier / im ganzen Vorgang / künftig immer stehen las
   - Positionen je Treffer für die Vorschau (PDF-Rects, OCR-Boxen, Text-Offsets)
   - ein Endpunkt „markieren“ mit Rückgabe der Fundstellen je Datei, bevor angewendet wird
   - Rückgängig-Stapel in der Sitzung
+
+## Stand der Umsetzung (05.11.2026)
+
+Umgesetzt in `server/markieren.py`, `server/dienst.py` (`auswahl`, `markieren`, `stelle`, `rueckgaengig`) und
+`ui/app.js`, getestet in `tests/test_server.py::test_markieren_und_im_rest_suchen`:
+
+- **M2:** Maus und Umschalt+Pfeiltasten. Abgeschnittene Wortränder bis 2 Zeichen werden ergänzt. Mehrzeilige
+  Auswahl ist möglich.
+- **M3:** Art-Vorschlag und „gehört zu …“.
+- **M4:** Gesucht wird nach ganzen Wörtern, Beugung, Silbentrennung, Ligaturen und Namensteilen als eigene Gruppe.
+  Schon markierte Stellen werden angezeigt und nicht doppelt angelegt.
+- **M5:** Anzahl je Datei, „Alle anwenden“, „Einzeln ansehen“, „Nur hier“ und eine Warnung ab 50 Fundstellen.
+- **M6:** Rückgängig mit Strg+Z oder per Toast. Das gilt auch für Änderungen an den Karten.
+- **M7:** Nicht anonymisieren: nur hier, im ganzen Vorgang oder künftig immer. Außerdem „doch anonymisieren“.
+- **M8:** Begründung „von Ihnen markiert“ bzw. „wie von Ihnen markiert“.
+- **M9:** dieselbe Pipeline wie bei erkannten Treffern.
+- **M10:** Lernen mit Haken.
+
+Abweichungen und offen:
+
+- **M1:** Die Vorschau zeigt den gelesenen Text, nicht das Seitenbild der PDF. Scans erscheinen als Text aus der
+  Texterkennung. Eine Seitenbild-Ansicht mit Textebene ist noch offen.
+- **„Nur hier“:** Das wirkt in Text- und Markdown-Ausgaben genau an der Stelle. PDF-, Word- und Excel-Kopien
+  ersetzen nach Suchtext, dort wird derselbe Text überall ersetzt (sichere Richtung). Die Oberfläche sagt das.
+- **„hierher übernehmen“ (M4):** Eine Fundstelle, die schon zu einem anderen Platzhalter gehört, lässt sich noch
+  nicht umhängen. Das geht weiter über „gehört zu“ auf der Karte.
+- **Rückgängig und gelernte Begriffe:** Rückgängig nimmt gelernte Einträge in den Einstellungen nicht zurück.
+  Sie lassen sich unter Einstellungen → Gelernte Begriffe löschen.

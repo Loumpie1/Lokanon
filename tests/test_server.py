@@ -245,3 +245,52 @@ def test_fehlerfall_rueckweg_und_protokoll_ohne_klartext(client, monkeypatch):
     datei = "\n".join(f.read_text(encoding="utf-8") for f in Path(p["ordner"]).glob("*.log"))
     for klar in ("Weber", "Goethestraße", "Krause", "Nolte", "0201 5551234"):
         assert klar not in text and klar not in datei, klar
+
+
+def test_markieren_und_im_rest_suchen(client):
+    """Anforderung Markieren und Suchen: Stelle markieren → Fundstellen in allen Dateien (auch getrennt am
+    Zeilenende, nicht „Noltenbach“) → anwenden → nichts mehr lesbar; Rückgängig stellt alles wieder her;
+    einzelne Stelle stehen lassen und wieder anonymisieren."""
+    from server import markieren as mk
+
+    a = ("Die Ware holte die Spedition Nolte am Montag ab. Laut Spedition Nolte fehlte ein Karton.\n"
+         "Die Rechnung der Spedi-\ntion Nolte liegt bei.")
+    b = "Rückfrage an Spedition Nolte, Lager Noltenbach."
+    client.post("/api/leeren")
+    client.post("/api/dateien", files=[("datei", ("A.txt", a.encode("utf-8"), "text/plain")),
+                                       ("datei", ("B.txt", b.encode("utf-8"), "text/plain"))])
+    client.post("/api/analyse", json={"begriffe": []})
+    warte(client)
+    vorher = [d["anonym"] for d in client.get("/api/zustand").json()["dokumente"]]
+    s = a.index("Spedition Nolte") + 2  # ungenau markiert: Wortanfang abgeschnitten
+    r = client.post("/api/auswahl", json={"dok": 0, "s": s, "e": s + len("Spedition Nolte") - 2}).json()
+    assert r["begriff"] == "Spedition Nolte" and r["art"] == "ORGANIZATION" and r["gesamt"] == 4 and not r["warnung"]
+    texte = [st["text"] for f in r["dateien"] for st in f["stellen"]]
+    assert "Spedi-\ntion Nolte" in texte and not any("Noltenbach" in t for t in texte)
+    stellen = [{"dok": f["i"], "s": st["s"], "e": st["e"]} for f in r["dateien"] for st in f["stellen"] if not st["schon"]]
+    if stellen:
+        z = client.post("/api/markieren", json={"begriff": r["begriff"], "art": r["art"], "stellen": stellen,
+                                               "ursprung": {"dok": 0, "s": r["s"]}}).json()
+        assert z["neu"] == len(stellen) and z["rueckgaengig"].startswith("Markierung")
+    z = client.get("/api/zustand").json()
+    for d in z["dokumente"]:
+        assert "Nolte " not in d["anonym"] and "Nolte," not in d["anonym"] and "tion Nolte" not in d["anonym"]
+    assert "Noltenbach" in z["dokumente"][1]["anonym"]
+    if stellen:
+        z = client.post("/api/rueckgaengig").json()
+        assert [d["anonym"] for d in z["dokumente"]] == vorher
+        client.post("/api/markieren", json={"begriff": r["begriff"], "art": r["art"], "stellen": stellen})
+    # Eine Stelle stehen lassen und wieder anonymisieren
+    z = client.get("/api/zustand").json()
+    import re
+    m = re.search(r'data-s="(\d+)" data-e="(\d+)"', z["dokumente"][1]["markiert_html"])
+    s1, e1 = int(m.group(1)), int(m.group(2))
+    z = client.post("/api/stelle", json={"dok": 1, "s": s1, "e": e1, "aktion": "hier"}).json()
+    assert b[s1:e1] in z["dokumente"][1]["anonym"]
+    z = client.post("/api/stelle", json={"dok": 1, "s": s1, "e": e1, "aktion": "wieder"}).json()
+    assert b[s1:e1] not in z["dokumente"][1]["anonym"]
+    # Sehr häufiger Begriff: Warnung
+    class D:  # noqa: D401 – Minimaldokument für die reine Textsuche
+        name, findings, schluessel = "X.txt", [], {}
+        text = "Bank " * 60
+    assert mk.fundstellen([D()], "Bank", "MANUELL")["warnung"]
