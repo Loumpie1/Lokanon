@@ -17,6 +17,7 @@ from presidio_analyzer.predefined_recognizers import SpacyRecognizer
 
 from . import lexikon
 from .felder import feld_treffer
+from .struktur import struktur_treffer
 from .recognizers_de import DATUM_ALLE_RX, DATUM_KONTEXT, RECHTSFORMEN, german_recognizers
 
 DATUM_KONTEXT_KURZ = ["geb", "geburt", "verstorb", "versterb", "gestorb", "sterb", "tod"]
@@ -82,6 +83,8 @@ NER_STOPWORDS = {
     "iban", "bic", "steuer-id", "steuernummer", "ust-idnr", "ust-id", "tel", "telefon", "fax",
     "e-mail", "email", "mail", "mobil", "handy", "anschrift", "adresse", "kennzeichen", "betreff",
     "datum", "anlage", "anlagen", "sehr geehrte", "sehr geehrter", "herr", "herrn", "frau", "dr", "prof", "mfg",
+    # Abkürzungen in Befunden und Arztbriefen
+    "pat", "pat.", "pt", "pt.", "st.p", "st.p.", "z.n", "z.n.", "v.a", "v.a.", "o.g", "o.g.", "o.b", "o.b.", "amb", "stat",
     "gmbh", "ag", "kg", "abteilung", "team", "ki", "pdf", "excel", "word", "fin", "vin", "kanzlei", "praxis",
     "firma", "unternehmen", "gesellschaft", "verein", "behörde", "gericht", "versicherung", "bank",
     "person", "personen", "name", "namen", "platzhalter", "sachverhalt", "beteiligte", "beteiligter",
@@ -160,7 +163,8 @@ INSTITUTION_WORDS = {
     "gericht", "bußgeldstelle", "staatsanwaltschaft", "polizei", "finanzamt", "behörde", "ministerium", "kammer",
     "krankenhaus", "klinik", "klinikum", "hospital", "seniorenstift", "pflegeheim", "altenheim", "versicherung",
     "versicherer", "sparkasse", "volksbank", "raiffeisenbank", "commerzbank", "postbank", "bankhaus", "krankenkasse",
-    "universität", "hochschule",
+    "universität", "hochschule", "spital", "ambulanz", "abteilung für", "institut für", "zentrum für", "department",
+    "konsil", "lehrkrankenhaus",
     "schule", "kirche", "gemeinde", "landkreis", "jobcenter", "agentur für arbeit", "rentenversicherung",
     "bundesamt", "landesamt", "ordnungsamt", "jugendamt", "standesamt", "nachlassgericht", "notariat",
     "caritas", "diakonie", "johanniter", "malteser", "huk-coburg", "allianz", "arag", "devk", "ergo", "signal iduna",
@@ -203,6 +207,16 @@ FIELD_LABEL_WORDS = {
 # Briefkopf-Datum "Essen, 21.10.2026" – Ort plus Komma unmittelbar davor
 _DATELINE_RX = re.compile(r"[A-ZÄÖÜ][a-zäöüß\.\- ]{1,40},[ \t]*(?:den[ \t]+)?$")
 _KFZ_RX = re.compile(r"[A-ZÄÖÜ]{1,3}[\s\-][A-Z]{1,2}[\s\-]?\d{1,4}[EH]?")
+def _kfz_kuerzen(f: Finding) -> Finding:
+    """Kennzeichen aus dem Modell, das zu viel mitnimmt ("BO-SR 618 W0LBF6EC3JG019754"), auf das Kennzeichen
+    kürzen. Sonst verdrängt der lange Treffer den richtigen aus der Regel und fällt danach selbst durch."""
+    if f.entity in ("KFZ", "DE_KFZ") and f.quelle == "modell":
+        m = _KFZ_RX.match(f.text)
+        if m and m.end() < len(f.text) and not f.text[m.end()].isalnum():
+            return Finding(f.start, f.start + m.end(), f.entity, f.score, m.group(), quelle=f.quelle, grund=f.grund)
+    return f
+
+
 _FILENAME_RX = re.compile(r"[\w\-]+\.(?:py|md|txt|docx?|xlsx?|pptx?|pdf|csv|json|ya?ml|bat|exe|zip|png|jpe?g)", re.IGNORECASE)
 
 
@@ -228,6 +242,7 @@ class Result:
 
 
 # Labels des GLiNER-PII-Modells (englisch, so wurde es trainiert) -> unsere Entitäten
+GLINER_NUR_BEKANNTE = True  # nur diese Labels abfragen (False = altes Verhalten mit Rohlabels, nur zum Messen)
 GLINER_MAPPING = {
     "person": "PERSON",
     "organization": "ORGANIZATION",
@@ -274,7 +289,8 @@ class _KontextEnhancer(LemmaContextAwareEnhancer):
 
 
 def build_analyzer(spacy_model: str = "de_core_news_lg", gliner_model: str | None = None,
-                   gliner_threshold: float = 0.5, gliner_onnx_file: str = "") -> AnalyzerEngine:
+                   gliner_threshold: float = 0.5, gliner_onnx_file: str = "", ner_modell: str = "",
+                   ner_schwelle: float = 0.5) -> AnalyzerEngine:
     nlp_conf = {
         "nlp_engine_name": "spacy",
         "models": [{"lang_code": "de", "model_name": spacy_model}],
@@ -299,12 +315,22 @@ def build_analyzer(spacy_model: str = "de_core_news_lg", gliner_model: str | Non
 
         # gliner_onnx_file leer = PyTorch-Gewichte (CPU). Der 4-Bit-ONNX-Export von hansa-institute liefert
         # keine Treffer (geprüft 28.10.2026), deshalb Standard PyTorch.
-        registry.add_recognizer(GLiNERRecognizer(
+        gl = GLiNERRecognizer(
             supported_language="de", model_name=gliner_model, entity_mapping=GLINER_MAPPING,
             threshold=gliner_threshold, load_onnx_model=bool(gliner_onnx_file),
             onnx_model_file=gliner_onnx_file or "model.onnx", map_location="cpu",
             chunk_size=1000, chunk_overlap=100,
-        ))
+        )
+        if GLINER_NUR_BEKANNTE:
+            # Presidio hängt jede angefragte Entität ohne Zuordnung als Rohlabel an ("DIKTATZEICHEN",
+            # "EIGENE_BEGRIFFE", "KENNNUMMER" …). Damit kann das Modell nichts anfangen und markiert Laborwerte und
+            # Befundsätze. Nur die englischen Labels aus GLINER_MAPPING abfragen.
+            gl._GLiNERRecognizer__create_input_labels = lambda _entities: list(gl.gliner_labels)
+        registry.add_recognizer(gl)
+    if ner_modell:
+        from .eigenes_modell import LokanonNER
+
+        registry.add_recognizer(LokanonNER(ner_modell, ner_schwelle))
     # Kontextwörter auch NACH dem Treffer berücksichtigen ("… ist am 02.09.2026 verstorben")
     enhancer = _KontextEnhancer(context_prefix_count=5, context_suffix_count=6)
     return AnalyzerEngine(nlp_engine=nlp_engine, registry=registry, supported_languages=["de"],
@@ -355,10 +381,16 @@ def make_allow_matcher(allow_list: list[str] | None):
     return allowed
 
 
+# Gerichtskürzel zählen nur am Anfang ("AG Essen", "LG Duisburg"); "Siemens AG" ist eine Aktiengesellschaft
+_GERICHT_KUERZEL = {"ag", "lg", "olg", "pi", "bgh", "bverfg"}
+
+
 def _is_institution(text: str) -> bool:
     t = text.lower()
-    toks = set(re.split(r"[\s\-]+", t))
-    return any(w in t for w in INSTITUTION_WORDS) or bool(toks & INSTITUTION_TOKENS)
+    toks = [w for w in re.split(r"[\s\-]+", t) if w]
+    if toks and toks[0] in _GERICHT_KUERZEL and len(toks) > 1:
+        return True
+    return any(w in t for w in INSTITUTION_WORDS) or bool(set(toks) & (INSTITUTION_TOKENS - _GERICHT_KUERZEL))
 
 
 def _term_findings(text: str, terms: list[str], entity: str, quelle: str = "liste") -> list[Finding]:
@@ -426,7 +458,10 @@ def _lexikon_plausibel(f: Finding) -> bool:
         return False  # "Skoda Octavia"
     if f.entity == "PERSON":
         if len(kern) == 1:
-            return not lexikon.gewoehnlich(kern[0])  # "Gespräch", "Vaters", "Ferienregelung"
+            if kern[0][:1].islower():
+                return False  # "insusp", "venöse": Namen sind großgeschrieben
+            w = kern[0].capitalize() if kern[0].isupper() and len(kern[0]) > 3 else kern[0]
+            return not lexikon.gewoehnlich(w)  # "Gespräch", "Vaters", "Ferienregelung"
         if any(w[:1].islower() for w in kern):
             return False  # "Ileitis terminalis": Namen bestehen aus großgeschriebenen Wörtern
         return any(lexikon.ist_name(w) for w in kern) or not all(lexikon.gewoehnlich(w) for w in kern)
@@ -435,6 +470,8 @@ def _lexikon_plausibel(f: Finding) -> bool:
             w = kern[0]
             if w.isupper() and len(w) <= 5:
                 return False  # "FAST", "CBCL": Abkürzungen von Testverfahren
+            if w.isupper():
+                w = w.capitalize()  # "ONKOLOGIE", "DEKURS" (Überschriften in Großbuchstaben)
             return not lexikon.gewoehnlich(w)
         # "Fahrzeug A", "Stadtkasse Essen" – nur gewöhnliche Wörter und einzelne Buchstaben
         return not all(len(w) == 1 or lexikon.gewoehnlich(w) for w in kern)
@@ -524,20 +561,83 @@ class _Wortarten:
         return out
 
 
+# Tarifverträge, Betriebsvereinbarungen, Ordnungen: Regelwerke, keine Firmen
+_REGELWERK_RX = re.compile(
+    r"^(?:G?K?BV|MTV|E?TV|RTV|TVöD|TV-L|TVÜ|DVO|VO|AVR|EntgO|BAT|GBV|KBV|ETV|MTV)(?:[\s.\-]|$)|"
+    r"(?i:tarifvertrag|betriebsvereinbarung|dienstvereinbarung|richtlinien?$|verordnung|ordnung$|satzung$)")
+
+
+# Häufige Endungen von Domains; "A.me", "c.et", "Neurolog.St" in Befunden sind Abkürzungen, keine Adressen
+_TLD = {"de", "at", "ch", "li", "lu", "eu", "com", "net", "org", "info", "biz", "io", "me", "tv", "co", "uk", "fr", "it",
+        "nl", "be", "dk", "se", "no", "fi", "pl", "cz", "es", "pt", "gov", "edu", "online", "shop", "app", "dev", "berlin",
+        "nrw", "bayern", "hamburg", "koeln", "ruhr", "email", "law", "legal", "health", "med", "jobs", "us"}
+
+
+def _url_plausibel(t: str) -> bool:
+    t = t.strip()
+    if "://" in t or t.lower().startswith("www."):
+        return True
+    host = re.split(r"[/:?#]", t, maxsplit=1)[0]
+    teile = host.split(".")
+    return host == host.lower() and len(teile) >= 2 and teile[-1] in _TLD and len(teile[-2]) >= 2
+
+
+# Medizinische Endungen (Diagnosen, Eingriffe, Untersuchungen); Namen aus der Namensliste sind ausgenommen
+_MEDIZIN_ENDUNGEN = ("itis", "ose", "ämie", "aemie", "algie", "ektomie", "tomie", "skopie", "graphie", "grafie", "plastik",
+                     "pathie", "urie", "penie", "zytose", "ismus", "ödem", "oedem", "insuffizienz", "punktion", "resektion",
+                     "anamnese", "sonographie", "sonografie", "therapie", "syndrom")
+# Dosierung hinter einem Wort: dann ist es ein Medikament ("Concor 5 MG 1-0-0", "Fucidine Salbe", "Novalgin Trpf")
+_DOSIS_RX = re.compile(r"[ \t]*(?:\d+(?:[.,]\d+)?[ \t]?(?:mg|µg|ug|mcg|g|ml|IE|I\.E\.|%|mmol|Hub|Trpf|Tbl)(?![\w])|"
+                       r"\d[ \t]?-[ \t]?\d[ \t]?-[ \t]?\d|"
+                       r"(?:Tbl|Tabl|Tabletten?|Trpf|Tropfen|Salbe|Creme|AT|AS|Drg|Dragees?|Supp|Amp|Kps|Kapseln?|Inj|Gel|"
+                       r"Spray|retard|ret\.|forte|comp\.?|Prolong|Depot|Perfusor|s\.c\.|i\.v\.|p\.o\.)(?![\w]))",
+                       re.IGNORECASE)
+
+
+_DARREICHUNG = {"salbe", "creme", "at", "as", "drg", "trpf", "tbl", "tabl", "supp", "amp", "kps", "gel", "spray", "retard",
+                "forte", "comp", "prolong", "depot", "perfusor", "tropfen", "tabletten", "kapseln", "lösung", "saft",
+                "pflaster", "zäpfchen", "ampullen", "injektion", "infusion"}
+
+
+def _medizinisch(text: str, f: Finding) -> bool:
+    """Medikament, Fachbegriff oder abgekürztes Wort statt Name (nur für Modelltreffer ohne weiteres Signal)."""
+    if _DOSIS_RX.match(text, f.end):
+        return True
+    woerter = [w.strip(",:;()\"'„“") for w in f.text.split()]
+    woerter = [w for w in woerter if w and w.lower() not in TITLES]
+    if woerter and woerter[-1].lower().rstrip(".") in _DARREICHUNG:
+        return True  # "Fucidine Salbe", "Reparil Drg", "Brimonidin AT"
+    if len(woerter) > 1 and f.entity == "PERSON" and woerter[0][:1].isupper() and not lexikon.ist_name(woerter[0])             and woerter[0].lower() in lexikon._liste("adjektive"):
+        return True  # "Venöse Ekatsie", "Konstitutioneller Zwerchfellhochstand": Namen beginnen nicht mit Adjektiven
+    if len(woerter) != 1:
+        return bool(woerter) and all(lexikon.ist_medizin(w) or lexikon.gewoehnlich(w.capitalize()) for w in woerter) \
+            and any(lexikon.ist_medizin(w) for w in woerter)
+    w = woerter[0].rstrip(".")
+    if lexikon.ist_name(w) or lexikon.ist_name(w.capitalize()):
+        return False
+    if lexikon.ist_medizin(w) or w.lower().endswith(_MEDIZIN_ENDUNGEN) or (len(w) >= 7 and w.lower().endswith(("om", "oms"))):
+        return True
+    abgekuerzt = text[f.end:f.end + 1] == "." or f.text.endswith(".")
+    return abgekuerzt and lexikon.ist_abkuerzung(w) and not lexikon.ist_wort(w)
+
+
 def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
+    if f.entity == "URL" and not _url_plausibel(f.text):
+        return False
     if f.entity not in NER_ENTITIES:
         if f.entity == "EMAIL_ADDRESS" and "@" not in f.text:
             return False  # "E-Mail-Anschrift"
+        if f.entity == "DATUM" and f.quelle in ("modell", "regel"):
+            # Daten aus Modell oder Muster nur mit Personenbezug im Umfeld derselben Zeile, als Wortanfang
+            # ("geboren", nicht "Arbeitgeber"). Presidios Kontextwörter reichen über Zeilen hinweg ("Datum |
+            # 27.10.2026⏎Bußgeldbescheid⏎… geboren am …"), deshalb hier noch einmal enger.
+            zs = max(text.rfind("\n", 0, f.start) + 1, f.start - 60)
+            ze = text.find("\n", f.end)
+            if ze >= 0:  # danach auch die Folgezeile ("ist am 02.09.2026\nim Stift verstorben")
+                ze = text.find("\n", ze + 1)
+            umfeld = text[zs:min(ze if ze >= 0 else len(text), f.end + 60)].lower()
+            return bool(re.search(r"(?<![\wäöüß])(?:" + "|".join(DATUM_KONTEXT_KURZ) + ")", umfeld))
         if f.quelle == "modell":
-            if f.entity == "DATUM":
-                # Modell-Daten nur mit Personenbezug im Umfeld derselben Zeile, als Wortanfang ("geboren", nicht
-                # "Arbeitgeber")
-                zs = max(text.rfind("\n", 0, f.start) + 1, f.start - 60)
-                ze = text.find("\n", f.end)
-                if ze >= 0:  # danach auch die Folgezeile ("ist am 02.09.2026\nim Stift verstorben")
-                    ze = text.find("\n", ze + 1)
-                umfeld = text[zs:min(ze if ze >= 0 else len(text), f.end + 60)].lower()
-                return bool(re.search(r"(?<![\wäöüß])(?:" + "|".join(DATUM_KONTEXT_KURZ) + ")", umfeld))
             if f.entity == "ADRESSE" and not _ADRESSE_ANKER_RX.search(f.text):
                 return False  # "Zimmer 2.14": eine Anschrift hat ein Straßenwort, eine Postleitzahl oder "Postfach"
             if f.entity in ("KFZ", "DE_KFZ") and not _KFZ_RX.fullmatch(f.text.strip()):
@@ -575,9 +675,14 @@ def _plausible(text: str, f: Finding, wa: _Wortarten | None = None) -> bool:
         return False
     if f.quelle == "modell" and not _lexikon_plausibel(f):
         return False
+    if f.quelle == "modell" and f.entity in ("PERSON", "ORGANIZATION") and not _RECHTSFORM_RX.search(f.text) \
+            and _medizinisch(text, f):
+        return False
     if any(p.endswith(_LOHN_ENDUNGEN) or p.startswith(_LOHN_ANFAENGE) for p in teile) and not (
             f.entity == "ORGANIZATION" and _RECHTSFORM_RX.search(f.text)):
         return False  # "Gesamtbrutto", "SV-Brutto", "Krankengeldzuschuss" – Fachbegriffe der Lohnabrechnung
+    if f.entity == "ORGANIZATION" and _REGELWERK_RX.search(f.text):
+        return False  # "MTV Systemgastronomie", "BV Soziale Richtlinien", "DVO.EKD": Tarifverträge und Regelwerke
     if f.entity == "ORGANIZATION" and f.quelle == "modell" and _RECHTSFORM_ANFANG_RX.match(f.text):
         return False  # "GmbH · Postfach": Rechtsform steht am Ende eines Firmennamens, nicht am Anfang
     if f.entity == "PERSON" and any(w.lower().endswith(_SUBSTANTIV_ENDUNGEN) for w in toks_all):
@@ -622,9 +727,13 @@ def _mentions(text: str, allowed, keep_institutions: bool) -> list[tuple[int, in
     Kontaktdaten in derselben Zeile danach gehören zu ihr und bleiben stehen."""
     spans = []
     if keep_institutions:
-        words = sorted(INSTITUTION_WORDS | INSTITUTION_TOKENS, key=len, reverse=True)
-        rx = re.compile(r"(?<![\wäöüß])(?:" + "|".join(re.escape(w) for w in words) + r")(?:[\wäöüß\-]*)",
-                        re.IGNORECASE)
+        # Lange Wörter auch als Wortanfang ("Amtsgerichts"), Kürzel nur als ganzes Wort ("PI", nicht "PIZ")
+        words = sorted(INSTITUTION_WORDS, key=len, reverse=True)
+        toks = sorted(INSTITUTION_TOKENS - _GERICHT_KUERZEL - {"stadt", "kreis", "amt", "bank", "stift", "heim"}, key=len,
+                      reverse=True)
+        rx = re.compile(r"(?<![\wäöüß])(?:(?:" + "|".join(re.escape(w) for w in words) + r")[\wäöüß\-]*|(?:"
+                        + "|".join(re.escape(w) for w in toks) + r"|(?:" + "|".join(sorted(_GERICHT_KUERZEL))
+                        + r")(?=[ \t]+[A-ZÄÖÜ]))(?![\wäöüß]))", re.IGNORECASE)
         spans += [(m.start(), m.end()) for m in rx.finditer(text) if len(m.group()) > 2]
     for term in getattr(allowed, "terms", []):
         if len(term) >= 4:
@@ -709,14 +818,16 @@ def detect(
     findings = []
     for r in raw:
         name = (r.recognition_metadata or {}).get("recognizer_name", "")
-        quelle = "modell" if name in ("SpacyRecognizer", "GLiNERRecognizer") else "regel"
+        quelle = "modell" if name in ("SpacyRecognizer", "GLiNERRecognizer", "LokanonNER") else "regel"
         findings.append(Finding(r.start, r.end, r.entity_type, r.score, text[r.start:r.end], quelle=quelle))
     findings += _heuristic_persons(text)
     findings += _vorname_personen(text)
     findings += _parteien(text)
+    findings += [f for f in struktur_treffer(text) if f.entity in entities]
     findings += feld_treffer(text, entities)
     findings = [t for f in findings for t in _an_spalten_teilen(f)]
     findings = [c for f in findings if (c := _clean_span(text, f))]
+    findings = [_kfz_kuerzen(f) for f in findings]
     # Wortarten für die Plausibilitätsprüfung (spaCy-Modell aus dem Analyzer wiederverwenden)
     wa = None
     try:

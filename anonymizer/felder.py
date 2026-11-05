@@ -31,10 +31,10 @@ FELDER = [
     (_PERSON_ROLLEN, "PERSON", "name_oder_firma"),
     (["arbeitgeber", "firma", "unternehmen", "dienstherr"], "ORGANIZATION", "name_oder_firma"),
     (["geburtsdatum", "geb.-datum", "geb.datum", "geb. am", "geboren am", "geburtstag", "sterbedatum", "todestag",
-      "verstorben am", "todesdatum"], "DATUM", "datum"),
+      "verstorben am", "todesdatum", "geb.dat.", "geb.-dat.", "geb. dat.", "geb.am", "geburtsdat."], "DATUM", "datum"),
     (["versicherten-nr.", "versichertennr.", "versichertennummer", "krankenversichertennummer", "kv-nr.",
       "kv-nummer", "kvnr"], "DE_HEALTH_INSURANCE", "nummer"),
-    (["sv-nummer", "sv-nr.", "sozialversicherungsnummer", "rentenversicherungsnummer", "rv-nummer", "rv-nr.",
+    (["sv-nummer", "sv-nr.", "sv nr.", "svnr.", "sv-nr", "sozialversicherungsnummer", "rentenversicherungsnummer", "rv-nummer", "rv-nr.",
       "versicherungsnummer"], "DE_SOCIAL_SECURITY", "nummer"),
     (["versicherungsschein-nr.", "versicherungsscheinnummer", "versicherungsschein", "vertragsnummer", "vertrags-nr.",
       "vertragsnr.", "vertrag", "vertrag nr.", "police", "policennummer", "police-nr.", "schadennummer", "schaden-nr.",
@@ -42,7 +42,12 @@ FELDER = [
     (["kundennummer", "kunden-nr.", "kundennr.", "kd.-nr.", "kd-nr.", "kd.nr.", "kd. nr.", "mitgliedsnummer",
       "mitglieds-nr.", "mitgliedsnr.", "fallnummer", "fall-nr.", "fallnr.", "patientennummer", "patienten-nr.",
       "pat.-nr.", "kassenzeichen", "vorgangsnummer", "vorgangs-nr.", "zählernummer", "zähler-nr.",
-      "personenkennziffer", "mandantennummer", "mandanten-nr."], "KENNNUMMER", "nummer"),
+      "personenkennziffer", "mandantennummer", "mandanten-nr.",
+      # Krankenhaus und Labor
+      "fallzahl", "fall-zahl", "fn", "piz", "pat.-id", "patienten-id", "patientenid", "pid", "e-nr.", "einsende-nr.",
+      "eingangs-nr.", "eingangsnummer", "auftrags-nr.", "auftragsnummer", "labor-nr.", "labornummer", "befund-nr.",
+      "befundnummer", "histo-nr.", "h-nr.", "hnr.", "aufnahme-nr.", "aufnahmenummer", "probennummer", "proben-nr."],
+     "KENNNUMMER", "nummer"),
     (["personalnummer", "personal-nummer", "personal-nr.", "personalnr.", "pers.-nr.", "pers.nr.", "pers-nr.",
       "mitarbeiternummer", "mitarbeiter-nr.", "pnr."], "PERSONALNR", "nummer"),
     (["steuer-id", "steuer-idnr.", "steuer-id-nr.", "steuerliche identifikationsnummer", "identifikationsnummer",
@@ -75,11 +80,11 @@ _RECHTSFORM_RX = re.compile(rf"(?<![\wäöüß])(?:{RECHTSFORMEN})(?![\wäöüß
 _TOK = r"(?:[A-Za-z]{0,4}[-/]?\d[\dA-Za-z\-/.]*|[A-Z]{1,4})"
 _NUMMER_RX = re.compile(rf"{_TOK}(?:[ ]{_TOK}){{0,5}}")
 _BETRAG_RX = re.compile(r"-?\d{1,3}(?:[.\s]\s?\d{3})*\s?,\s?\d{2}\s?(?:€|EUR)?")
-_DATUM_RX = re.compile(DATUM_ALLE_RX)
+_DATUM_RX = re.compile(DATUM_ALLE_RX + r"|\b\d{1,2}[./]\d{1,2}[./]\d{2}(?:\d{2})?(?!\d)|\b\d{4}-\d{2}-\d{2}\b")
 # "Name: …" im Fließtext nur mit Doppelpunkt; Nummern und Daten auch ohne ("Kundennummer K-20419")
 _INLINE_RX = re.compile(
-    r"(?<![\wäöüß\-])(?P<bez>" + "|".join(re.escape(b) for b, _e, _f in _BEZEICHNUNGEN) + r")(?![\wäöüß\-])"
-    r"(?P<sep>[ \t]*:[ \t]*|[ \t]+)", re.IGNORECASE)
+    r"(?<![\wäöüß\-])(?P<bez>" + "|".join(re.escape(b) for b, _e, _f in _BEZEICHNUNGEN) + r")(?:(?<=\.)(?=\d)|(?![\wäöüß\-]))"
+    r"(?P<sep>[ \t]*:[ \t]*|[ \t]+|(?<=\.)(?=\d))", re.IGNORECASE)
 
 
 def _bezeichnung(zelle: str) -> tuple[str, str] | None:

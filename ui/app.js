@@ -662,6 +662,7 @@
           <label class="swrow"><div class="t"><b>Antworten der KI zurückübersetzen</b><span>Lokanon speichert je Durchlauf einen verschlüsselten Schlüssel und zeigt oben „Antwort zurückübersetzen“.</span></div><span class="switch"><input type="checkbox" id="s-rz" ${erw.rueckuebersetzung ? "checked" : ""}><span class="track"></span></span></label>
           <div class="field" id="s-pw-row" ${erw.rueckuebersetzung ? "" : "hidden"}><label class="lbl">Passwort für Schlüsseldateien</label><input class="input" type="password" id="s-pw" value="${esc(c.schluessel_passwort || "")}" placeholder="einmal festlegen"><span class="muted small">Liegt in Ihrer Einstellungsdatei auf diesem PC. Schlüssel: ${esc(c._schluessel_ordner_effektiv)}</span></div>
           <label class="swrow"><div class="t"><b>KI-Anweisung und Claude-Skill anzeigen</b><span>Nach dem Anonymisieren erscheint „KI-Anweisung kopieren“.</span></div><span class="switch"><input type="checkbox" id="s-ki" ${erw.ki_anweisung ? "checked" : ""}><span class="track"></span></span></label>
+          <label class="swrow"><div class="t"><b>Geprüfte Vorgänge als eigene Testfälle speichern</b><span>Nach dem Anonymisieren bleiben Text und Ihre Korrekturen verschlüsselt auf diesem PC (nur unter Ihrem Windows-Konto lesbar). Damit lässt sich jede neue Lokanon-Version an Ihren echten Dokumenten messen. <span id="s-tf-stand"></span></span></div><span class="switch"><input type="checkbox" id="s-tf" ${erw.testfaelle ? "checked" : ""}><span class="track"></span></span></label>
           <label class="swrow"><div class="t"><b>Vorgangsordner mit Prüfbericht und Protokoll</b><span>Je Durchlauf ein Ordner mit Originalen, Kopien, Prüfbericht (Klartext) und Protokoll unter ${esc(c._vorgaenge_ordner_effektiv)}.</span></div><span class="switch"><input type="checkbox" id="s-vg" ${erw.vorgaenge ? "checked" : ""}><span class="track"></span></span></label>
         </div>
         <div class="sect" id="s-vorstellung"><h3>Lokanon vorstellen</h3><p class="desc">Produktvorstellung und Filme für Kolleginnen, Kollegen und Mandanten. Läuft ohne Internet.</p>
@@ -678,6 +679,14 @@
       $$("#s-lern button", m).forEach((b) => (b.onclick = () => { gel[b.dataset.art].splice(+b.dataset.k, 1); lernListe(); }));
     };
     lernListe();
+    const tfStand = async () => {
+      let t; try { t = await api("/testfaelle"); } catch { return; }
+      const z = $("#s-tf-stand", m);
+      if (!t.vorgaenge) { z.textContent = ""; return; }
+      z.innerHTML = `${t.vorgaenge} ${t.vorgaenge === 1 ? "Vorgang" : "Vorgänge"} gespeichert · <button class="linkbtn" id="s-tf-del">alle löschen</button>`;
+      $("#s-tf-del", m).onclick = async (e) => { e.preventDefault(); await api("/testfaelle", { method: "DELETE" }); toast("Testfälle gelöscht", "ok"); tfStand(); };
+    };
+    tfStand();
     if (abschnitt) { const z = $(`#s-${abschnitt}`, m); if (z) setTimeout(() => z.scrollIntoView({ block: "start" }), 50); }
     $$("#s-datum label", m).forEach((l) => (l.onclick = () => { $$("#s-datum label", m).forEach((x) => x.classList.remove("on")); l.classList.add("on"); }));
     $("#s-rz", m).onchange = (e) => { $("#s-pw-row", m).hidden = !e.target.checked; };
@@ -688,7 +697,7 @@
       const werte = { gelernt: gel, allow_list: lines("#s-allow"), deny_list: lines("#s-deny"), keep_institutions: $("#s-inst", m).checked, mask_locations: $("#s-orte", m).checked,
         datum_modus: ($("#s-datum input:checked", m) || {}).value || "kontext", entities, suffix: $("#s-suffix", m).value, ausgabe_ordner: $("#s-out", m).value.trim(),
         ki_textfassung: $("#s-md", m).checked, schluessel_passwort: $("#s-pw", m).value,
-        erweitert: { rueckuebersetzung: $("#s-rz", m).checked, ki_anweisung: $("#s-ki", m).checked, vorgaenge: $("#s-vg", m).checked } };
+        erweitert: { rueckuebersetzung: $("#s-rz", m).checked, ki_anweisung: $("#s-ki", m).checked, vorgaenge: $("#s-vg", m).checked, testfaelle: $("#s-tf", m).checked } };
       if (werte.erweitert.rueckuebersetzung && !werte.schluessel_passwort) { toast("Bitte ein Passwort für die Schlüsseldateien festlegen.", "danger"); return; }
       try { await api("/einstellungen", { method: "PUT", json: { werte } }); S.cfg = await api("/einstellungen"); badge(); closeModal(); toast("Einstellungen gespeichert", "ok"); await laden(); } catch (e) { toast(e.message, "danger"); }
     };

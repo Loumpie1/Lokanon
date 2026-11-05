@@ -68,6 +68,7 @@ erweitert:
   rueckuebersetzung: false   # Schlüssel speichern und KI-Antworten zurückübersetzen
   ki_anweisung: false        # KI-Anweisung und Claude-Skill anzeigen
   vorgaenge: false           # je Durchlauf einen Vorgangsordner mit Prüfbericht und Protokoll anlegen
+  testfaelle: false          # geprüfte Vorgänge verschlüsselt als eigene Testfälle speichern (evaluate.py --eigene)
 # Passwort für Schlüsseldateien (nur bei Rückübersetzung; liegt lokal in dieser Datei)
 schluessel_passwort: ""
 

@@ -1,7 +1,10 @@
 """Misst die Erkennungsqualität gegen handmarkierte Testdaten.
 
 Aufruf:  python evaluate.py [--config testdaten\\kanzlei\\config_eval.yaml] [--ohne-gliner] [--json ergebnis.json]
-                            [--gegen basis.json] [--leise] testdaten\\beispiel.jsonl  [weitere.jsonl ...]
+                            [--gegen basis.json] [--leise] [--eigene] [--klartext] testdaten\\beispiel.jsonl  [...]
+--eigene nimmt die eigenen Testfälle aus geprüften Vorgängen dazu (Einstellungen → Erweitert, verschlüsselt im
+Datenordner). Dann erscheinen übersehene Stellen und Fehlalarme nur mit Art und Länge, ohne Klartext, außer mit
+--klartext.
 Ohne --config gilt die persönliche config.yaml (eigene Allow-Liste!). Für die Kanzlei-Referenzfälle und die
 Testsammlung (testdaten/korpus) die mitgelieferte config_eval.yaml nutzen, sonst zählt die fiktive Kanzlei als
 Fehlalarm.
@@ -46,7 +49,8 @@ def lade_faelle(paths):
 
 def analyzer_fuer(cfg, ohne_gliner=False):
     return build_analyzer(cfg["spacy_model"], None if ohne_gliner else (cfg.get("gliner_model") or None),
-                          cfg.get("gliner_threshold", 0.5), cfg.get("gliner_onnx_file", ""))
+                          cfg.get("gliner_threshold", 0.5), cfg.get("gliner_onnx_file", ""),
+                          cfg.get("ner_modell", ""), cfg.get("ner_schwelle", 0.5))
 
 
 def detect_fall(analyzer, cfg, text):
@@ -135,6 +139,29 @@ def auswerten(analyzer, cfg, faelle) -> dict:
     }
 
 
+def _verdecken(r: dict) -> dict:
+    """Klartext aus Listen entfernen (eigene Testfälle enthalten echte Daten)."""
+    def v(t):
+        return f"‹{len(t)} Zeichen›"
+    return {**r, "uebersehen": [[lab, v(t), d] for lab, t, d in r["uebersehen"]],
+            "fehlalarme": [[lab, v(t), q, d] for lab, t, q, d in r["fehlalarme"]],
+            "typfehler": [[lab, typ, v(t), d] for lab, typ, t, d in r["typfehler"]],
+            "namensteile": [v(t) for t in r["namensteile"]]}
+
+
+def eigene_bilanz(faelle) -> None:
+    """Was die Prüfung an den eigenen Vorgängen geändert hat: nachgetragene Stellen = von Lokanon übersehen,
+    abgewählte Vorschläge = Fehlalarme. Das ist die Messung der Version, mit der geprüft wurde."""
+    vor = sum(len(f.get("vorschlaege", [])) for f in faelle)
+    ab = sum(1 for f in faelle for v in f.get("vorschlaege", []) if not v[4])
+    nach = sum(f.get("nachgetragen", 0) for f in faelle)
+    gold = sum(len(f["spans"]) for f in faelle)
+    print(f"\nEigene Prüfungen: {len(faelle)} Dateien, {gold} ersetzte Stellen. Damals {vor} Vorschläge, davon {ab} "
+          f"abgewählt; {nach} Stellen von Hand nachgetragen.")
+    if gold:
+        print(f"  Recall damals ≈ {(gold - nach) / gold:.1%}, Precision damals ≈ {(vor - ab) / max(1, vor):.1%}")
+
+
 def ausgeben(r: dict, leise: bool = False) -> None:
     print(f"\n{'Familie':<22}{'Dok.':>5}{'Recall':>9}{'Precision':>11}{'Fehlalarme/Seite':>18}")
     for name, z in list(r["familien"].items()) + [("GESAMT", r["gesamt"])]:
@@ -206,7 +233,10 @@ def main(args):
     cfg_path = option("--config") or "config.yaml"
     json_out, gegen = option("--json"), option("--gegen")
     ohne_gliner, leise = "--ohne-gliner" in args, "--leise" in args
-    paths = [a for a in args if a not in ("--ohne-gliner", "--leise")] or ["testdaten/beispiel.jsonl"]
+    eigene, klartext = "--eigene" in args, "--klartext" in args
+    paths = [a for a in args if a not in ("--ohne-gliner", "--leise", "--eigene", "--klartext")]
+    if not paths and not eigene:
+        paths = ["testdaten/beispiel.jsonl"]
     cfg = yaml.safe_load(open(cfg_path, encoding="utf-8"))
     print(f"Konfiguration: {cfg_path}")
     t0 = time.time()
@@ -214,7 +244,17 @@ def main(args):
     print(f"Modelle geladen in {time.time() - t0:.0f} s"
           + (f" (spaCy + GLiNER {cfg['gliner_model']})" if cfg.get("gliner_model") and not ohne_gliner
              else " (spaCy)"))
-    r = auswerten(analyzer, cfg, lade_faelle(paths))
+    faelle = list(lade_faelle(paths))
+    if eigene:
+        from server import einstellungen as est
+        from server import testfaelle as tf
+
+        mein = tf.laden(est.daten_ordner())
+        eigene_bilanz(mein)
+        faelle += mein
+    r = auswerten(analyzer, cfg, faelle)
+    if eigene and not klartext:
+        r = _verdecken(r)
     ausgeben(r, leise)
     if gegen:
         vergleichen(r, json.load(open(gegen, encoding="utf-8")))

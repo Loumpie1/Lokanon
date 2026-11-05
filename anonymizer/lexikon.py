@@ -6,6 +6,7 @@ Vor- oder Nachnamen sind ("Fischer", "Koch", "Engel"), gelten nie als gewöhnlic
 """
 from __future__ import annotations
 
+import bisect
 import gzip
 from functools import lru_cache
 from pathlib import Path
@@ -32,7 +33,7 @@ def _liste(name: str) -> frozenset[str]:
 
 
 def ist_vorname(w: str) -> bool:
-    return w in _liste("vornamen")
+    return w in _liste("vornamen") or w in _liste("vornamen_wikidata")
 
 
 def ist_nachname(w: str) -> bool:
@@ -43,11 +44,38 @@ def ist_name(w: str) -> bool:
     return ist_vorname(w) or ist_nachname(w)
 
 
+def ist_medizin(w: str) -> bool:
+    """Medizinischer Fachbegriff, Wirkstoff oder Handelsname (Wikidata, ohne Eigennamen in Krankheitsnamen)."""
+    return w.strip(".,:;()\"'„“").lower() in _liste("medizin")
+
+
+@lru_cache(maxsize=None)
+def _anfaenge() -> list[str]:
+    return sorted({w.lower() for n in ("substantive", "adjektive", "medizin") for w in _liste(n)})
+
+
+@lru_cache(maxsize=20000)
+def ist_abkuerzung(w: str) -> bool:
+    """Abgekürztes Wort ("Unauff." zu "unauffällig", "körperl." zu "körperlich", "Pat." zu "Patient")."""
+    low = w.strip(".,:;()").lower()
+    if len(low) < 3 or not low.isalpha():
+        return False
+    liste = _anfaenge()
+    i = bisect.bisect_left(liste, low)
+    while i < len(liste) and liste[i].startswith(low):
+        if len(liste[i]) > len(low) + 1:
+            return True
+        i += 1
+    return False
+
+
 def _einfach(w: str) -> bool:
     """Substantiv (großgeschrieben) oder Adjektiv/Partizip (kleingeschrieben) aus der Liste."""
     if (w[:1].upper() + w[1:]) in _liste("substantive"):
         return True
     low = w.lower()
+    if low in _liste("medizin"):
+        return True
     # Adjektiv/Partizip, auch gebeugt ("weitergeleitete" zu "weitergeleitet")
     return low in _liste("adjektive") or any(low.endswith(e) and low[:-len(e)] in _liste("adjektive")
                                              for e in ("e", "en", "er", "es", "em"))
@@ -64,9 +92,11 @@ def ist_wort(w: str) -> bool:
         return bool(teile) and ist_wort(teile[-1]) and all(t.isupper() or ist_wort(t) for t in teile[:-1])
     if _einfach(w):
         return True
-    if len(w) < 9 or w.lower().endswith(NAMENSENDEN):  # "Rehbein", "Lindemann" bleiben Namen
+    if len(w) < 8 or w.lower().endswith(NAMENSENDEN):  # "Rehbein", "Lindemann" bleiben Namen
         return False
     low = w.lower()
+    if len(w) == 8:  # "Ruhe|geld", "Hand|buch": nur zwei gewöhnliche Wörter mit je mindestens 4 Buchstaben
+        return _einfach(low[4:]) and _einfach(low[:4])
     for i in range(3, len(w) - 2):
         kopf, rest = low[:i], low[i:]
         if not _einfach(rest) and not (len(rest) >= 7 and ist_wort(rest)):

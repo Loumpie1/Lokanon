@@ -241,6 +241,20 @@ def zurueck_zum_pruefen():
     return sitzung.zurueck_zum_pruefen()
 
 
+@app.get("/api/testfaelle")
+def testfaelle_uebersicht():
+    from server import testfaelle as tf
+
+    return tf.uebersicht(est.daten_ordner())
+
+
+@app.delete("/api/testfaelle")
+def testfaelle_loeschen():
+    from server import testfaelle as tf
+
+    return {"geloescht": tf.alle_loeschen(est.daten_ordner())}
+
+
 @app.get("/api/protokoll")
 def protokoll():
     """Einträge des letzten Durchlaufs (ohne Klartext) und der Ordner mit den Protokolldateien."""

@@ -24,6 +24,7 @@ from anonymizer.vorgang import (LESBARE_TYPEN, Vorgang, dateien_im_ordner, mappi
                                 pruefbericht_html, sicherer_name)
 from server import einstellungen as est
 from server import markieren as mk
+from server import testfaelle as tf
 from server.protokoll import Protokoll
 
 APP_DIR = Path(__file__).resolve().parents[1]
@@ -638,6 +639,12 @@ class Sitzung:
                 if vorgang is not None:
                     vorgang.notiere_treffer(d.name, d.findings, len(d.text), True)
                 dateien.append(eintrag)
+            if erweitert.get("testfaelle"):
+                try:
+                    if tf.speichern(est.daten_ordner(), self.docs):
+                        prot.notiere("info", f"Als eigener Testfall gespeichert ({n} Dateien, verschlüsselt)")
+                except Exception as e:  # ein Testfall darf das Anonymisieren nie verhindern
+                    prot.ausnahme("Testfall speichern", e)
             schluessel_pfad = ""
             if erweitert.get("rueckuebersetzung"):
                 schluessel_pfad = self._schluessel_speichern(cfg, ziel)

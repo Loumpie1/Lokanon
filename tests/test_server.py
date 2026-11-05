@@ -294,3 +294,29 @@ def test_markieren_und_im_rest_suchen(client):
         name, findings, schluessel = "X.txt", [], {}
         text = "Bank " * 60
     assert mk.fundstellen([D()], "Bank", "MANUELL")["warnung"]
+
+
+def test_eigene_testfaelle(client):
+    """Erweitert → Testfälle: nach dem Anonymisieren liegt der Vorgang verschlüsselt im Datenordner (kein Klartext in
+    der Datei), evaluate.py liest ihn mit Goldspannen und Bilanz, „alle löschen“ entfernt ihn."""
+    import evaluate as E
+    from server import testfaelle as tf
+
+    assert client.get("/api/testfaelle").json()["vorgaenge"] == 0
+    client.put("/api/einstellungen", json={"werte": {"erweitert": {"testfaelle": True}}})
+    client.post("/api/leeren")
+    client.post("/api/text", json={"text": "Herr Thomas Weber aus Essen schreibt an die Autohaus Krause GmbH."})
+    client.post("/api/analyse", json={"begriffe": []})
+    warte(client)
+    client.post("/api/anonymisieren")
+    warte(client)
+    assert client.get("/api/testfaelle").json()["vorgaenge"] == 1
+    datei = next(tf.ordner(est.daten_ordner()).glob("*" + tf.ENDUNG))
+    assert b"Weber" not in datei.read_bytes()
+    faelle = tf.laden(est.daten_ordner())
+    f = faelle[0]
+    assert "Thomas Weber" in [f["text"][s:e] for s, e, _ in f["spans"]] and f["vorschlaege"] and f["nachgetragen"] == 0
+    r = E._verdecken(E.auswerten(E.analyzer_fuer(est.laden(), ohne_gliner=True), est.laden(), faelle))
+    assert r["gesamt"]["total"] == len(f["spans"]) and all("Weber" not in str(m) for m in r["uebersehen"])
+    assert client.delete("/api/testfaelle").json()["geloescht"] == 1
+    client.put("/api/einstellungen", json={"werte": {"erweitert": {"testfaelle": False}}})
