@@ -784,6 +784,12 @@ def detect(
             if len(term) >= 3:
                 extra += [Finding(x.start, x.end, ent, 0.01, x.text, quelle=quelle)
                           for x in _term_findings(text, [term], ent)]
+        if include_name_parts:
+            # Unterscheidendes Wort eines Firmennamens allein ("bei Brandauer" zu "Parfümerie Brandauer GmbH")
+            for f in [f for f in findings if f.entity == "ORGANIZATION"]:
+                for teil in firmenteile(f.text, allowed):
+                    if teil.lower() not in loc_texts:
+                        extra += _firmenteil_findings(text, teil, f.text)
         # Bewusst KEINE Ausnahme für Einrichtungen: Was einmal als sensibel gilt, wird überall maskiert
         # (sonst bliebe z. B. die PLZ des Mandanten an der Gerichtsadresse lesbar).
         findings = _resolve_overlaps(findings + extra)
@@ -815,6 +821,64 @@ def _firmenteile_umdeuten(text: str, findings: list[Finding]) -> list[Finding]:
     return findings
 
 
+_FIRMEN_KLEINWORT = {"gmbh", "ggmbh", "mbh", "co", "kg", "kgaa", "ohg", "gbr", "ug", "partg", "mbb", "inc", "ltd",
+                     "und", "der", "die", "das", "von", "für", "haftungsbeschränkt"}
+_FIRMEN_BRANCHENENDEN = ("bau", "werk", "markt", "haus", "hof", "service", "handel", "technik", "zentrum", "büro")
+
+
+def _gewoehnliches_firmenwort(w: str) -> bool:
+    """Branchen- oder Allerweltswort in einem Firmennamen ("Bäckerei", "Autoservice", "Stahlbau", "Verwaltungs").
+    Strenger als lexikon.ist_wort: Zusammensetzungen zählen nur mit einem Grundwort ab 5 Buchstaben, damit
+    Nachnamen wie "Brandauer" (Brand+auer) nicht als gewöhnliches Wort gelten."""
+    from . import lexikon as L
+
+    if L._einfach(w) or (w.endswith("s") and L._einfach(w[:-1])):
+        return True
+    low = w.lower()
+    if len(low) > 6 and low.endswith(_FIRMEN_BRANCHENENDEN):
+        return True
+    for i in range(3, len(low) - 4):
+        kopf, rest = low[:i], low[i:]
+        if not L._einfach(rest):
+            continue
+        for fuge in L._FUGEN:
+            if kopf.endswith(fuge) and len(kopf) - len(fuge) >= 4 and L._einfach(kopf[:len(kopf) - len(fuge)]):
+                return True
+    return False
+
+
+def firmenteile(org: str, allowed=None) -> list[str]:
+    """Unterscheidende Wörter eines mehrteiligen Firmennamens, die allein für die Firma stehen können:
+    "PARFÜMERIE BRANDAUER GMBH & Co. KG" -> ["BRANDAUER"]. Nicht: Rechtsformen, Branchen- und Allerweltswörter
+    ("Bäckerei", "Lange", "Sommer"), Bindestrich-Wörter wie "Rhein-Ruhr", Automarken, erlaubte Begriffe."""
+    from . import lexikon as L
+
+    woerter = re.findall(r"[A-Za-zÄÖÜäöüß][\wÄÖÜäöüß-]*", org)
+    if len(woerter) < 2:
+        return []
+    out = []
+    for w in woerter:
+        n = w[0] + w[1:].lower() if w.isupper() else w
+        low = n.lower()
+        if (len(n) < 4 or not n[0].isupper() or "-" in n or low in _FIRMEN_KLEINWORT or low in NER_STOPWORDS
+                or low in FUNKTIONSWOERTER or low in AUTOMARKEN or _gewoehnliches_firmenwort(n)
+                or (allowed and allowed(w))):
+            continue
+        if not L.ist_name(n) and L.ist_wort(n) and L._einfach(n):
+            continue
+        out.append(w)
+    return out
+
+
+def _firmenteil_findings(text: str, teil: str, org: str) -> list[Finding]:
+    """Vorkommen eines Firmenteils als ganzes Wort, in der Schreibweise wie im Firmennamen, groß oder in
+    Großbuchstaben ("Brandauer", "BRANDAUER"), nicht klein ("lange")."""
+    formen = {teil, teil.upper(), teil[0] + teil[1:].lower()}
+    rx = re.compile(r"(?<![\w-])(?:" + "|".join(re.escape(f) for f in sorted(formen, key=len, reverse=True)) + r")(?![\w-])")
+    return [Finding(m.start(), m.end(), "ORGANIZATION", 0.01, m.group(), quelle="firmenteil",
+                    grund=f"Teil der Firma „{org}“") for m in rx.finditer(text)]
+
+
 def namensteile(text: str, allowed=None) -> list[str]:
     """Einzelne Namensteile eines Personennamens, die separat maskiert werden dürfen."""
     out = []
@@ -841,10 +905,13 @@ def propagate_vorgang(texte: list[str], findings_list: list[list[Finding]], allo
             if include_name_parts and f.entity == "PERSON":
                 for p in namensteile(f.text, allowed):
                     terms.add((p, "PERSON"))
+    teile = {(t, f.text) for fs in findings_list for f in fs
+             if include_name_parts and f.active and f.entity == "ORGANIZATION" and f.quelle != "firmenteil"
+             for t in firmenteile(f.text, allowed)}
     out = []
     for text, fs in zip(texte, findings_list):
         vorhanden = {(f.text.lower(), f.entity) for f in fs}
-        extra = []
+        extra = [x for t, org in teile for x in _firmenteil_findings(text, t, org)]
         for term, ent in terms:
             if (term.lower(), ent) in vorhanden and ent != "PERSON":
                 continue  # schon per Dokument-Propagation abgedeckt
@@ -888,6 +955,10 @@ def _ph_fuer(text: str, entity: str, reverse: dict[str, str], aliases: dict[str,
         for full_lower, p in reverse.items():  # Namensteil über den vollen Namen
             if key in [w.strip(".,") for w in full_lower.split()]:
                 return p
+    if ph is None and entity == "ORGANIZATION":
+        for full_lower, p in reverse.items():  # Firmenteil über den vollen Firmennamen
+            if p.startswith(LABELS["ORGANIZATION"] + "_") and key in re.findall(r"[\wäöüß-]+", full_lower):
+                return p
     return ph
 
 
@@ -922,6 +993,13 @@ def pseudonymize(text: str, findings: list[Finding], mapping: dict[str, str] | N
         if k.startswith(person_label):
             haeufigkeit[v] += 1
     persons = sorted(haeufigkeit, key=lambda p: (-len(p.split()), -haeufigkeit[p], -len(p)))
+    org_label = LABELS["ORGANIZATION"] + "_"
+    firmen = {f.text for f in active if f.entity == "ORGANIZATION" and f.quelle != "firmenteil"}
+    firmen |= {v for k, v in mapping.items() if k.startswith(org_label)}
+    firma_von: dict[str, str] = {}
+    for full in sorted(firmen, key=len, reverse=True):
+        for t in firmenteile(full):
+            firma_von.setdefault(t.lower(), full)
     part_owner = {}
     for full in persons:
         if full.lower() in getrennt and " " not in full:
@@ -952,6 +1030,9 @@ def pseudonymize(text: str, findings: list[Finding], mapping: dict[str, str] | N
                         break
             if f.entity == "PERSON" and key in part_owner and part_owner[key].lower() != key:
                 orig = part_owner[key]
+                key = orig.lower()
+            elif f.entity == "ORGANIZATION" and key in firma_von and firma_von[key].lower() != key:
+                orig = firma_von[key]
                 key = orig.lower()
             elif key in reverse:
                 orig = mapping[reverse[key]]

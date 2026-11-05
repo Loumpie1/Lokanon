@@ -153,3 +153,22 @@ def test_enge_wertezeile_wird_an_spaltenkoepfen_getrennt():
     werte = [w("57", 61.6, 73.4), w("281", 74.5, 90.4), w("956", 112.3, 128.5), w("13", 136.1, 148.0),
              w("150380", 150.8, 181.8), w("AOK", 218.9, 237.2), w("Rheinland", 240.1, 290.0)]
     assert [z[3] for z in _nach_spalten(werte, kopf)] == ["57 281 956", "13 150380", "AOK Rheinland"]
+
+
+def test_firmenwort_allein_wird_wie_die_firma_ersetzt(analyzer, cfg):
+    """„bei Brandauer“ zu „PARFÜMERIE BRANDAUER GMBH & Co. KG“: gleicher Platzhalter wie die Firma, auch in einer
+    anderen Datei des Vorgangs. Allerweltswörter aus Firmennamen („Lange“ in „Sommer & Lange GbR“) bleiben stehen."""
+    from anonymizer.engine import firmenteile, propagate_vorgang
+
+    assert firmenteile("PARFÜMERIE BRANDAUER GMBH & Co. KG") == ["BRANDAUER"]
+    assert firmenteile("Hausverwaltung Sommer & Lange GbR") == [] and firmenteile("Stahlbau Kerkhoff GmbH") == ["Kerkhoff"]
+    text = ("Kundenerklärung der PARFÜMERIE BRANDAUER GMBH & Co. KG, Lindenallee 4, 45127 Essen.\n"
+            "Ansprechpartner bei Brandauer ist Herr Tobias Lindqvist. Das dauerte lange.")
+    fs = detect(analyzer, text, cfg["entities"], 0.4, cfg.get("allow_list"), [], [], True, True)
+    res = pseudonymize(text, fs)
+    assert "Brandauer" not in res.anonymized and "BRANDAUER" not in res.anonymized and "lange" in res.anonymized
+    ph = [k for k, v in res.mapping.items() if "BRANDAUER" in v]
+    assert len(ph) == 1 and res.anonymized.count(f"[{ph[0]}]") == 2
+    zweite = "Rückruf von Brandauer erbeten."
+    neu = propagate_vorgang([text, zweite], [fs, []])
+    assert [f.text for f in neu[1]] == ["Brandauer"] and neu[1][0].entity == "ORGANIZATION"
