@@ -313,12 +313,13 @@ def namen_ersetzen(stamm: str, pairs: list[tuple[str, str]]) -> str:
 # ---------------------------------------------------------------------------
 
 FARBEN = {"PERSON": "#ffd6d6", "ORGANIZATION": "#d6e4ff", "LOCATION": "#d9f2e3", "PLZ_ORT": "#d9f2e3",
-          "ADRESSE": "#d9f2e3", "EIGENE_BEGRIFFE": "#f3d9ff", "MANUELL": "#f3d9ff", "DATUM": "#ffe9c4"}
+          "ADRESSE": "#d9f2e3", "EIGENE_BEGRIFFE": "#f3d9ff", "MANUELL": "#f3d9ff", "PROJEKT": "#f3d9ff",
+          "DATUM": "#ffe9c4"}
 
 
 _KLASSE = {"PERSON": "m-person", "ORGANIZATION": "m-firma", "LOCATION": "m-ort", "PLZ_ORT": "m-ort", "ADRESSE": "m-ort",
            "EMAIL_ADDRESS": "m-ort", "TELEFON": "m-ort", "URL": "m-ort", "DATUM": "m-datum", "EIGENE_BEGRIFFE": "m-eigene",
-           "MANUELL": "m-eigene"}
+           "MANUELL": "m-eigene", "PROJEKT": "m-eigene"}
 
 
 def markiert_html(text: str, findings: list[Finding], platzhalter: dict[tuple[int, int], str] | None = None,

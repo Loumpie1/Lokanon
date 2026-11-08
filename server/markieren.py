@@ -14,7 +14,7 @@ from anonymizer.recognizers_de import RECHTSFORMEN
 
 ARTEN = [("PERSON", "Person"), ("ORGANIZATION", "Firma oder Einrichtung"), ("ADRESSE", "Adresse"),
          ("PLZ_ORT", "Ort"), ("EMAIL_ADDRESS", "E-Mail"), ("TELEFON", "Telefon"), ("KENNNUMMER", "Kennnummer"),
-         ("DATUM", "Datum"), ("MANUELL", "Sonstiges")]
+         ("DATUM", "Datum"), ("PROJEKT", "Projekt oder Kürzel"), ("MANUELL", "Sonstiges")]
 WARNGRENZE = 50
 _BRANCHE = re.compile(r"(?i)\b(?:spedition|autohaus|bäckerei|praxis|kanzlei|apotheke|logistik|bau|handel|service|"
                       r"versicherung|bank|sparkasse|klinik|verlag|werkstatt|gruppe|holding|immobilien|hausverwaltung)")

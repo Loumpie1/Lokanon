@@ -62,6 +62,7 @@ LABELS = {
     "DIAGNOSE": "Diagnose",
     "EIGENE_BEGRIFFE": "Begriff",
     "MANUELL": "Begriff",
+    "PROJEKT": "Projekt",
 }
 
 # Gruppen für die Oberfläche (Reihenfolge = Anzeige)
@@ -75,7 +76,7 @@ GRUPPEN = {
     "Fahrzeug": ["DE_KFZ", "KFZ", "FIN"],
     "Datum": ["DATUM"],
     "Beruf und Gesundheit (indirekte Hinweise)": ["BERUF", "DIAGNOSE"],
-    "Eigene Listen": ["EIGENE_BEGRIFFE", "MANUELL"],
+    "Eigene Listen": ["EIGENE_BEGRIFFE", "MANUELL", "PROJEKT"],
 }
 
 # Häufige Fehlerkennungen des NER-Modells (Feldbezeichner, Dokumentarten, Anreden)
@@ -812,7 +813,7 @@ def detect(
     datum_modus: "kontext" = nur Daten mit Personenbezug (Geburt, Tod); "alle" = jedes Datum; "keine".
     """
     allowed = make_allow_matcher(allow_list)
-    model_entities = [e for e in entities if e not in ("EIGENE_BEGRIFFE", "MANUELL")]
+    model_entities = [e for e in entities if e not in ("EIGENE_BEGRIFFE", "MANUELL", "PROJEKT")]
     if "PERSON" in model_entities and "LOCATION" not in model_entities:
         model_entities.append("LOCATION")  # brauchen wir für die Ort/Firma-Unterscheidung
 

@@ -122,33 +122,104 @@ def test_kompletter_weg(client):
 
 
 
-def test_lernen_aus_korrekturen(client):
-    """"Künftig immer stehen lassen" und "künftig immer suchen" gelten in späteren Durchläufen; in den
-    Einstellungen sichtbar und löschbar."""
-    def durchlauf(text):
-        client.post("/api/leeren")
-        client.post("/api/dateien", files=[("datei", ("Notiz.txt", text.encode("utf-8"), "text/plain"))])
-        client.post("/api/analyse", json={"begriffe": []})
-        warte(client)
-        return {i["name"]: i for i in client.get("/api/zustand").json()["identitaeten"]}
+def durchlauf(client, text, name="Notiz.txt"):
+    client.post("/api/leeren")
+    client.post("/api/dateien", files=[("datei", (name, text.encode("utf-8"), "text/plain"))])
+    client.post("/api/analyse", json={"begriffe": []})
+    warte(client)
+    return {i["name"]: i for i in client.get("/api/zustand").json()["identitaeten"]}
 
-    ids = durchlauf(TEXT)
+
+def test_lernen_aus_korrekturen(client):
+    """„Künftig immer stehen lassen“ gilt in späteren Durchläufen, verschlüsselt im Gedächtnis statt im Klartext in
+    den Einstellungen; in der Übersicht sichtbar und löschbar."""
+    ids = durchlauf(client, TEXT)
     nolte = ids["Spedition Nolte"]
     assert nolte["belege"] and not nolte["gelernt"]
     client.post("/api/identitaet", json={"ph": nolte["ph"], "aktiv": False})
     z = client.post("/api/lernen", json={"art": "stehen_lassen", "begriffe": nolte["varianten"]}).json()
     assert {i["name"]: i for i in z["identitaeten"]}["Spedition Nolte"]["gelernt"]
-    client.post("/api/lernen", json={"art": "immer_ersetzen", "begriffe": ["Projekt Phoenix"]})
     assert client.post("/api/lernen", json={"art": "unbekannt", "begriffe": ["x"]}).status_code == 400
-    cfg = client.get("/api/einstellungen").json()
-    assert [g["begriff"] for g in cfg["gelernt"]["stehen_lassen"]] == nolte["varianten"]
-    assert cfg["gelernt"]["immer_ersetzen"][0]["datum"]
-    ids = durchlauf(TEXT + "\nIntern: Projekt Phoenix.")
-    assert "Spedition Nolte" not in ids and "Projekt Phoenix" in ids
-    # vergessen (Einstellungen speichern ohne Eintrag) -> wieder vorgeschlagen
-    client.put("/api/einstellungen", json={"werte": {"gelernt": {}}})
-    ids = durchlauf(TEXT)
+    assert "gelernt" not in client.get("/api/einstellungen").json()
+    assert b"Nolte" not in (HOME / "gedaechtnis.lokanon").read_bytes()
+    ids = durchlauf(client, TEXT)
+    assert "Spedition Nolte" not in ids
+    u = client.get("/api/faelle").json()
+    nolte_id = next(a["id"] for a in u["ohne_fall"] if a["text"] == "Spedition Nolte")
+    client.delete(f"/api/angabe/{nolte_id}")
+    ids = durchlauf(client, TEXT)
     assert "Spedition Nolte" in ids and "Formularfeld" not in " ".join(ids["Thomas Weber"]["belege"])
+
+
+def test_merken_fall_und_loeschen(client):
+    """Selbst markiert → am Ende bestätigt → im nächsten Vorgang mit Begründung vorgeschlagen; Fall aus dem
+    Aktenzeichen; Fall löschen entfernt Angaben und Schlüssel, danach kein Vorschlag mehr."""
+    client.put("/api/einstellungen", json={"werte": {"erweitert": {"rueckuebersetzung": True},
+                                                     "schluessel_passwort": "geheim"}})
+    text = TEXT + "\nIntern: Projekt Falkenhorst. Mandantennr.: 48213"
+    durchlauf(client, text, "Akte.txt")
+    z = client.get("/api/zustand").json()
+    assert z["fall"] == "3 O 123/26" and not z["fall_bestaetigt"]
+    for begriff, art in (("Falkenhorst", "PROJEKT"), ("48213", "KENNNUMMER")):
+        s = text.index(begriff)
+        a = client.post("/api/auswahl", json={"dok": 0, "s": s, "e": s + len(begriff), "art": art}).json()
+        stellen = [{"dok": f["i"], "s": st["s"], "e": st["e"]} for f in a["dateien"] for st in f["stellen"]]
+        client.post("/api/markieren", json={"begriff": a["begriff"], "art": art, "stellen": stellen,
+                                            "ursprung": {"dok": 0, "s": a["s"]}})
+    z = client.get("/api/zustand").json()
+    assert {i["name"]: i for i in z["identitaeten"]}["Falkenhorst"]["gruppe"] == "Selbst markiert"
+    client.post("/api/anonymisieren")
+    warte(client)
+    e = client.get("/api/zustand").json()["ergebnis"]
+    kand = {k["text"]: k for k in e["merken"]}
+    assert kand["48213"]["regel"]["wert"] == "Mandantennr." and not kand["Falkenhorst"]["personenbezug"]
+    assert e["fall"] == "3 O 123/26" and e["vorgang_id"]
+    client.post("/api/merken", json={"fall": "3 O 123/26", "eintraege": [
+        {"text": "Falkenhorst", "art": "PROJEKT"}, {"regel": kand["48213"]["regel"]}, {"text": "Weber", "art": "PERSON"}]})
+    # Nächster Vorgang: gelernte Angaben und die Regel kommen als Vorschlag mit Begründung
+    ids = durchlauf(client, "Herr Weber fragt nach dem Projekt Falkenhorst. Mandantennr.: 77310")
+    assert "Falkenhorst" in ids and "von Ihnen gelernt am" in " ".join(ids["Falkenhorst"]["belege"])
+    assert "77310" in ids and "Mandantennr." in " ".join(ids["77310"]["belege"])
+    u = client.get("/api/faelle").json()
+    fall = next(f for f in u["faelle"] if f["name"] == "3 O 123/26")
+    assert [a["text"] for a in fall["angaben"]] == ["Weber"] and fall["loeschdatum"]
+    v = client.post("/api/loeschen/vorschau", json={"faelle": [fall["id"]]}).json()
+    assert v["anzahl"]["angaben"] == 1 and v["anzahl"]["schluessel"] == 1 and v["anzahl"]["kopien"] >= 1
+    r = client.post("/api/loeschen", json={"faelle": [fall["id"]], "grund": "mandant"}).json()
+    assert r["geloescht"]["angaben"] == 1 and r["geloescht"]["schluessel"] == 1 and not r["fehler"]
+    nachweis = client.get(f"/api/loeschnachweis/{r['protokoll_nr']}").text
+    assert "Löschbestätigung" in nachweis and "Weber" not in nachweis
+    ids = durchlauf(client, "Notiz ohne Namen: Weber-Grill bestellen.")
+    assert not any("gelernt" in " ".join(i["belege"]) for i in ids.values())
+    client.put("/api/einstellungen", json={"werte": {"erweitert": {"rueckuebersetzung": False}}})
+
+
+def test_einfuehrung_uebungssitzung(client):
+    """Die Übung läuft neben einer offenen echten Arbeit, ohne echte Daten zu berühren."""
+    durchlauf(client, TEXT, "Echt.txt")
+    echt_vorher = client.get("/api/zustand").json()["dokumente"][0]["anonym"]
+    gd_vorher = (HOME / "gedaechtnis.lokanon").read_bytes() if (HOME / "gedaechtnis.lokanon").exists() else b""
+    cfg_vorher = client.get("/api/einstellungen").json()
+    client.post("/api/einfuehrung/start")
+    assert client.get("/api/status").json()["uebung"]
+    z = client.post("/api/einfuehrung/beispiel").json()
+    assert z["uebung"] and z["fall"] == "14 C 512/26" and len(z["dokumente"]) == 2
+    namen = {i["name"]: i for i in z["identitaeten"]}
+    assert namen["Morbus Crohn"]["unsicher"] and "Falkenhorst" not in namen
+    u = client.get("/api/faelle").json()
+    assert {f["name"] for f in u["faelle"]} >= {"3 O 1120/26", "9 O 88/25", "2 O 77/25"}
+    assert [f["name"] for f in u["hinweise"]] == ["9 O 88/25"]
+    client.put("/api/einstellungen", json={"werte": {"allow_list": ["nur in der Übung"]}})
+    client.post("/api/anonymisieren")
+    warte(client)
+    e = client.get("/api/zustand").json()["ergebnis"]
+    assert e["schluessel_pfad"] and "lokanon-uebung-" in e["ordner"]
+    client.post("/api/einfuehrung/ende")
+    assert not Path(e["ordner"]).exists()
+    assert client.get("/api/zustand").json()["dokumente"][0]["anonym"] == echt_vorher
+    assert client.get("/api/einstellungen").json()["allow_list"] == cfg_vorher["allow_list"]
+    assert ((HOME / "gedaechtnis.lokanon").read_bytes() if (HOME / "gedaechtnis.lokanon").exists() else b"") == gd_vorher
+
 
 def test_namen_im_dateinamen(client):
     client.post("/api/leeren")

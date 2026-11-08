@@ -10,12 +10,11 @@ dient ein Schlüssel in der Datei testfaelle.key im Datenordner.
 """
 from __future__ import annotations
 
-import ctypes
 import json
-import os
-import sys
 from datetime import datetime
 from pathlib import Path
+
+from server import tresor
 
 ENDUNG = ".lokanon-test"
 
@@ -24,56 +23,8 @@ def ordner(home: Path) -> Path:
     return home / "testfaelle"
 
 
-# ------------------------------------------------------------------------------------------- Verschlüsselung
-class _Blob(ctypes.Structure):
-    _fields_ = [("cbData", ctypes.c_uint32), ("pbData", ctypes.POINTER(ctypes.c_char))]
-
-
-def _dpapi(daten: bytes, schuetzen: bool) -> bytes:
-    from ctypes import POINTER, byref, c_char, c_uint32, c_void_p, c_wchar_p
-
-    crypt32, kernel32 = ctypes.windll.crypt32, ctypes.windll.kernel32
-    fn = crypt32.CryptProtectData if schuetzen else crypt32.CryptUnprotectData
-    fn.argtypes = [POINTER(_Blob), c_wchar_p if schuetzen else c_void_p, POINTER(_Blob), c_void_p, c_void_p,
-                   c_uint32, POINTER(_Blob)]
-    kernel32.LocalFree.argtypes = [c_void_p]
-    puffer = ctypes.create_string_buffer(daten, len(daten))
-    zusatz_puffer = ctypes.create_string_buffer(b"Lokanon", 7)
-    ein = _Blob(len(daten), ctypes.cast(puffer, POINTER(c_char)))
-    zusatz = _Blob(7, ctypes.cast(zusatz_puffer, POINTER(c_char)))
-    aus = _Blob()
-    # 0x01 = CRYPTPROTECT_UI_FORBIDDEN: nie ein Dialogfenster
-    if not fn(byref(ein), "Lokanon Testfall" if schuetzen else None, byref(zusatz), None, None, 0x01, byref(aus)):
-        raise OSError("Der Testfall ließ sich unter diesem Windows-Konto nicht "
-                      + ("verschlüsseln." if schuetzen else "entschlüsseln."))
-    try:
-        return ctypes.string_at(aus.pbData, aus.cbData)
-    finally:
-        kernel32.LocalFree(ctypes.cast(aus.pbData, c_void_p))
-
-
-def _fernet(home: Path):
-    from cryptography.fernet import Fernet
-
-    k = home / "testfaelle.key"
-    if not k.exists():
-        k.write_bytes(Fernet.generate_key())
-    return Fernet(k.read_bytes())
-
-
-def verschluesseln(home: Path, daten: bytes) -> bytes:
-    if sys.platform == "win32" and not os.environ.get("LOKANON_TESTFALL_FERNET"):
-        return b"DPAPI1" + _dpapi(daten, True)
-    return b"FERNET" + _fernet(home).encrypt(daten)
-
-
-def entschluesseln(home: Path, roh: bytes) -> bytes:
-    art, rest = roh[:6], roh[6:]
-    if art == b"DPAPI1":
-        return _dpapi(rest, False)
-    if art == b"FERNET":
-        return _fernet(home).decrypt(rest)
-    raise ValueError("Unbekanntes Testfall-Format.")
+# Verschlüsselung: server/tresor.py (DPAPI, sonst Fernet)
+verschluesseln, entschluesseln = tresor.verschluesseln, tresor.entschluesseln
 
 
 # ------------------------------------------------------------------------------------------- Speichern, Laden

@@ -17,14 +17,15 @@ from pathlib import Path
 
 from anonymizer import ausgabe as aus
 from anonymizer import files as fio
-from anonymizer.engine import (LABELS, Finding, anzeige_platzhalter, build_analyzer, deanonymize, detect,
-                               platzhalter_schluessel, propagate_vorgang, pseudonymize, replacement_pairs)
+from anonymizer.engine import (LABELS, Finding, _term_findings, anzeige_platzhalter, build_analyzer, deanonymize,
+                               detect, platzhalter_schluessel, propagate_vorgang, pseudonymize, replacement_pairs)
 from anonymizer.vault import decrypt_mapping, encrypt_mapping
 from anonymizer.vorgang import (LESBARE_TYPEN, Vorgang, dateien_im_ordner, mapping_aus_schluessel, markiert_html,
                                 pruefbericht_html, sicherer_name)
 from server import einstellungen as est
 from server import markieren as mk
 from server import testfaelle as tf
+from server.gedaechtnis import OHNE_PERSONENBEZUG, Gedaechtnis, fristen, regel_treffer, regel_vorschlag
 from server.protokoll import Protokoll
 
 APP_DIR = Path(__file__).resolve().parents[1]
@@ -41,11 +42,14 @@ GRUPPEN_ANZEIGE = {
                                 "DE_ID_CARD", "DE_PASSPORT", "DE_FUEHRERSCHEIN", "FUEHRERSCHEIN", "DE_SOCIAL_SECURITY",
                                 "DE_HEALTH_INSURANCE", "DE_LANR", "DE_BSNR", "PERSONALNR", "KENNNUMMER", "DE_KFZ", "KFZ",
                                 "FIN"],
-    "Daten und Sonstiges": ["DATUM", "BERUF", "DIAGNOSE", "EIGENE_BEGRIFFE", "MANUELL"],
+    "Daten und Sonstiges": ["DATUM", "BERUF", "DIAGNOSE", "EIGENE_BEGRIFFE", "MANUELL", "PROJEKT"],
 }
+# Selbst markierte Angaben stehen in der Liste in einer eigenen Gruppe direkt nach den Personen
+SELBST = "Selbst markiert"
+GRUPPEN_REIHE = ["Personen", SELBST, *list(GRUPPEN_ANZEIGE)[1:]]
 QUELLE_TEXT = {"modell": "Sprachmodell", "regel": "Muster", "heuristik": "Anrede oder Unterschrift", "feld": "Formularfeld",
                "liste": "Ihre Liste", "wiederholung": "Wiederholung", "namensteil": "Namensteil", "vorgang": "andere Datei",
-               "firmenteil": "Teil eines Firmennamens", "manuell": "von Ihnen markiert"}
+               "firmenteil": "Teil eines Firmennamens", "manuell": "von Ihnen markiert", "gelernt": "von Ihnen gelernt"}
 VORSCHLAEGE = {
     "PERSON": ["Mandant", "Mandantin", "Gegner", "Gegnerin", "Zeuge", "Zeugin", "Erblasser", "Erblasserin"],
     "ORGANIZATION": ["Gegnerfirma", "Arbeitgeber", "Versicherung", "Werkstatt", "Bank"],
@@ -123,16 +127,26 @@ class Modelle:
 
 
 class Sitzung:
-    def __init__(self, cfg_laden, cfg_speichern, modelle: Modelle):
+    """home_fn: Datenordner (Protokoll, Testfälle, Gedächtnis). Die Übungssitzung der Einführung bekommt einen
+    eigenen Temp-Ordner, damit nichts davon in den echten Daten landet."""
+
+    def __init__(self, cfg_laden, cfg_speichern, modelle: Modelle, home_fn=est.daten_ordner,
+                 gedaechtnis: Gedaechtnis | None = None, uebung: bool = False):
+        self.uebung = uebung
         self.cfg_laden = cfg_laden
         self.cfg_speichern = cfg_speichern
         self.modelle = modelle
-        self.protokoll = Protokoll(est.daten_ordner)
+        self.home_fn = home_fn
+        self.gd = gedaechtnis or Gedaechtnis(home_fn)
+        self.protokoll = Protokoll(home_fn)
         self.leeren()
 
     def leeren(self) -> dict:
         self.docs: list[Dokument] = []
         self.ordner: str = ""
+        self.fall: str = ""                      # vom Anwender bestätigter oder geänderter Fall
+        self.vorgang_id: str = ""                # Eintrag im Vorgangsverzeichnis nach dem Anonymisieren
+        self.selbst: dict[str, dict] = {}        # selbst markiert/nachgetragen: Begriff klein -> {text, art, regel}
         self.manual: list[str] = []
         self.disabled: set[str] = set()          # Platzhalter-Schlüssel, die stehen bleiben ("Person_2")
         self.bezeichnungen: dict[str, str] = {}  # "Person_1" -> "Mandant"
@@ -145,6 +159,27 @@ class Sitzung:
         self.fortschritt = Fortschritt()
         self.ergebnis: dict | None = None
         self.schluessel_pfad: str = ""
+        return self.zustand()
+
+    def uebung_laden(self, dokumente: list[dict]) -> dict:
+        """Einführung: Beispieldokumente mit vorberechneten Treffern laden, ohne Sprachmodell. So läuft die Übung
+        sofort und sieht bei jedem gleich aus. Je Treffer: text, entity, quelle, grund, score (alle Vorkommen)."""
+        import re
+
+        self.leeren()
+        for dok in dokumente:
+            d = Dokument(name=dok["name"], text=dok["text"], data=dok["text"].encode("utf-8"))
+            kandidaten = []
+            for t in dok["treffer"]:
+                for m in re.finditer(rf"(?<![\wäöüß]){re.escape(t['text'])}(?![\wäöüß])", d.text):
+                    kandidaten.append(Finding(m.start(), m.end(), t["entity"], t.get("score", 0.9), m.group(),
+                                              quelle=t.get("quelle", "modell"), grund=t.get("grund", "")))
+            for f in sorted(kandidaten, key=lambda f: (f.start, -(f.end - f.start))):
+                if not any(f.start < g.end and f.end > g.start for g in d.findings):
+                    d.findings.append(f)
+            self.docs.append(d)
+        self.fortschritt = Fortschritt(fertig=True, schritt="Fertig", prozent=100)
+        self._pseudonymisieren()
         return self.zustand()
 
     # ------------------------------------------------------------------ Dateien
@@ -204,6 +239,7 @@ class Sitzung:
         if not self.docs:
             raise ValueError("Bitte zuerst Dateien ablegen oder einen Ordner wählen.")
         self.manual = [m.strip() for m in (manual or []) if m.strip()]
+        self.vormerken(self.manual)
         self.fortschritt = Fortschritt(laeuft=True, schritt="Modelle laden", begonnen=time.time())
         self.ergebnis = None
         threading.Thread(target=self._analyse_lauf, daemon=True).start()
@@ -219,6 +255,9 @@ class Sitzung:
         prot.geheimnisse([(m, "<nachgetragen>") for m in self.manual])
         try:
             cfg = self.cfg_laden()
+            gelernt = self.gd.fuer_erkennung()
+            erlaubt = list(dict.fromkeys([*(cfg.get("allow_list") or []), *gelernt["stehen"]]))
+            prot.geheimnisse([(a["text"], "<gelernt>") for a in gelernt["ersetzen"]])
             self.modelle.warten()
             analyzer = self.modelle.analyzer
             n = len(self.docs)
@@ -240,15 +279,16 @@ class Sitzung:
                 self._melde("Erkenne Personendaten", d.name, int(50 + 45 * i / n))
                 t0 = time.time()
                 d.findings = detect(analyzer, d.text, cfg["entities"], float(cfg.get("threshold", 0.4)),
-                                    est.erlaubt_liste(cfg), est.ersetzen_liste(cfg), self.manual,
+                                    erlaubt, cfg.get("deny_list") or [], self.manual,
                                     cfg.get("propagate_repeats", True), cfg.get("include_name_parts", True),
                                     cfg.get("mask_locations", False), cfg.get("keep_institutions", True),
                                     cfg.get("datum_modus", "kontext"))
+                d.findings = _mit_gelerntem(d.text, d.findings, gelernt)
                 prot.notiere("info", f"{d.name}: {len(d.findings)} Treffer ({_zaehle(d.findings)}), "
                                      f"{time.time() - t0:.1f} s")
             self._melde("Gleiche Namen über alle Dateien ab", "", 96)
             neu = propagate_vorgang([d.text for d in self.docs], [d.findings for d in self.docs],
-                                    est.erlaubt_liste(cfg), cfg.get("include_name_parts", True))
+                                    erlaubt, cfg.get("include_name_parts", True))
             for d, fs in zip(self.docs, neu):
                 d.findings = fs
             self.verlauf = []
@@ -401,12 +441,18 @@ class Sitzung:
             raise ValueError("Alle gewählten Stellen sind schon markiert.")
         if begriff.lower() not in (m.lower() for m in self.manual):
             self.manual.append(begriff)  # bleibt bei einer erneuten Analyse erhalten
-        if lernen:
-            self.cfg_speichern(est.lernen(self.cfg_laden(), "immer_ersetzen", [begriff]))
+        # Für die Frage am Ende („künftig vorschlagen?“): Begriff, Art und, wenn möglich, eine Regel statt des Namens
+        regel = None
+        if ursprung:
+            d0 = self._dok(int(ursprung.get("dok", 0)))
+            s0 = int(ursprung.get("s", -1))
+            f0 = next((f for f in d0.findings if f.start == s0 and f.quelle == "manuell"), None)
+            if f0:
+                regel = regel_vorschlag(d0.text, f0.start, f0.end, art)
+        self.selbst[begriff.lower()] = {"text": begriff, "art": art, "regel": regel}
         self._pseudonymisieren()
         self._protokoll_geheimnisse()
-        self.protokoll.notiere("info", f"Markiert: {neu} Stellen als {LABELS.get(art, art)}"
-                                       + (", künftig immer suchen" if lernen else ""))
+        self.protokoll.notiere("info", f"Markiert: {neu} Stellen als {LABELS.get(art, art)}")
         return {**self.zustand(), "neu": neu}
 
     def stelle(self, dok: int, s: int, e: int, aktion: str) -> dict:
@@ -432,7 +478,7 @@ class Sitzung:
             else:
                 self.aus_stellen.add(key)
             if aktion == "immer":
-                self.cfg_speichern(est.lernen(self.cfg_laden(), "stehen_lassen", self._varianten(ph) if ph else [d.findings[i].text]))
+                self.gd.stehen_lassen(self._varianten(ph) if ph else [d.findings[i].text])
         else:
             raise ValueError("Unbekannte Aktion.")
         self._pseudonymisieren()
@@ -452,14 +498,52 @@ class Sitzung:
             return
         self.analysieren(self.manual + neu)
 
+    def vormerken(self, begriffe: list[str]) -> None:
+        """Nachgetragene Begriffe kommen in die Frage am Ende („künftig vorschlagen?“)."""
+        for b in begriffe:
+            b = " ".join(b.split())
+            if len(b) >= 2:
+                self.selbst.setdefault(b.lower(), {"text": b, "art": "MANUELL", "regel": None})
+
     def lernen(self, art: str, begriffe: list[str]) -> dict:
-        """Korrektur dauerhaft merken (Einstellungen, nur auf diesem PC) und im laufenden Durchlauf anwenden."""
-        cfg = est.lernen(self.cfg_laden(), art, begriffe)
-        self.cfg_speichern(cfg)
+        """„Künftig immer stehen lassen“ sofort merken (verschlüsselt, ohne Frist); „immer ersetzen“ vormerken für die
+        Frage am Ende."""
+        if art == "stehen_lassen":
+            self.gd.stehen_lassen(begriffe)
+        elif art == "immer_ersetzen":
+            self.vormerken(begriffe)
+        else:
+            raise ValueError("Unbekannte Lernart.")
         return self.zustand()
 
+    def fall_vorschlag(self) -> str:
+        """Fall für diesen Vorgang: das erste Aktenzeichen in den Dokumenten, sonst der Ordnername."""
+        for d in self.docs:
+            for f in d.findings:
+                if f.entity == "AKTENZEICHEN" and len(f.text) >= 4:
+                    return " ".join(f.text.split())
+        if self.ordner:
+            return Path(self.ordner).name
+        return ""
+
+    def fall_setzen(self, name: str) -> dict:
+        self.fall = " ".join(name.split())[:80]
+        return self.zustand()
+
+    def merken_kandidaten(self) -> list[dict]:
+        """Was am Ende zur Frage „künftig vorschlagen?“ steht: selbst markierte Begriffe, die noch ersetzt werden."""
+        aktiv = {f.text.lower() for d in self.docs for f in d.findings if f.active}
+        art_text = dict(mk.ARTEN)
+        out = []
+        for s in self.selbst.values():
+            if s["text"].lower() not in aktiv and not any(s["text"].lower() in a for a in aktiv):
+                continue
+            out.append({"text": s["text"], "art": s["art"], "art_text": art_text.get(s["art"], s["art"]),
+                        "personenbezug": s["art"] not in OHNE_PERSONENBEZUG, "regel": s.get("regel")})
+        return out
+
     def identitaeten(self) -> list[dict]:
-        stehen = {b.lower() for b in est.gelernt(self.cfg_laden(), "stehen_lassen")}
+        stehen = {b.lower() for b in self.gd.fuer_erkennung()["stehen"]}
         groups: dict[str, dict] = {}
         voll_namen = {ph: name for ph, name in self.mapping.items()
                       if ph.startswith(LABELS["PERSON"] + "_") and " " in name.strip()}
@@ -500,6 +584,10 @@ class Sitzung:
             g["aus_einzeln"] = sum(1 for di, d in enumerate(self.docs) for i, f in enumerate(d.findings)
                                    if d.schluessel.get(i) == g["ph"] and (di, f.start, f.end) in self.aus_stellen)
             g["gelernt"] = any(v.lower() in stehen for v in g["varianten"])
+            g["selbst"] = g["quellen"] == [QUELLE_TEXT["manuell"]]
+            g["aus_gedaechtnis"] = QUELLE_TEXT["gelernt"] in g["quellen"]
+            if g["selbst"]:
+                g["gruppe"] = SELBST
             g["sicherheit"] = sicherheit(g["score"])
             gruende = []
             if g["score"] < 0.6:
@@ -518,8 +606,7 @@ class Sitzung:
             g["varianten"] = sorted(g["varianten"], key=lambda v: (-len(v.split()), -len(v)))
             out.append(g)
         # Reihenfolge wie im Dokument (erstes Vorkommen), damit Karten nach einem Klick nicht springen
-        reihen = list(GRUPPEN_ANZEIGE)
-        out.sort(key=lambda g: (reihen.index(g["gruppe"]), g["_erst"]))
+        out.sort(key=lambda g: (GRUPPEN_REIHE.index(g["gruppe"]), g["_erst"]))
         for g in out:
             g.pop("_erst", None)
         return out
@@ -549,6 +636,10 @@ class Sitzung:
             "rueckgaengig": self.verlauf[-1][0] if self.verlauf else "",
             "ausgabe_ordner": self.ordner or str(self._ausgabe_ordner(cfg)),
             "erweitert": cfg.get("erweitert", {}),
+            "fall": self.fall or (self.fall_vorschlag() if self.fortschritt.fertig else ""),
+            "fall_bestaetigt": bool(self.fall),
+            "vorgang_id": self.vorgang_id,
+            "uebung": self.uebung,
         }
 
     # ------------------------------------------------------------------ Anonymisieren
@@ -639,9 +730,11 @@ class Sitzung:
                 if vorgang is not None:
                     vorgang.notiere_treffer(d.name, d.findings, len(d.text), True)
                 dateien.append(eintrag)
+            testfall = None
             if erweitert.get("testfaelle"):
                 try:
-                    if tf.speichern(est.daten_ordner(), self.docs):
+                    testfall = tf.speichern(self.home_fn(), self.docs)
+                    if testfall:
                         prot.notiere("info", f"Als eigener Testfall gespeichert ({n} Dateien, verschlüsselt)")
                 except Exception as e:  # ein Testfall darf das Anonymisieren nie verhindern
                     prot.ausnahme("Testfall speichern", e)
@@ -656,9 +749,14 @@ class Sitzung:
                     {"name": d.name, "text": d.text, "findings": d.findings, "platzhalter": d.platzhalter} for d in self.docs]))
                 vorgang.schreibe_uebersicht()
                 vorgang.schreibe_protokoll()
+            fall = self.fall or self.fall_vorschlag() or f"Vorgang vom {datetime.now():%d.%m.%Y}"
+            self._verzeichnis_eintragen(fall, ziel, dateien, schluessel_pfad, vorgang.basis if vorgang else "", testfall)
             self.ergebnis = {"dateien": dateien, "ordner": str(ziel), "hinweise": hinweise,
                              "schluessel_pfad": schluessel_pfad, "vorgang": vorgang.basis if vorgang else "",
-                             "zeit": datetime.now().isoformat(timespec="seconds")}
+                             "zeit": datetime.now().isoformat(timespec="seconds"), "fall": fall,
+                             "vorgang_id": self.vorgang_id,
+                             "merken": self.merken_kandidaten() if fristen(cfg)["lernen_fragen"] else [],
+                             "frist_monate": fristen(cfg)["personen_monate"]}
             self.schluessel_pfad = schluessel_pfad
             ok = sum(1 for e in dateien if e["status"] == "ok")
             prot.notiere("info" if ok == len(dateien) else "warnung", f"Anonymisieren fertig: {ok} von {len(dateien)} Kopien")
@@ -668,6 +766,25 @@ class Sitzung:
             self.fortschritt.fehler = f"{e}"
         finally:
             self.fortschritt.laeuft = False
+
+    def _verzeichnis_eintragen(self, fall: str, ziel: Path, dateien: list[dict], schluessel: str, vorgangsordner: str,
+                               testfall: Path | None) -> None:
+        """Vorgangsverzeichnis (verschlüsselt): woraus ein Fall besteht, damit er sich vollständig löschen lässt.
+        Gelernte Angaben, die hier wieder vorkamen, bekommen eine neue Frist."""
+        kopien = [str(ziel / x) for e in dateien for x in (e["ausgabe"] if e["status"] == "ok" else "",
+                                                           e.get("textfassung", "")) if x]
+        name = Path(self.ordner).name if self.ordner else Path(self.docs[0].name).stem
+        alt = next((v for v in self.gd.laden()["vorgaenge"] if v["id"] == self.vorgang_id), None)
+        eintrag = {"dateien": len(self.docs), "angaben": sum(1 for d in self.docs for f in d.findings if f.active),
+                   "kopien": sorted(set(kopien + (alt or {}).get("kopien", []))), "schluessel": schluessel,
+                   "vorgangsordner": vorgangsordner, "ordner": self.ordner,
+                   "testfaelle": [str(testfall)] if testfall else [], "stand": "anonymisiert"}
+        try:
+            self.vorgang_id = self.gd.vorgang_eintragen(name, fall, eintrag, vid=self.vorgang_id)
+            aktiv = {f.text.lower() for d in self.docs for f in d.findings if f.active}
+            self.gd.gefunden([a["id"] for a in self.gd.fuer_erkennung()["ersetzen"] if a["text"].lower() in aktiv], fall)
+        except Exception as e:  # das Verzeichnis darf das Anonymisieren nie verhindern
+            self.protokoll.ausnahme("Vorgangsverzeichnis", e)
 
     def _dateiname_paare(self) -> list[tuple[str, str]]:
         """Ersetzungen für Dateinamen aus allen Dateien der Sitzung, damit "Klage Müller.docx" auch dann bereinigt
@@ -722,6 +839,10 @@ class Sitzung:
             mapping = mapping_aus_schluessel(obj)
             bez = obj.get("bezeichnungen", {}) if isinstance(obj, dict) else {}
             out = deanonymize(text, mapping, bez)
+            try:
+                self.gd.schluessel_genutzt(str(p))  # Rückfrage vor dem Löschen eines frisch benutzten Schlüssels
+            except Exception as e:
+                self.protokoll.ausnahme("Schlüssel vermerken", e)
             return {"text": out, "quelle": p.name, "platzhalter": _ersetzt(text, out)}
         if not self.mapping:
             raise ValueError("Kein offener Durchlauf. Bitte eine Schlüsseldatei wählen.")
@@ -744,6 +865,26 @@ class Sitzung:
 
 
 _ANREDEN = {"herr", "herrn", "frau", "prof", "dr", "dres", "von", "van", "der", "den"}
+
+
+def _mit_gelerntem(text: str, findings: list[Finding], gelernt: dict) -> list[Finding]:
+    """Gelernte Angaben und Regeln als Vorschläge ergänzen (Quelle „gelernt“, mit Begründung). Hat die Erkennung
+    dieselbe Stelle schon gefunden, bekommt sie nur die Begründung dazu."""
+    neu: list[Finding] = []
+    for a in gelernt["ersetzen"]:
+        for f in _term_findings(text, [a["text"]], a["art"] or "MANUELL", quelle="gelernt"):
+            f.grund, f.score = a["grund"], 0.9
+            neu.append(f)
+    neu += regel_treffer(text, gelernt["regeln"])
+    out = list(findings)
+    for f in neu:
+        gleich = [g for g in out if f.start < g.end and f.end > g.start]
+        if not gleich:
+            out.append(f)
+        for g in gleich:
+            if g.start == f.start and g.end == f.end and g.quelle not in ("manuell", "gelernt"):
+                g.grund = f.grund
+    return sorted(out, key=lambda f: f.start)
 
 
 def _zaehle(findings: list[Finding]) -> str:
