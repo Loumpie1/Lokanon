@@ -323,6 +323,14 @@ Abschnitt „Gespeicherte Angaben und Datenschutz“ in `static/anleitung/index.
 **Folgerung:** Ein Löschen „des Falls“ ist heute nicht möglich, weil nichts die Teile verbindet. Voraussetzung ist ein
 **Vorgangsverzeichnis**.
 
+> **Stand der Umsetzung (08.11.2026, Version 0.4.0):** Vorgangsverzeichnis, Löschdialog, Löschprotokoll mit Nachweis,
+> Fristen und Aufräumen sind gebaut. **Zurückgestellt:** der eigene Schlüssel je Fall (Löschen durch
+> Schlüsselvernichtung) und die Verschlüsselung des Vorgangsordners. Grund: Der Fallschlüssel läge selbst in der
+> gesicherten Gedächtnisdatei; eine ältere Sicherung enthielte ihn weiter, der versprochene Effekt träte also nicht
+> sicher ein. Stattdessen löscht Lokanon die Dateien, alles mit Namen ist mit dem Windows-Konto verschlüsselt, und die
+> Hilfe sagt offen, dass ältere Stände in einer Datensicherung bleiben (Hilfetext „sicherung“). Der Vorgangsordner
+> (Erweitert, standardmäßig aus) bleibt Klartext, gehört zum Fall und wird mit ihm gelöscht.
+
 ### Voraussetzung: Vorgangsverzeichnis und Fallschlüssel
 
 - **`vorgaenge.lokanon` (DPAPI):** Je Vorgang stehen dort:

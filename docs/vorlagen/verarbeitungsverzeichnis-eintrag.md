@@ -52,6 +52,8 @@
 | Daten | Frist | Anmerkung |
 |---|---|---|
 | Schlüsseldatei (Zuordnung Platzhalter zu Klartext) | Nach Abschluss des Vorgangs beziehungsweise nach der Rückübersetzung der KI-Antwort. [Spätestens nach [x] Tagen.] | Verantwortlich: [Name]. Löschung wird im Protokoll vermerkt. |
+| Gelernte Angaben (selbst markierte Begriffe, die Lokanon künftig vorschlägt; ab 0.4.0) | [12] Monate nach dem letzten Fund in einem Dokument; nach „Fall abgeschlossen“ [3] Monate; bei „Mandat läuft“ bis zum Abschluss. Automatische Löschung beim Start von Lokanon. | Je Fall (Aktenzeichen) zugeordnet, verschlüsselt mit dem Windows-Konto (DPAPI). Löschwunsch: Namenssuche → „überall löschen“. Löschprotokoll ohne Namen mit Nachweis. Regeln (Bezeichnungen, Nummernmuster) und „stehen lassen“ enthalten keine Personendaten und haben keine Frist. |
+| Eigene Testfälle, Vorgangsordner (optional, Einstellungen → Erweitert) | Wie der Fall, zu dem sie gehören. | Testfälle verschlüsselt; der Vorgangsordner enthält Klartext (Kopie der Originale, Prüfbericht) und liegt unter [Pfad]. |
 | Pseudonymisierter Text, lokal gespeichert | [Zusammen mit der Schlüsseldatei / nach [x] Tagen] | [Speicherort angeben.] |
 | Inhalte beim KI-Anbieter (Chats, Dateien) | [Löschung manuell nach Vorgangsabschluss / automatisch nach [x] Tagen laut Anbieterkonfiguration] | Aufbewahrungsfrist des Anbieters laut Vertrag und Einstellungen: [Angabe]. |
 | Protokoll je Vorgang | [Frist, z. B. entsprechend der Handakte] | Inhalt des Protokolls: [Angabe]. |
@@ -69,6 +71,7 @@
 
 - Die Pseudonymisierung läuft lokal auf Kanzleirechnern. Es erfolgt keine Übermittlung an Cloud-Dienste zur Erkennung personenbezogener Angaben.
 - Die Schlüsseldatei ist verschlüsselt. Das Passwort wird [im Passwortmanager der Kanzlei / nach interner Regel] verwaltet.
+- Gelernte Angaben, Fälle, Vorgangsverzeichnis und eigene Testfälle speichert Lokanon nur nach Bestätigung durch den Anwender und verschlüsselt mit dem Windows-Konto (DPAPI) im Ordner `%USERPROFILE%\Lokanon`. [Der Ordner ist von der Datensicherung ausgenommen / wird gesichert; ältere Stände bleiben bis zum Ablauf der Sicherung.]
 - Die Schlüsseldatei liegt außerhalb von Cloud-Synchronisierung (zum Beispiel OneDrive, Dropbox, iCloud). Speicherort: [lokaler Pfad].
 - Die Festplatte ist verschlüsselt ([Verfahren]).
 - Zugriff auf Lokanon und die Schlüsseldatei haben nur [Personen / Rollen].

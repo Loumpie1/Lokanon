@@ -33,8 +33,8 @@ Texte stehen nur an **einer** Stelle. Tour und Anleitung verweisen auf `hilfetex
 |---|---|---|
 | Anker-Test (ohne Browser) | Jeder `ziel`-Anker im Drehbuch kommt in `ui/app.js` vor. Jeder `data-tour`-Anker in `ui/app.js` ist im Drehbuch oder im Inventar als „ohne Tour“ geführt. | `tests/test_hilfe.py`, läuft mit `pytest` |
 | Hilfetext-Test | Jeder Schlüssel, den Drehbuch, App oder Anleitung nutzen, steht in `hilfetexte.js`, und kein Text ist ungenutzt. | `tests/test_hilfe.py` |
-| Tour-Test (Browser) | Spielt jedes Kapitel in der Übungssitzung mit „Zeig es mir“ durch. Jedes Ziel ist sichtbar, jede Wartebedingung tritt ein, danach sind echte Daten unverändert. | `tests/tour_durchspielen.py`, vor jedem Release |
-| Release-Prüfung | `build.py` bricht ab, wenn `Neu-in-<Version>.md` Funktionen nennt, für die das Drehbuch keinen Schritt mit `seit: "<Version>"` hat, oder wenn der Tour-Test nicht grün ist. | `build/build.py` |
+| Tour-Test (Browser) | Spielt jedes Kapitel in der Übungssitzung mit „Zeig es mir“ durch und meldet jedes fehlende Ziel und jedes ausbleibende Ereignis. Im laufenden Programm (Browser-Konsole oder Testwerkzeug): `await LokanonTour.selbsttest()` für alles, `selbsttest("neu")` oder `selbsttest("<kapitel>")` einzeln. Erwartet: leere Liste. Dass echte Daten unberührt bleiben, prüft `tests/test_server.py::test_einfuehrung_uebungssitzung`. | vor jedem Release |
+| Release-Prüfung | Gibt es `docs/pilot/Neu-in-<Version>.md` zur Version in `build/VERSION`, muss das Drehbuch Schritte mit `seit: "<Version>"` haben (Tour „Neu in …“). Die Anleitung verweist nur auf vorhandene Kapitel. | `tests/test_hilfe.py` |
 
 ## Ablauf bei jeder Änderung
 

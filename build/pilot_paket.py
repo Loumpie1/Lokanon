@@ -247,7 +247,7 @@ def paket(version: str, installer: Path | None, ziel: Path, work: Path) -> Path:
     d3 = ziel / "3 Pilot-Unterlagen"
     _leeren(d3)
     for quelle, name in (("Pilot-Hinweis.md", "Pilot-Hinweis"), ("Rueckmeldebogen.md", "Rückmeldebogen"),
-                         ("Neu-in-0.3.0.md", "Neu in 0.3.0")):
+                         ("Neu-in-0.4.0.md", "Neu in 0.4.0"), ("Neu-in-0.3.0.md", "Neu in 0.3.0")):
         md = (ROOT / "docs" / "pilot" / quelle).read_text(encoding="utf-8")
         (d3 / f"{name}.md").write_text(md, encoding="utf-8")
         md_nach_docx(md, d3 / f"{name}.docx", name)

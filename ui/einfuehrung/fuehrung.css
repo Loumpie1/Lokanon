@@ -1,0 +1,36 @@
+/* Einführung: Abdunkeln mit Ausschnitt, Rahmen um das Ziel, Sprechblase mit Pfeil. Farben aus den Tokens von app.css. */
+.fuehrung { position: fixed; inset: 0; z-index: 90; pointer-events: none; }
+.f-maske { position: fixed; background: var(--overlay); pointer-events: auto; transition: all 160ms ease-out; }
+.f-deckel { position: fixed; pointer-events: auto; background: transparent; }
+.f-rahmen { position: fixed; border: 2px solid var(--action); border-radius: 6px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--action) 25%, transparent); pointer-events: none; transition: all 160ms ease-out; }
+.f-blase { position: fixed; width: 340px; max-width: calc(100vw - 24px); background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); border-radius: var(--r-xl, 8px);
+  box-shadow: var(--shadow-dlg); padding: 14px 16px 12px; pointer-events: auto; display: grid; gap: 8px; font-size: 13.5px; line-height: 1.45; z-index: 2; }
+.f-blase h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.f-blase p { margin: 0; }
+.f-blase ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.f-kopf { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.f-stand { font-size: 12px; color: var(--muted); }
+.f-x { border: 0; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; }
+.f-x:hover { background: var(--surface-3); color: var(--ink); }
+.f-mehr { color: var(--muted); font-size: 12px; margin-top: 6px !important; }
+.f-aufgabe { padding: 8px 10px; border-radius: 4px; background: var(--action-soft); border: 1px solid var(--action-line); }
+.f-gut { color: var(--ok); }
+.f-fuss { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.f-fill { flex: 1; }
+.f-btn { height: 30px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 13px; }
+.f-btn:hover { background: var(--surface-2); }
+.f-btn:disabled { opacity: .45; cursor: default; }
+.f-primaer { background: var(--action); border-color: var(--action); color: var(--on-action); font-weight: 600; }
+.f-primaer:hover { background: var(--action-hover); }
+.f-zeig { border-color: var(--action); color: var(--action); }
+.f-pfeil { position: absolute; width: 14px; height: 14px; background: var(--surface); border: 1px solid var(--line-2); transform: rotate(45deg); }
+.f-pfeil.links { left: -8px; border-right: 0; border-top: 0; }
+.f-pfeil.rechts { right: -8px; border-left: 0; border-bottom: 0; }
+.f-pfeil.oben { top: -8px; border-right: 0; border-bottom: 0; }
+.f-pfeil.unten { bottom: -8px; border-left: 0; border-top: 0; }
+.f-pfeil:not(.links):not(.rechts):not(.oben):not(.unten) { display: none; }
+.f-ansage { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+/* Menüs, Hilfeblasen und Markierfenster liegen während der Einführung über der Abdunklung */
+body.tour-aktiv .menue, body.tour-aktiv .hilfe-pop { z-index: 100; }
+body.tour-aktiv .toasts { z-index: 101; }
+@media (prefers-reduced-motion: reduce) { .f-maske, .f-rahmen { transition: none; } }

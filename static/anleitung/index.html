@@ -63,62 +63,70 @@
 <header class="hero"><div class="wrap">
   <h1>Lokanon – Anleitung</h1>
   <p class="lead">Dateien ablegen, prüfen, anonymisieren. Lokanon ersetzt auf Ihrem PC alles, was eine Person erkennbar macht, durch Platzhalter und legt zu jeder Datei eine Kopie im gleichen Format an. Danach können die Kopien in ChatGPT, Claude oder Gemini.</p>
-  <span class="pill">Läuft lokal, kein Internet nötig</span><span class="pill">Für Kanzleien</span><span class="pill">Version 0.3.0 (Pilot)</span>
+  <span class="pill">Läuft lokal, kein Internet nötig</span><span class="pill">Für Kanzleien</span><span class="pill">Version 0.4.0 (Pilot)</span>
 </div></header>
 <nav class="toc"><div class="wrap">
-  <a href="#ablauf">Ablauf</a><a href="#pruefen">Prüfen</a><a href="#ausgabe">Ausgabe</a><a href="#einstellungen">Einstellungen</a><a href="#erweitert">Erweitert</a><a href="#ki">KI einrichten</a><a href="#grenzen">Grenzen</a><a href="#hilfe">Hilfe</a>
+  <a href="#einfuehrung">Einführung</a><a href="#ablauf">Ablauf</a><a href="#pruefen">Prüfen</a><a href="#markieren">Markieren</a><a href="#ausgabe">Ausgabe</a><a href="#gespeichert">Gespeicherte Angaben</a><a href="#einstellungen">Einstellungen</a><a href="#erweitert">Erweitert</a><a href="#ki">KI einrichten</a><a href="#grenzen">Grenzen</a><a href="#hilfe">Hilfe</a>
 </div></nav>
 <main><div class="wrap">
+
+<section id="einfuehrung">
+  <h2>Einführung im Programm</h2>
+  <p>Am schnellsten lernen Sie Lokanon im Programm selbst: Die Einführung lädt ein erfundenes Schreiben, und Sie führen jeden Schritt selbst aus. Eine Sprechblase steht direkt neben dem Bedienelement. Dauer etwa 5 Minuten, jederzeit abbrechbar. Alles bleibt in einem Übungsvorgang, Ihre eigenen Daten sind nicht betroffen.</p>
+  <p>Starten: oben rechts <b>?</b> → „Einführung starten“, oder links „Einführung“. Einzelne Kapitel:
+    <a href="/#einfuehrung/ablegen" target="_top">1. Dateien ablegen</a> ·
+    <a href="/#einfuehrung/pruefen" target="_top">2. Prüfen</a> ·
+    <a href="/#einfuehrung/markieren" target="_top">3. Übersehenes markieren</a> ·
+    <a href="/#einfuehrung/anonymisieren" target="_top">4. Anonymisieren</a> ·
+    <a href="/#einfuehrung/merken" target="_top">5. Merken</a> ·
+    <a href="/#einfuehrung/faelle" target="_top">6. Fälle und Einstellungen</a> ·
+    <a href="/#einfuehrung/gespeichert" target="_top">7. Gespeicherte Angaben verwalten und löschen</a></p>
+</section>
 
 <section id="ablauf">
   <h2>Der Ablauf in drei Schritten</h2>
   <ol class="steps">
-    <li><strong>Ablegen</strong>Ziehen Sie Dateien auf die Fläche oder klicken Sie „Ordner wählen“. Lokanon liest PDF (auch Scans, auch gedrehte Seiten), Word, Excel und Text. Alternativ fügen Sie über „Text einfügen“ eine E-Mail oder einen Absatz ein. Die Erkennung startet sofort.</li>
-    <li><strong>Prüfen</strong>Links steht, was Lokanon gefunden hat, als Personen und Angaben; rechts das Dokument mit Markierungen. Sie schalten einzelne Angaben aus, vergeben eigene Namen wie „Mandant“ und tragen Übersehenes nach. Unten steht ein Knopf: „Geprüft, jetzt anonymisieren“.</li>
-    <li><strong>Fertig</strong>Zu jeder Datei entsteht eine Kopie im gleichen Format mit dem Zusatz <code>_anonymisiert</code>. „Ordner öffnen“ führt hin. Mit „Neue Dateien“ geht es von vorn los.</li>
+    <li><strong>Ablegen</strong>Auf der Startseite „Dateien hinzufügen“ oder „Ordner öffnen“, oder Dateien einfach ins Fenster ziehen. Lokanon liest PDF (auch Scans, auch gedrehte Seiten), Word, Excel und Text. „Text einfügen“ nimmt eine E-Mail oder einen Absatz. Die Erkennung startet sofort.</li>
+    <li><strong>Prüfen</strong>In der Mitte das Dokument mit Markierungen, rechts die Liste dessen, was Lokanon gefunden hat. Sie nehmen Haken heraus, vergeben eigene Platzhalter wie „Mandant“ und markieren Übersehenes. Oben in der Befehlsleiste steht „Anonymisieren“ mit der Zahl der Angaben, die ersetzt werden.</li>
+    <li><strong>Fertig</strong>Zu jeder Datei entsteht eine gegengeprüfte Kopie im gleichen Format mit dem Zusatz <code>_anonymisiert</code>. Haben Sie etwas selbst markiert, fragt Lokanon, ob es sich das für künftige Dokumente merken soll. „Neuer Vorgang“ beginnt von vorn.</li>
   </ol>
-  <div class="ui"><div class="drop">Dateien hierher ziehen<br><small>oder klicken und auswählen · PDF, Word, Excel, Text</small></div><div style="text-align:center;color:var(--grau);margin:8px 0">oder</div><div style="text-align:center"><span class="btn" style="background:#fff;color:var(--tinte);border:1px solid #C6CFDC">Ordner wählen</span> &nbsp; <span style="color:var(--blau);font-weight:600">Text einfügen</span></div></div>
-  <div class="box">Beim ersten Start fragt Lokanon nach Ihrem Kanzleinamen und Ihren Mitarbeitenden. Diese Namen werden nie ersetzt. Sie können die Liste jederzeit unter dem Zahnrad ändern.</div>
+  <p><a href="/#einfuehrung/ablegen" target="_top">Im Programm zeigen</a></p>
+  <div class="box">Beim ersten Start fragt Lokanon nach Ihrem Kanzleinamen und Ihren Mitarbeitenden. Diese Namen werden nie ersetzt. Sie ändern die Liste jederzeit unter „Einstellungen“ links.</div>
 </section>
 
 <section id="pruefen">
-  <h2>Die Prüfliste</h2>
-  <p>Lokanon fasst zusammen, was zusammengehört. „Moritz Günther“, „Herr Günther“, „Günthers“ und „M. Günther“ sind eine Person und stehen auf einer Karte. Jede Karte zeigt den Namen, die weiteren Schreibweisen, wie oft er vorkommt, wie sicher die Erkennung war und was daraus wird.</p>
-  <div class="ui">
-    <div class="card2"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>Moritz Günther</b><div class="meta">auch: Herr Günther · Günthers</div></div><div style="text-align:center;font-size:.75rem;color:var(--grau)"><span class="sw"></span><br>wird ersetzt</div></div><div>wird zu <span class="ph">[Person_1]</span> <span class="meta">Vorschläge: Mandant · Gegner · Zeuge</span></div><div class="meta">Person · 7× in 3 Dateien · sicher</div><div class="frage">„Günther“ allein: wer ist gemeint? <span>Moritz Günther</span> <span>Cornelia Günther</span></div></div>
-    <div class="card2" style="border-left-color:#2F62C9;opacity:.65"><div style="display:flex;justify-content:space-between;align-items:center"><b>Amtsgericht Mülheim</b><div style="text-align:center;font-size:.75rem;color:var(--grau)"><span class="sw off"></span><br>bleibt stehen</div></div><div class="meta">Firma · 2× in 1 Datei · Einrichtung</div></div>
-  </div>
-  <h3>Was Sie auf einer Karte tun können</h3>
+  <h2>Prüfen</h2>
+  <p>Lokanon fasst zusammen, was zusammengehört. „Moritz Günther“, „Herr Günther“, „Günthers“ und „M. Günther“ sind eine Person und stehen in einer Zeile. Die Liste rechts ist nach Art geordnet (Personen, selbst markiert, Firmen, Adressen, Nummern). Jede Zeile zeigt den Namen, wie oft er vorkommt und was daraus wird; ein Klick klappt die Einzelheiten auf und zeigt die Stelle im Dokument. <a href="/#einfuehrung/pruefen" target="_top">Im Programm zeigen</a></p>
+  <h3>Was Sie in einer Zeile tun können</h3>
   <table>
     <tr><th>Element</th><th>Wirkung</th></tr>
-    <tr><td>Schalter rechts</td><td>Ein: alle Schreibweisen dieser Person werden ersetzt. Aus: sie bleiben in allen Dateien stehen (gestrichelt im Dokument).</td></tr>
-    <tr><td>Künftig immer stehen lassen</td><td>Erscheint, wenn Sie eine Karte ausschalten. Lokanon merkt sich den Begriff und schlägt ihn nicht mehr vor, etwa einen Fachbegriff, der fälschlich als Name erkannt wurde. Rückgängig unter Einstellungen → Gelernte Begriffe.</td></tr>
-    <tr><td>„erkannt über …“</td><td>Woher der Vorschlag kommt: Formularfeld (z. B. „Name“), Muster (IBAN, Kennzeichen …), Anrede oder Unterschrift, bekannter Vorname, Sprachmodell, Wiederholung. Reine Sprachmodell-Treffer verdienen den genauesten Blick.</td></tr>
-    <tr><td>Platzhalter anklicken</td><td>Eigenen Namen vergeben, zum Beispiel <code>[Mandant]</code> oder <code>[Zeugin Schmidt]</code>. Gilt überall, auch in der Rückübersetzung. „Standard“ setzt auf <code>[Person_1]</code> zurück.</td></tr>
-    <tr><td>Vorschläge</td><td>Ein Klick auf „Mandant“, „Gegner“ usw. vergibt den Namen sofort.</td></tr>
-    <tr><td>Frage „wer ist gemeint?“</td><td>Erscheint, wenn ein Nachname zu zwei Personen passt. Ein Klick ordnet ihn zu.</td></tr>
-    <tr><td>gehört zu …</td><td>Lokanon hat zwei Karten angelegt, die dieselbe Person sind? Wählen Sie die andere Person, die Karten verschmelzen.</td></tr>
-    <tr><td>trennen …</td><td>Eine Schreibweise gehört doch nicht zu dieser Person? Sie bekommt eine eigene Karte.</td></tr>
-    <tr><td>Fehlt etwas?</td><td>Begriff oben eintragen, mehrere mit Komma. Lokanon sucht ihn in allen Dateien und ersetzt ihn. Mit „künftig in allen Dokumenten suchen“ gilt er auch in späteren Durchläufen (er steht dann im Klartext in Ihren Einstellungen auf diesem PC).</td></tr>
+    <tr><td>Haken links</td><td>Gesetzt: alle Schreibweisen werden ersetzt. Herausgenommen: sie bleiben in allen Dateien stehen (gestrichelt im Dokument).</td></tr>
+    <tr><td>Klick auf die Zeile</td><td>Klappt auf: woran Lokanon die Angabe erkannt hat (Formularfeld, Muster, Anrede oder Unterschrift, Sprachmodell, Wiederholung, „von Ihnen gelernt“), ein Satzausschnitt, Platzhalter und Zuordnung. Im Dokument springt Lokanon zur Stelle; ein Fähnchen zeigt den Platzhalter. „Im Dokument zeigen“ springt zur nächsten Stelle.</td></tr>
+    <tr><td>Platzhalter</td><td>Ein Klick auf „Mandant“, „Gegner“ usw. oder „eigener Name“ vergibt einen sprechenden Platzhalter wie <code>[Mandant]</code>. Gilt überall, auch in der Rückübersetzung. „Standard“ setzt auf <code>[Person_1]</code> zurück.</td></tr>
+    <tr><td>„Wer ist gemeint?“</td><td>Erscheint, wenn ein Nachname zu zwei Personen passt. Ein Klick ordnet ihn zu.</td></tr>
+    <tr><td>Gehört zu … / Trennen …</td><td>Zwei Zeilen sind dieselbe Person: zusammenführen. Eine Schreibweise gehört nicht dazu: abtrennen.</td></tr>
+    <tr><td>Künftig immer stehen lassen</td><td>Erscheint, wenn der Haken heraus ist. Für Fachbegriffe, die Lokanon für einen Namen hält. Lokanon merkt sich das Wort verschlüsselt, ohne Frist. Rückgängig unter „Fälle und gelernte Angaben“.</td></tr>
   </table>
   <h3>„Bitte ansehen“</h3>
-  <p>Lokanon ersetzt im Zweifel. Angaben, bei denen es sich nicht sicher ist, markiert es und erklärt warum („nur über die Anrede erkannt“, „einzelnes Wort“, „Nachname passt zu mehreren Personen“). Ein Klick auf den gelben Hinweis zeigt nur diese Karten. Was kein Personenbezug ist, schalten Sie aus.</p>
-  <h3>Das Dokument rechts</h3>
-  <p>„Original mit Markierungen“ zeigt jede Stelle farbig mit ihrem Platzhalter als kleinem Etikett: <mark class="p">Sabine Winter</mark> Person, <mark class="f">Autohaus Krause GmbH</mark> Firma, <mark class="o">Eppinghofer Straße 47</mark> Adresse, <mark class="n">14 VI 512/26</mark> Nummer. Gestrichelt umrandet heißt „bleibt stehen“. „Anonymisiert“ zeigt den Text, wie ihn die KI bekommt. Bei mehreren Dateien wechseln Sie über die Reiter.</p>
-  <h3>Karte und Stelle</h3>
-  <p>Ein Klick auf eine Karte zeigt die Stelle im Dokument; jeder weitere Klick die nächste, auch in anderen Dateien („Stelle 2 von 5“). Umgekehrt zeigt ein Klick auf eine Markierung im Dokument die passende Karte. Mit „Dokument ausblenden“ bekommt die Liste die ganze Breite; Lokanon merkt sich die Wahl.</p>
-  <h3>Im Dokument markieren und im Rest suchen</h3>
-  <p>Hat Lokanon etwas übersehen, markieren Sie es mit der Maus im Dokument. Daneben erscheint „Anonymisieren als …“ mit einem Vorschlag für die Art (Person, Firma, Adresse …) und der Zahl der Fundstellen im ganzen Vorgang. Gefunden werden auch gebeugte Formen („Noltes“), Trennungen am Zeilenende („Spedi-tion“) und bei Personen die einzelnen Namensteile.</p>
+  <p>Lokanon ersetzt im Zweifel. Unsichere Angaben stehen gelb beschriftet mit dem Grund („nur mit mittlerer Sicherheit erkannt“, „einzelnes Wort“, „Nachname passt zu mehreren Personen“). „Nur diese zeigen“ filtert die Liste. Was kein Personenbezug ist, nehmen Sie heraus.</p>
+  <h3>Das Dokument in der Mitte</h3>
+  <p>„Original mit Markierungen“ zeigt jede Stelle farbig mit ihrem Platzhalter als kleinem Etikett: <mark class="p">Sabine Winter</mark> Person, <mark class="f">Autohaus Krause GmbH</mark> Firma, <mark class="o">Eppinghofer Straße 47</mark> Adresse, <mark class="n">14 C 512/26</mark> Nummer. Gestrichelt umrandet heißt „bleibt stehen“. „Anonymisiert“ zeigt den Text, wie ihn die KI bekommt. Mehrere Dateien stehen als Reiter darüber, gescannte PDFs mit einem kleinen Scan-Zeichen.</p>
+  <div class="box warn">Die Prüfung ist Teil der Arbeit, nicht Beiwerk: Keine Erkennung ist vollständig. Was Lokanon übersieht, markieren Sie; was es zu viel erkennt, nehmen Sie heraus. Erst dann anonymisieren.</div>
+</section>
+
+<section id="markieren">
+  <h2>Übersehenes markieren</h2>
+  <p>Hat Lokanon etwas übersehen, klicken Sie oben auf „Übersehenes markieren“ (oder Taste <kbd>M</kbd>) und dann auf ein Wort im Dokument, oder überstreichen Sie mehrere Wörter mit der Maus. Ein Doppelklick auf ein Wort geht immer. <a href="/#einfuehrung/markieren" target="_top">Im Programm zeigen</a></p>
+  <p>Direkt an der Stelle erscheint ein kleines Fenster: „„Falkenhorst“ anonymisieren · 2 Stellen“, die Art (Person, Firma, Adresse, Kennnummer, Projekt oder Kürzel, Sonstiges …) und wo der Begriff sonst noch vorkommt. Gefunden werden auch gebeugte Formen („Noltes“), Trennungen am Zeilenende („Spedi-tion“) und bei Personen die einzelnen Namensteile.</p>
   <table>
     <tr><th>Knopf</th><th>Wirkung</th></tr>
-    <tr><td>Alle anwenden</td><td>Alle Fundstellen in allen Dateien bekommen denselben Platzhalter.</td></tr>
-    <tr><td>Einzeln ansehen</td><td>Liste aller Fundstellen mit Satzausschnitt, alle vorausgewählt und einzeln abwählbar. Ein Klick auf den Text zeigt die Stelle.</td></tr>
+    <tr><td>Überall ersetzen</td><td>Alle Fundstellen in allen Dateien bekommen denselben Platzhalter.</td></tr>
     <tr><td>Nur hier</td><td>Nur die markierte Stelle.</td></tr>
-    <tr><td>gehört zu …</td><td>Die Stelle bekommt den Platzhalter einer schon erkannten Person oder Firma.</td></tr>
-    <tr><td>künftig in allen Dokumenten suchen</td><td>Der Begriff wird gelernt (Einstellungen → Gelernte Begriffe); ohne Haken gilt er nur für diesen Durchlauf.</td></tr>
+    <tr><td>Stellen ansehen</td><td>Liste aller Fundstellen mit Satzausschnitt, alle vorausgewählt und einzeln abwählbar. Bei mehr als 50 Fundstellen öffnet Lokanon sie von selbst, weil der Begriff dann meist zu allgemein ist.</td></tr>
+    <tr><td>Gehört zu …</td><td>Die Stelle bekommt den Platzhalter einer schon erkannten Person oder Firma.</td></tr>
   </table>
-  <p>Ein Klick auf eine Markierung bietet die Gegenrichtung an: <b>nicht anonymisieren</b> – nur hier, im ganzen Vorgang oder künftig immer. „Nur hier“ wirkt in der Textfassung genau an dieser Stelle; in der PDF- oder Word-Kopie wird derselbe Text überall ersetzt. Jede dieser Aktionen lässt sich mit <kbd>Strg</kbd>+<kbd>Z</kbd> oder „Rückgängig“ zurücknehmen. Bei mehr als 50 Fundstellen warnt Lokanon, weil der Begriff dann meist zu allgemein ist.</p>
-  <div class="box warn">Die Prüfung ist Teil der Arbeit, nicht Beiwerk: Keine Erkennung ist vollständig. Was Lokanon übersieht, tragen Sie nach; was es zu viel erkennt, schalten Sie aus. Erst dann anonymisieren.</div>
+  <p>Ein Klick auf eine Markierung bietet die Gegenrichtung an: <b>nicht anonymisieren</b> – nur hier, im ganzen Vorgang oder künftig immer. Jede Änderung beim Prüfen lässt sich mit <kbd>Strg</kbd>+<kbd>Z</kbd> oder „Rückgängig“ zurücknehmen. Unten in der Liste lassen sich Begriffe auch eintippen („Fehlt etwas?“).</p>
+  <p>Selbst Markiertes gilt zunächst nur für diesen Vorgang. Ob Lokanon es sich für künftige Dokumente merkt, fragt es einmal am Ende (siehe <a href="#gespeichert">Gespeicherte Angaben</a>).</p>
 </section>
 
 <section id="ausgabe">
@@ -134,10 +142,51 @@
   <p>Der Zusatz im Dateinamen (<code>_anonymisiert</code>) lässt sich in den Einstellungen ändern. Dateien mit diesem Zusatz überspringt Lokanon beim nächsten „Ordner wählen“, damit nichts doppelt anonymisiert wird. Erkannte Namen ersetzt Lokanon auch im Dateinamen: Aus „Klage Müller.docx“ wird „Klage Person_1_anonymisiert.docx“, mit eigener Bezeichnung „Klage Mandant_anonymisiert.docx“.</p>
 </section>
 
+<section id="gespeichert">
+  <h2>Gespeicherte Angaben und Datenschutz</h2>
+  <p>Lokanon merkt sich nur, was Sie bestätigen, verschlüsselt und nur auf diesem PC, und löscht Namen wieder, wenn sie nicht mehr gebraucht werden. <a href="/#einfuehrung/merken" target="_top">Merken im Programm zeigen</a> · <a href="/#einfuehrung/gespeichert" target="_top">Verwalten und löschen im Programm zeigen</a></p>
+  <h3>Merken am Ende</h3>
+  <p>Haben Sie beim Prüfen etwas selbst markiert, fragt Lokanon nach dem Anonymisieren einmal: „2 Angaben für künftige Dokumente merken?“ Alles ist vorausgewählt, ein Klick auf „Merken“ genügt; Einzelnes lässt sich abwählen, „Nicht mehr fragen“ schaltet das ab. Gemerkte Angaben schlägt Lokanon später vor, mit der Begründung „von Ihnen gelernt am …“, und Sie können sie wie jeden Vorschlag abwählen.</p>
+  <p><b>Regel statt Name:</b> Steht vor dem markierten Wert eine Bezeichnung („Mandantennr.: 48213“), bietet Lokanon an, die Bezeichnung zu lernen statt der Nummer. Künftig wird jeder Wert dahinter vorgeschlagen, gespeichert wird keine Nummer und kein Name. Bei Nummern mit festem Aufbau („AZ-2026-0815“) lernt Lokanon das Muster.</p>
+  <h3>Fälle und Fristen</h3>
+  <p>Jede gemerkte Angabe gehört zu einem Fall. Lokanon nimmt dafür das Aktenzeichen aus dem Dokument, sonst den Ordnernamen; im Prüfbereich und beim Merken lässt sich der Fall ändern. Nehmen Sie das Aktenzeichen, keine Namen.</p>
+  <table>
+    <tr><th>Frage</th><th>Antwort</th></tr>
+    <tr><td>Warum speichert Lokanon überhaupt?</td><td>Damit Sie Übersehenes nur einmal markieren. Gespeichert wird nur, was Sie am Ende bestätigen.</td></tr>
+    <tr><td>Warum ein Fall?</td><td>Damit Sie bei einem Löschwunsch alles zu einem Mandat auf einmal finden und zeigen können, woher eine Angabe stammt (Rechenschaftspflicht, Art. 5 Abs. 2 DSGVO).</td></tr>
+    <tr><td>Warum eine Frist?</td><td>Namen von Mandanten, Gegnern und Zeugen dürfen nur so lange gespeichert sein, wie sie gebraucht werden (Art. 5 Abs. 1 e DSGVO). Standard: 12 Monate nach dem letzten Fund. Jeder neue Fund in einem Dokument setzt die Frist neu.</td></tr>
+    <tr><td>Und wenn das Mandat länger läuft?</td><td>Den Fall verlängern: um 6, 12 oder 24 Monate oder „bis auf Widerruf (Mandat läuft)“. 30 Tage vor dem Löschen erinnert Lokanon beim Start daran.</td></tr>
+    <tr><td>Und wenn es beendet ist?</td><td>„Fall abgeschlossen“: Dann läuft eine kurze Frist (Standard 3 Monate).</td></tr>
+    <tr><td>Warum verschlüsselt?</td><td>Sie unterliegen der Schweigepflicht. Alles mit Namen ist mit Ihrem Windows-Konto verschlüsselt (Art. 32 DSGVO, § 203 StGB). Nichts davon verlässt den PC.</td></tr>
+    <tr><td>Warum nicht 6 Jahre wie die Handakte?</td><td>Die Liste ist ein Arbeitsmittel, nicht Teil der Handakte (§ 50 BRAO). Für sie gilt: so kurz wie möglich.</td></tr>
+    <tr><td>Was hat keine Frist?</td><td>Projekte und Kürzel, Regeln und „Künftig immer stehen lassen“: Sie enthalten keine Personendaten.</td></tr>
+  </table>
+  <h3>Verwalten und löschen</h3>
+  <p>Links „Fälle und gelernte Angaben“ zeigt je Fall die Angaben, die Vorgänge und den Löschtag. Dort verlängern, abschließen, umbenennen und löschen Sie. Einzelne Angaben vergessen Sie mit dem ×.</p>
+  <table>
+    <tr><th>Sie möchten …</th><th>So geht es</th></tr>
+    <tr><td>einen Fall löschen</td><td>Fall aufklappen → „Fall löschen …“. Gelöscht werden gelernte Angaben, Schlüssel für die Rückübersetzung, Vorgangsordner und eigene Testfälle des Falls. Angaben, die auch zu einem anderen Fall gehören, bleiben.</td></tr>
+    <tr><td>einen einzelnen Vorgang löschen</td><td>Startseite → „Zuletzt bearbeitet“ → Menü der Zeile, oder mehrere ankreuzen → „Auswahl löschen“.</td></tr>
+    <tr><td>einen Löschwunsch erfüllen</td><td>Namen suchen → „… überall löschen“. Lokanon löscht die Angabe aus allen Fällen und alle Fälle, in denen sie vorkommt (Art. 17 DSGVO). Bei „Wunsch des Mandanten“ lässt sich nichts abwählen.</td></tr>
+    <tr><td>die anonymisierten Kopien mit löschen</td><td>Im Löschdialog unter „Sie entscheiden“ ankreuzen. Sie kommen in den Papierkorb. Was schon bei einer KI liegt, kann Lokanon nicht löschen; diese Kopien enthalten aber keine Namen.</td></tr>
+    <tr><td>einen Nachweis</td><td>Nach dem Löschen „Nachweis öffnen“, oder später im Löschprotokoll „Nachweis“: eine Bestätigung ohne Namen, für die Akte oder den Mandanten.</td></tr>
+  </table>
+  <p>Vor dem Löschen zeigt Lokanon genau, was gelöscht wird und was bleibt. Ihre Originaldateien verändert Lokanon nie. Das Protokoll ohne Namen löscht sich nach 30 Tagen. Eine zweite Rückfrage kommt nur, wenn der Fall als „Mandat läuft“ markiert ist, ein Schlüssel kürzlich benutzt wurde oder der Vorgang gerade offen ist.</p>
+  <h3>Fragen</h3>
+  <table>
+    <tr><th>Frage</th><th>Antwort</th></tr>
+    <tr><td>Muss das ins Verarbeitungsverzeichnis?</td><td>Ja. Ein Mustertext liegt im Pilot-Paket (<code>vorlagen/verarbeitungsverzeichnis-eintrag.md</code>, Abschnitt „Gelernte Angaben“). Stimmen Sie Fristen und Text mit Ihrer oder Ihrem Datenschutzbeauftragten ab.</td></tr>
+    <tr><td>Wer kann die gespeicherten Angaben lesen?</td><td>Nur Lokanon unter Ihrem Windows-Konto auf diesem PC. Eine kopierte Datei ist an einem anderen PC oder unter einem anderen Konto nicht lesbar.</td></tr>
+    <tr><td>Was passiert bei einer Neuinstallation?</td><td>Die Daten liegen in <code>Lokanon</code> in Ihrem Benutzerordner und bleiben bei einer Neuinstallation von Lokanon erhalten. Ein neues Windows-Konto kann sie nicht mehr lesen.</td></tr>
+    <tr><td>Und meine Datensicherung?</td><td>Sichern Sie den Lokanon-Datenordner, bleiben dort ältere, verschlüsselte Stände bis zum Ablauf Ihrer Sicherung. Wer ihn von der Sicherung ausnimmt, hat nach dem Löschen nichts mehr davon.</td></tr>
+  </table>
+</section>
+
 <section id="einstellungen">
-  <h2>Einstellungen (Zahnrad oben rechts)</h2>
+  <h2>Einstellungen (links in der Navigation)</h2>
   <div class="cards">
-    <div class="card"><h4>Ihre Kanzlei</h4><p>Was nie ersetzt wird: Kanzleiname, Mitarbeitende, eigene Telefonnummern und E-Mail-Adressen, eine Angabe je Zeile. Darunter „Immer ersetzen“ für interne Kürzel oder Projektnamen. „Gelernte Begriffe“ zeigt, was Sie beim Prüfen dauerhaft festgelegt haben; „vergessen“ nimmt es zurück.</p></div>
+    <div class="card"><h4>Ihre Kanzlei</h4><p>Was nie ersetzt wird: Kanzleiname, Mitarbeitende, eigene Telefonnummern und E-Mail-Adressen, eine Angabe je Zeile. Darunter „Immer ersetzen“ für interne Kürzel oder Projektnamen (dauerhaft, ohne Frist).</p></div>
+    <div class="card"><h4>Aufbewahrung und Löschfristen</h4><p>Wie lange personenbezogene Angaben nach dem letzten Fund bleiben (3, 6, 12, 24 Monate), die Frist nach „Fall abgeschlossen“, und ob Lokanon am Ende fragt, ob es sich etwas merken soll.</p></div>
     <div class="card"><h4>Erkennung</h4><p>Gerichte, Behörden, Versicherer und Kliniken stehen lassen (an); Ortsnamen ohne Adresse ersetzen (aus); Datumsangaben nur mit Personenbezug, alle oder keine; welche Gruppen erkannt werden.</p></div>
     <div class="card"><h4>Ausgabe</h4><p>Zusatz im Dateinamen, Ablageordner für Drag &amp; Drop, und ob zusätzlich eine reine Textfassung (<code>.md</code>) entstehen soll, mit der KI-Assistenten am besten arbeiten.</p></div>
     <div class="card"><h4>Erweitert</h4><p>Vier Schalter, alle aus, bis Sie sie brauchen: Rückübersetzung, KI-Anweisung, eigene Testfälle, Vorgangsordner. Siehe nächster Abschnitt.</p></div>
@@ -148,13 +197,13 @@
 <section id="erweitert">
   <h2>Erweiterte Funktionen</h2>
   <h3>Antworten der KI zurückübersetzen</h3>
-  <p>Eingeschaltet, speichert Lokanon bei jedem Durchlauf einen verschlüsselten Schlüssel (Platzhalter → Original) und zeigt oben rechts „Antwort zurückübersetzen“. Dort fügen Sie die Antwort der KI ein; aus <code>[Person_1]</code> und <code>[Mandant]</code> werden wieder die echten Namen, auch wenn die KI „Person 1“ oder „[Person_1]s“ geschrieben hat. Das Passwort für die Schlüssel legen Sie einmal in den Einstellungen fest.</p>
+  <p>Eingeschaltet, speichert Lokanon bei jedem Vorgang einen verschlüsselten Schlüssel (Platzhalter → Original) und zeigt nach dem Anonymisieren „Antwort zurückübersetzen“. Der Schlüssel gehört zum Fall und wird mit ihm gelöscht. Dort fügen Sie die Antwort der KI ein; aus <code>[Person_1]</code> und <code>[Mandant]</code> werden wieder die echten Namen, auch wenn die KI „Person 1“ oder „[Person_1]s“ geschrieben hat. Das Passwort für die Schlüssel legen Sie einmal in den Einstellungen fest.</p>
   <h3>KI-Anweisung und Claude-Skill</h3>
   <p>Eingeschaltet, erscheint auf der Fertig-Seite „KI-Anweisung kopieren“: ein Text, den Sie einmal als Projekt-Anweisung in ChatGPT oder Claude einfügen. Die KI lässt die Platzhalter dann stehen und erfindet keine Namen. Für Claude gibt es die Anweisung auch als Skill zum Herunterladen.</p>
   <h3>Geprüfte Vorgänge als eigene Testfälle</h3>
-  <p>Eingeschaltet, speichert Lokanon nach dem Anonymisieren den gelesenen Text und Ihre Entscheidungen beim Prüfen: was ersetzt wurde, was Sie nachgetragen und was Sie abgewählt haben. Die Datei liegt unter <code>Lokanon\testfaelle</code> und ist mit Ihrem Windows-Konto verschlüsselt; nur Sie können sie auf diesem PC lesen. Damit lässt sich jede neue Lokanon-Version an Ihren echten Dokumenten messen (<code>evaluate.py --eigene</code>, die Ausgabe zeigt keinen Klartext). „alle löschen“ in den Einstellungen entfernt die Testfälle.</p>
+  <p>Eingeschaltet, speichert Lokanon nach dem Anonymisieren den gelesenen Text und Ihre Entscheidungen beim Prüfen: was ersetzt wurde, was Sie nachgetragen und was Sie abgewählt haben. Die Datei liegt unter <code>Lokanon\testfaelle</code> und ist mit Ihrem Windows-Konto verschlüsselt; nur Sie können sie auf diesem PC lesen. Damit lässt sich jede neue Lokanon-Version an Ihren echten Dokumenten messen (<code>evaluate.py --eigene</code>, die Ausgabe zeigt keinen Klartext). „alle löschen“ in den Einstellungen entfernt die Testfälle; sonst gehören sie zum Fall und werden mit ihm gelöscht.</p>
   <h3>Vorgangsordner mit Prüfbericht und Protokoll</h3>
-  <p>Eingeschaltet, legt Lokanon je Durchlauf zusätzlich einen Ordner unter <code>Lokanon\Vorgaenge</code> an: Originale, Kopien, ein Prüfbericht mit allen Markierungen im Klartext (bleibt auf Ihrem PC) und ein Protokoll, was wann ersetzt wurde. Nützlich als Nachweis der Sorgfalt.</p>
+  <p>Eingeschaltet, legt Lokanon je Durchlauf zusätzlich einen Ordner unter <code>Lokanon\Vorgaenge</code> an: Originale, Kopien, ein Prüfbericht mit allen Markierungen im Klartext (bleibt auf Ihrem PC) und ein Protokoll, was wann ersetzt wurde. Nützlich als Nachweis der Sorgfalt. Der Ordner enthält Klartext; er gehört zum Fall und wird mit ihm gelöscht.</p>
 </section>
 
 <section id="ki">
@@ -184,15 +233,16 @@
     <tr><th>Problem</th><th>Was hilft</th></tr>
     <tr><td>Beim Start erscheint lange „Lokanon wird gestartet …“</td><td>Beim ersten Start nach der Installation laden die Sprachmodelle ein bis zwei Minuten. Startet Lokanon gar nicht, steht der Grund in <code>Lokanon\lokanon.log</code> in Ihrem Benutzerordner.</td></tr>
     <tr><td>Eine Datei wurde nicht erzeugt</td><td>Die Ergebnisseite sagt, wo die Gegenprüfung noch Originaltext gefunden hat (sichtbarer Text, Scan-Seite oder ein unsichtbarer Teil der PDF) und was Sie tun können. „Zurück zum Prüfen“ behält Ihre Prüfung; Stelle markieren oder nachtragen, dann erneut anonymisieren. Statt der PDF entsteht eine geprüfte Textfassung (.md).</td></tr>
-    <tr><td>Etwas lief schief und Sie brauchen Hilfe</td><td>„Protokoll“ auf der Ergebnisseite oder unter dem Zahnrad. Es enthält keine Namen, nur Platzhalter und Dateinummern, und lässt sich kopieren und weitergeben. Ältere Protokolle liegen im Ordner <code>protokolle</code> Ihres Lokanon-Datenordners (30 Tage).</td></tr>
+    <tr><td>Etwas lief schief und Sie brauchen Hilfe</td><td>„Protokoll“ links in der Navigation oder auf der Ergebnisseite. Es enthält keine Namen, nur Platzhalter und Dateinummern, und lässt sich kopieren und weitergeben. Ältere Protokolle liegen im Ordner <code>protokolle</code> Ihres Lokanon-Datenordners (30 Tage).</td></tr>
     <tr><td>Ein Name wurde nicht erkannt</td><td>Im Dokument markieren: Lokanon sucht ihn in allen Dateien. Oder „Fehlt etwas?“ oben in der Prüfliste.</td></tr>
-    <tr><td>Der Kanzleiname wird ersetzt</td><td>Unter dem Zahnrad bei „Ihre Kanzlei“ eintragen.</td></tr>
-    <tr><td>Zwei Karten sind dieselbe Person</td><td>Auf einer Karte „gehört zu …“ wählen.</td></tr>
+    <tr><td>Der Kanzleiname wird ersetzt</td><td>Unter Einstellungen bei „Ihre Kanzlei“ eintragen.</td></tr>
+    <tr><td>Zwei Zeilen sind dieselbe Person</td><td>Zeile aufklappen, „Gehört zu …“ wählen.</td></tr>
+    <tr><td>Wo ist „Gelernte Begriffe“?</td><td>Jetzt links unter „Fälle und gelernte Angaben“, verschlüsselt und nach Fall geordnet. Ältere Einträge aus 0.3.0 hat Lokanon beim ersten Start übernommen (Fall „Übernommen aus Lokanon 0.3.0“).</td></tr>
   </table>
   <p>Ihre Einstellungen liegen unter <code>Lokanon\einstellungen.yaml</code> in Ihrem Benutzerordner. Lokanon baut keine Verbindung ins Internet auf.</p>
 </section>
 
 </div></main>
-<footer><div class="wrap">Lokanon 3.0 (Pilotversion) · Stand 31. Oktober 2026 · Alle Beispiele in dieser Anleitung sind erfunden.</div></footer>
+<footer><div class="wrap">Lokanon 0.4.0 (Pilotversion) · Stand 8. November 2026 · Alle Beispiele in dieser Anleitung sind erfunden.</div></footer>
 </body>
 </html>

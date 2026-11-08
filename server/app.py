@@ -32,6 +32,7 @@ gedaechtnis = Gedaechtnis(est.daten_ordner)
 sitzung = Sitzung(est.laden, est.speichern, modelle, gedaechtnis=gedaechtnis)
 fenster = {"webview": None}  # wird vom Launcher gesetzt (pywebview-Fenster für native Dialoge)
 uebung: dict = {}  # Einführung: eigene Sitzung mit Temp-Ordner, solange sie läuft
+letzte_fehler: set[str] = set()  # Dateien, die beim letzten Löschen übrig blieben („Erneut versuchen“)
 
 
 def aktiv() -> Sitzung:
@@ -373,6 +374,8 @@ def loeschen(body: LoeschenBody):
     ordner = {v.get("ordner") for v in s.gd.laden()["vorgaenge"]
               if v["fall"] in body.faelle or v["id"] in body.vorgaenge}
     r = s.gd.loeschen(cfg, body.faelle, body.vorgaenge, body.name, body.grund, body.kopien, body.auswahl)
+    letzte_fehler.clear()
+    letzte_fehler.update(f["pfad"] for f in r["fehler"])
     if s.vorgang_id and s.vorgang_id in r["vorgaenge"]:
         s.leeren()
     ordner.discard(None)
@@ -381,6 +384,28 @@ def loeschen(body: LoeschenBody):
         cfg["zuletzt_ordner"] = [z for z in cfg.get("zuletzt_ordner", []) if z not in ordner]
         s.cfg_speichern(cfg)
     return {**r, "uebersicht": s.gd.uebersicht(cfg)}
+
+
+class PfadeBody(BaseModel):
+    pfade: list[str]
+
+
+@app.post("/api/loeschen/nochmal")
+def loeschen_nochmal(body: PfadeBody):
+    """„Erneut versuchen“ nach dem Löschen: nur Dateien, die beim letzten Löschen übrig blieben."""
+    import shutil
+
+    fehler = []
+    for p in body.pfade:
+        if p not in letzte_fehler:
+            continue
+        try:
+            q = Path(p)
+            shutil.rmtree(q) if q.is_dir() else q.unlink(missing_ok=True)
+            letzte_fehler.discard(p)
+        except OSError as e:
+            fehler.append({"art": "", "pfad": p, "grund": str(e)})
+    return {"fehler": fehler}
 
 
 @app.get("/api/loeschnachweis/{nr}", response_class=HTMLResponse)

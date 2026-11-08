@@ -65,8 +65,8 @@ ALLOW = ["Lehmkuhl & Partner", "Annette Lehmkuhl", "Lehmkuhl"]
 
 
 def beispielfaelle(gd: gm.Gedaechtnis, cfg: dict) -> None:
-    """Drei erfundene Fälle für das Kapitel „Gespeicherte Angaben“: ein laufender, einer kurz vor dem Löschen,
-    einer abgeschlossen."""
+    """Drei erfundene Fälle für das Kapitel „Gespeicherte Angaben“: einen verlängert der Anwender („Mandat läuft“),
+    einen schließt er ab, einer läuft in 20 Tagen ab."""
     gd.merken("3 O 1120/26", [{"text": "Martin Ochs", "art": "PERSON"}, {"text": "Ochs Haustechnik GmbH",
                                                                          "art": "ORGANIZATION"}])
     gd.merken("9 O 88/25", [{"text": "Lena Brinkhoff", "art": "PERSON"}, {"text": "Hof Brinkhoff", "art": "ADRESSE"}])
@@ -78,6 +78,4 @@ def beispielfaelle(gd: gm.Gedaechtnis, cfg: dict) -> None:
             ende = gm.heute() + timedelta(days=20)
             f["zuletzt"] = gm._plus_monate(ende, -int(fr["personen_monate"])).isoformat()
             f["angelegt"] = f["zuletzt"]
-        if f["name"] == "2 O 77/25":
-            f["status"], f["abgeschlossen_am"] = "abgeschlossen", (gm.heute() - timedelta(days=30)).isoformat()
     gd.speichern(d)
