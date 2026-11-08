@@ -114,7 +114,9 @@
     { kapitel: "faelle", ziel: "loeschprotokoll", art: "zeigen", seit: "0.4.0", titel: "Löschprotokoll", hilfe: "loeschprotokoll" },
     { kapitel: "faelle", ziel: "nav-einstellungen", art: "tun", warten: "ansicht-einstellungen", seit: "0.3.0", titel: "Einstellungen",
       text: "Hier stellen Sie Ihre Kanzlei, die Erkennung und die Ausgabe ein.", aufgabe: "Öffnen Sie die Einstellungen.", vormachen: () => klick('[data-tour="nav-einstellungen"]') },
-    { kapitel: "faelle", ziel: "aufbewahrung", art: "zeigen", seit: "0.4.0", titel: "Aufbewahrung", hilfe: "aufbewahrung" },
+    // „Neu in …“ überspringt den Schritt „Einstellungen“ (seit 0.3.0): dann selbst dorthin wechseln
+    { kapitel: "faelle", ziel: "aufbewahrung", art: "zeigen", seit: "0.4.0", titel: "Aufbewahrung", hilfe: "aufbewahrung",
+      vorher: async (app) => { if (app.state.ansicht !== "einstellungen") app.zeige("einstellungen", "aufbewahrung"); } },
     // 7 Gespeicherte Angaben
     { kapitel: "gespeichert", ziel: "nav-faelle", art: "zeigen", seit: "0.4.0", titel: "Warum Lokanon sich etwas merkt", hilfe: "speichern" },
     { kapitel: "gespeichert", ziel: "nav-faelle", art: "tun", warten: "ansicht-faelle", seit: "0.4.0", titel: "Die Übersicht",
