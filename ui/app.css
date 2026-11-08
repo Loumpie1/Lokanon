@@ -262,11 +262,15 @@ table.tabelle { border-collapse: collapse; width: 100%; min-width: 640px; }
 .phedit input { width: 160px; height: 28px; padding: 0 6px; border: 1px solid var(--line-2); border-radius: var(--r); font-family: var(--font-mono); font-size: 12.5px; background: var(--surface); }
 .nachtrag { border-top: 1px solid var(--line); padding: 10px 16px 12px; display: flex; flex-direction: column; gap: 6px; }
 .nachtrag label { font-size: 12px; color: var(--muted); }
+.abschluss { border-top: 1px solid var(--line); background: var(--surface-2); padding: 10px 16px 12px; display: grid; gap: 8px; }
+.abschluss p { margin: 0; font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.abschluss p b { color: var(--ink); }
+.abschluss .btn { justify-content: center; }
 
 /* Markierfenster an der Auswahl und Fenster an einer Markierung */
 .leiste { position: absolute; z-index: 30; width: 320px; max-width: calc(100% - 16px); background: var(--surface); color: var(--ink); border: 1px solid var(--line-2);
   border-radius: var(--r-lg); box-shadow: var(--shadow-pop); padding: 12px; display: grid; gap: 10px; font-family: var(--font-ui); font-size: 13px; line-height: 1.4;
-  white-space: normal; animation: leiste-in 140ms ease-out; }
+  white-space: normal; animation: leiste-in 140ms ease-out; overflow-y: auto; overscroll-behavior: contain; }
 @keyframes leiste-in { from { opacity: 0; transform: translateY(4px); } }
 .leiste .kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .leiste .kopf b { font-weight: 600; overflow-wrap: anywhere; }
@@ -275,6 +279,10 @@ table.tabelle { border-collapse: collapse; width: 100%; min-width: 640px; }
 .arten button[aria-checked="true"] { background: var(--action-soft); border-color: var(--action); color: var(--action-hover); font-weight: 600; }
 .leiste select { height: 28px; padding: 0 6px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--surface); font-size: 12.5px; width: 100%; }
 .leiste .aktionen { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.leiste .aktionen .abbrechen { margin-right: auto; }
+.leiste .gruppe { display: grid; gap: 4px; }
+.leiste .gruppe > .lbl { font-size: 12px; font-weight: 600; color: var(--ink-2, var(--ink)); }
+.leiste .gruppe > small { color: var(--muted); font-size: 12px; }
 .leiste .wahl { display: grid; gap: 4px; }
 .leiste .wahl button { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); min-height: 34px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
 .leiste .wahl button:hover { background: var(--surface-2); border-color: var(--line-2); }
@@ -305,6 +313,7 @@ table.tabelle { border-collapse: collapse; width: 100%; min-width: 640px; }
 .pfad span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ergebnis-datei { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
 .ergebnis-datei:first-child { border-top: 0; }
+.ergebnis-datei > .btn { flex: none; align-self: center; }
 .ergebnis-datei .st { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--ok-soft); color: var(--ok); }
 .ergebnis-datei.fehl { background: var(--danger-soft); border-radius: var(--r); padding: 10px 12px; border-top: 0; }
 .ergebnis-datei.fehl .st { background: var(--surface); color: var(--danger); }

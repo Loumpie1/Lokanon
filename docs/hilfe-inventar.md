@@ -19,12 +19,14 @@ gespeichert (`ui/einfuehrung/drehbuch.js`).
 | `dokument` | Dokument mit Markierungen, Fähnchen | pruefen, markieren | – | #pruefen |
 | `platzhalter-vorschlaege` | Platzhalter ändern | pruefen | – | #pruefen |
 | `befehl-markieren` | Übersehenes markieren | markieren | markieren | #markieren |
+| `markier-zuordnung` | „Ersetzen durch“ im Markierfenster, Abbrechen | markieren | – | #markieren |
 | `markierfenster` | Fenster an der Auswahl | markieren | – | #markieren |
 | `markier-ueberall` | Überall ersetzen | markieren | – | #markieren |
 | `befehl-rueckgaengig` | Rückgängig | markieren | – | #markieren |
 | `nachtrag` | Begriff eintragen | markieren | markieren | #markieren |
-| `befehl-anonymisieren` | Anonymisieren mit Zähler | anonymisieren | – | #ausgabe |
+| `befehl-anonymisieren` | „Anonymisierte Kopie(n) erstellen“ mit Zähler | anonymisieren | – | #ablauf |
 | `ergebnis-dateien` | Ergebnis, Gegenprüfung | anonymisieren | – | #ausgabe |
+| `datei-oeffnen` | Kopie direkt öffnen | anonymisieren | – | #ausgabe |
 | `befehl-ki` | KI-Anweisung | anonymisieren | – | #ki |
 | `befehl-zurueck` | Antwort zurückübersetzen | anonymisieren | – | #erweitert |
 | `merken` | Frage „künftig vorschlagen?“ | merken | speichern_warum | #gespeichert |
@@ -69,6 +71,7 @@ gespeichert (`ui/einfuehrung/drehbuch.js`).
 | `fallzeile` | Fall im Prüfbereich ändern | ohne Tour: im Schritt „Was Lokanon gefunden hat“ erwähnt | fall | #gespeichert |
 | `filter` | Filter nach Art | ohne Tour: selbsterklärend | – | #pruefen |
 | `markier-arten` | Art im Markierfenster | ohne Tour: Teil des Markierfensters | – | #markieren |
+| `pruefen-abschluss` | „Alles geprüft?“ mit Knopf am Ende der Liste | ohne Tour: im Schritt „Kopien erstellen“ erwähnt | – | #ablauf |
 | `zeile-schalter` | Haken einer Zeile | ohne Tour: Tour bedient ihn über die Zeile | – | #pruefen |
 | `suchergebnis` | Ergebnis der Suche | ohne Tour: Teil des Schritts „Überall löschen“ | – | #gespeichert |
 | `fall-loeschen` | Fall löschen | ohne Tour: Tour zeigt Löschen über die Suche | ueberall_loeschen | #gespeichert |

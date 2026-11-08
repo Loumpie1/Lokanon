@@ -87,7 +87,7 @@
   <h2>Der Ablauf in drei Schritten</h2>
   <ol class="steps">
     <li><strong>Ablegen</strong>Auf der Startseite „Dateien hinzufügen“ oder „Ordner öffnen“, oder Dateien einfach ins Fenster ziehen. Lokanon liest PDF (auch Scans, auch gedrehte Seiten), Word, Excel und Text. „Text einfügen“ nimmt eine E-Mail oder einen Absatz. Die Erkennung startet sofort.</li>
-    <li><strong>Prüfen</strong>In der Mitte das Dokument mit Markierungen, rechts die Liste dessen, was Lokanon gefunden hat. Sie nehmen Haken heraus, vergeben eigene Platzhalter wie „Mandant“ und markieren Übersehenes. Oben in der Befehlsleiste steht „Anonymisieren“ mit der Zahl der Angaben, die ersetzt werden.</li>
+    <li><strong>Prüfen</strong>In der Mitte das Dokument mit Markierungen, rechts die Liste dessen, was Lokanon gefunden hat. Sie nehmen Haken heraus, vergeben eigene Platzhalter wie „Mandant“ und markieren Übersehenes. Wenn alles stimmt, klicken Sie auf „Anonymisierte Kopie erstellen“ (bei mehreren Dateien „Kopien“): oben rechts in der Befehlsleiste, mit der Zahl der Angaben, die ersetzt werden, oder unten am Ende der Liste. Erst dieser Klick schreibt die Kopien; Ihre Originale bleiben unverändert.</li>
     <li><strong>Fertig</strong>Zu jeder Datei entsteht eine gegengeprüfte Kopie im gleichen Format mit dem Zusatz <code>_anonymisiert</code>. Haben Sie etwas selbst markiert, fragt Lokanon, ob es sich das für künftige Dokumente merken soll. „Neuer Vorgang“ beginnt von vorn.</li>
   </ol>
   <p><a href="/#einfuehrung/ablegen" target="_top">Im Programm zeigen</a></p>
@@ -117,13 +117,14 @@
 <section id="markieren">
   <h2>Übersehenes markieren</h2>
   <p>Hat Lokanon etwas übersehen, klicken Sie oben auf „Übersehenes markieren“ (oder Taste <kbd>M</kbd>) und dann auf ein Wort im Dokument, oder überstreichen Sie mehrere Wörter mit der Maus. Ein Doppelklick auf ein Wort geht immer. <a href="/#einfuehrung/markieren" target="_top">Im Programm zeigen</a></p>
-  <p>Direkt an der Stelle erscheint ein kleines Fenster: „„Falkenhorst“ anonymisieren · 2 Stellen“, die Art (Person, Firma, Adresse, Kennnummer, Projekt oder Kürzel, Sonstiges …) und wo der Begriff sonst noch vorkommt. Gefunden werden auch gebeugte Formen („Noltes“), Trennungen am Zeilenende („Spedi-tion“) und bei Personen die einzelnen Namensteile.</p>
+  <p>Direkt an der Stelle erscheint ein kleines Fenster: „„Falkenhorst“ anonymisieren · 2 Stellen“, darunter „Was ist es?“ mit der Art (Person, Firma, Adresse, Kennnummer, Projekt oder Kürzel, Sonstiges …), „Ersetzen durch“ und wo der Begriff sonst noch vorkommt. „Abbrechen“ (oder <kbd>Esc</kbd>) schließt das Fenster, ohne etwas zu markieren. Gefunden werden auch gebeugte Formen („Noltes“), Trennungen am Zeilenende („Spedi-tion“) und bei Personen die einzelnen Namensteile.</p>
   <table>
     <tr><th>Knopf</th><th>Wirkung</th></tr>
     <tr><td>Überall ersetzen</td><td>Alle Fundstellen in allen Dateien bekommen denselben Platzhalter.</td></tr>
     <tr><td>Nur hier</td><td>Nur die markierte Stelle.</td></tr>
     <tr><td>Stellen ansehen</td><td>Liste aller Fundstellen mit Satzausschnitt, alle vorausgewählt und einzeln abwählbar. Bei mehr als 50 Fundstellen öffnet Lokanon sie von selbst, weil der Begriff dann meist zu allgemein ist.</td></tr>
-    <tr><td>Gehört zu …</td><td>Die Stelle bekommt den Platzhalter einer schon erkannten Person oder Firma.</td></tr>
+    <tr><td>Ersetzen durch</td><td>Normalerweise „einen neuen Platzhalter“. Ist das Wort ein Spitzname, Kürzel oder eine andere Schreibweise einer schon gefundenen Person oder Firma, wählen Sie „denselben wie …“: Dann steht in der Kopie derselbe Platzhalter, und die KI erkennt, dass es dieselbe Person ist.</td></tr>
+    <tr><td>Abbrechen</td><td>Fenster schließen, nichts ändern. Auch im Fenster an einer schon markierten Stelle.</td></tr>
   </table>
   <p>Ein Klick auf eine Markierung bietet die Gegenrichtung an: <b>nicht anonymisieren</b> – nur hier, im ganzen Vorgang oder künftig immer. Jede Änderung beim Prüfen lässt sich mit <kbd>Strg</kbd>+<kbd>Z</kbd> oder „Rückgängig“ zurücknehmen. Unten in der Liste lassen sich Begriffe auch eintippen („Fehlt etwas?“).</p>
   <p>Selbst Markiertes gilt zunächst nur für diesen Vorgang. Ob Lokanon es sich für künftige Dokumente merkt, fragt es einmal am Ende (siehe <a href="#gespeichert">Gespeicherte Angaben</a>).</p>
@@ -138,7 +139,7 @@
     <tr><td><code>Liste.xlsx</code></td><td><code>Liste_anonymisiert.xlsx</code></td><td>Zellen und Blattnamen ersetzt, Formeln bleiben unberührt, Metadaten entfernt.</td></tr>
     <tr><td><code>Notiz.txt</code>, <code>.md</code>, <code>.csv</code></td><td><code>Notiz_anonymisiert.txt</code></td><td>Text ersetzt.</td></tr>
   </table>
-  <p><b>Wo die Kopien landen:</b> Bei „Ordner wählen“ direkt neben den Originalen im selben Ordner. Bei Drag &amp; Drop und eingefügtem Text in <code>Dokumente\Lokanon\Anonymisiert</code>; den Ort ändern Sie in den Einstellungen. Die Fertig-Seite hat immer einen Knopf „Ordner öffnen“.</p>
+  <p><b>Wo die Kopien landen:</b> Bei „Ordner wählen“ direkt neben den Originalen im selben Ordner. Bei Drag &amp; Drop und eingefügtem Text in <code>Dokumente\Lokanon\Anonymisiert</code>; den Ort ändern Sie in den Einstellungen. Die Fertig-Seite hat immer einen Knopf „Ordner öffnen“, und jede erzeugte Kopie hat daneben „Öffnen“: Sie öffnet sich dann direkt im passenden Programm, etwa Word oder dem PDF-Programm.</p>
   <p>Der Zusatz im Dateinamen (<code>_anonymisiert</code>) lässt sich in den Einstellungen ändern. Dateien mit diesem Zusatz überspringt Lokanon beim nächsten „Ordner wählen“, damit nichts doppelt anonymisiert wird. Erkannte Namen ersetzt Lokanon auch im Dateinamen: Aus „Klage Müller.docx“ wird „Klage Person_1_anonymisiert.docx“, mit eigener Bezeichnung „Klage Mandant_anonymisiert.docx“.</p>
 </section>
 

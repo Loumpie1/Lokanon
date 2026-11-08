@@ -244,6 +244,24 @@ def test_namen_im_dateinamen(client):
     assert all((Path(e["ordner"]) / n).exists() for n in namen.values())
 
 
+def test_kopie_oeffnen(client, monkeypatch):
+    """„Öffnen“ auf der Fertig-Seite öffnet nur Kopien aus dem aktuellen Ergebnis, keine beliebigen Pfade."""
+    import server.app as app_mod
+
+    geoeffnet = []
+    monkeypatch.setattr(app_mod.os, "startfile", lambda p: geoeffnet.append(p), raising=False)
+    monkeypatch.setattr(app_mod.sys, "platform", "win32")
+    durchlauf(client, TEXT, "Brief.txt")
+    client.post("/api/anonymisieren")
+    warte(client)
+    e = client.get("/api/zustand").json()["ergebnis"]
+    assert client.post("/api/ergebnis/oeffnen", json={"i": 0}).status_code == 200
+    assert geoeffnet == [e["dateien"][0]["pfad"]] and geoeffnet[0].endswith("Brief_anonymisiert.txt")
+    assert client.post("/api/ergebnis/oeffnen", json={"i": 5}).status_code == 400
+    assert client.post("/api/ergebnis/oeffnen", json={"i": -1}).status_code == 400
+    assert len(geoeffnet) == 1
+
+
 def test_erweitert_rueckuebersetzung(client):
     client.put("/api/einstellungen", json={"werte": {"erweitert": {"rueckuebersetzung": True}, "schluessel_passwort": "geheim"}})
     client.post("/api/leeren")

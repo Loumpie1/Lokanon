@@ -219,26 +219,29 @@
   window.addEventListener("dragover", (e) => e.preventDefault());
   window.addEventListener("drop", (e) => { e.preventDefault(); zieht = 0; document.body.classList.remove("ziehen"); if (e.dataTransfer && e.dataTransfer.files.length) neueDateien(() => hochladen(e.dataTransfer.files)); });
   // Neue Dateien verwerfen die laufende Prüfung: dann erst fragen
+  // Die offene Prüfung wird erst verworfen, wenn wirklich neue Dateien gewählt sind. Bricht man den Datei- oder
+  // Ordnerdialog ab, bleibt sie unverändert offen.
   function neueDateien(fn) {
     const z = S.z;
-    if (z && z.fortschritt.fertig && !z.ergebnis && z.identitaeten.length) bestaetigen("Neue Dateien ablegen? Die aktuelle Prüfung wird verworfen.", async () => { await api("/leeren", { method: "POST" }); fn(); }, "Neue Dateien");
-    else fn();
+    if (z && z.fortschritt.fertig && !z.ergebnis && z.identitaeten.length) bestaetigen("Neue Dateien ablegen? Die aktuelle Prüfung wird verworfen, sobald Sie Dateien gewählt haben.", () => { S.verwerfen = true; fn(); }, "Neue Dateien");
+    else { S.verwerfen = false; fn(); }
   }
+  async function vorAblegen() { if (S.verwerfen) { S.verwerfen = false; await api("/leeren", { method: "POST" }); } }
   function dateiWaehlen() {
     const i = document.createElement("input"); i.type = "file"; i.multiple = true; i.accept = ".pdf,.docx,.xlsx,.csv,.txt,.md";
-    i.onchange = () => hochladen(i.files); i.click();
+    i.onchange = () => hochladen(i.files); i.oncancel = () => (S.verwerfen = false); i.click();
   }
   async function hochladen(files) {
-    if (!files || !files.length) return;
+    if (!files || !files.length) { S.verwerfen = false; return; }
     const form = new FormData();
     for (const f of files) form.append("datei", f, f.name);
-    try { await api("/dateien", { form }); await analyseStarten(); } catch (e) { toast(e.message, "danger"); }
+    try { await vorAblegen(); await api("/dateien", { form }); await analyseStarten(); } catch (e) { toast(e.message, "danger"); }
   }
   async function ordnerWaehlen() {
     let pfad = "";
     try { pfad = (await api("/system/ordner-waehlen", { method: "POST" })).pfad; } catch { pfad = await pfadDialog(); }
-    if (!pfad) return;
-    try { await api("/ordner", { json: { pfad } }); await analyseStarten(); } catch (e) { toast(e.message, "danger"); }
+    if (!pfad) { S.verwerfen = false; return; }
+    try { await vorAblegen(); await api("/ordner", { json: { pfad } }); await analyseStarten(); } catch (e) { toast(e.message, "danger"); }
   }
   function pfadDialog() {
     return new Promise((resolve) => {
@@ -257,7 +260,8 @@
       <div class="minhalt"><textarea class="input" id="txt" rows="10" placeholder="Text hier einfügen …" autofocus></textarea></div>
       <div class="mfuss"><button class="btn x">Abbrechen</button><button class="btn primary" id="txt-ok">Erkennen und prüfen</button></div>`);
     $("#txt", m).focus();
-    $("#txt-ok", m).onclick = async () => { try { await api("/text", { json: { text: $("#txt", m).value } }); closeModal(); await analyseStarten(); } catch (e) { toast(e.message, "danger"); } };
+    $$(".x", m).forEach((b) => b.addEventListener("click", () => (S.verwerfen = false)));
+    $("#txt-ok", m).onclick = async () => { try { await vorAblegen(); await api("/text", { json: { text: $("#txt", m).value } }); closeModal(); await analyseStarten(); } catch (e) { toast(e.message, "danger"); } };
   }
   async function analyseStarten(begriffe = []) {
     try { await api("/analyse", { json: { begriffe } }); S.docIndex = 0; S.gewaehlt = null; S.stelle = null; S.ansicht = "vorgang"; await laden(); pollen(); } catch (e) { toast(e.message, "danger"); }
@@ -372,13 +376,14 @@
     const z = S.z; const ids = z.identitaeten;
     const ersetzt = ids.filter((i) => i.aktiv).length, unsicher = ids.filter((i) => i.unsicher && i.aktiv).length;
     const gruppen = [...new Set(ids.map((i) => i.gruppe))];
+    const kopieWort = z.dateien.length === 1 ? "Kopie" : "Kopien";
     const alt = $("#leinwand"); const docTop = alt ? alt.scrollTop : 0; const listTop = $("#liste") ? $("#liste").scrollTop : 0;
     befehle(`<button class="cmd" data-c="dateien">${ico("datei")}Dateien hinzufügen</button>
       <button class="cmd" data-c="ordner">${ico("ordner")}Ordner öffnen</button><span class="sep"></span>
       <button class="cmd" data-c="markieren" data-tour="befehl-markieren" aria-pressed="${S.markiermodus}" title="Taste M">${ico("markieren")}Übersehenes markieren</button>
       <button class="cmd" data-c="rueck" data-tour="befehl-rueckgaengig" ${z.rueckgaengig ? "" : "disabled"} title="${z.rueckgaengig ? "Rückgängig: " + esc(z.rueckgaengig) + " (Strg+Z)" : "Nichts zum Rückgängigmachen"}">${ico("rueck")}Rückgängig</button>
       <span class="fill"></span><span class="hinweis" title="${esc(z.ordner || z.ausgabe_ordner)}">${z.ordner ? "Kopien neben den Originalen" : "Kopien nach " + esc(z.ausgabe_ordner)}</span>
-      <button class="btn primary" data-c="anon" data-tour="befehl-anonymisieren">${ico("schild")}Anonymisieren<span class="zahl">${ersetzt} ersetzen</span></button>`);
+      <button class="btn primary" data-c="anon" data-tour="befehl-anonymisieren" title="Jetzt die anonymisierte ${kopieWort} schreiben: ${ersetzt} ${ersetzt === 1 ? "Angabe wird" : "Angaben werden"} ersetzt">${ico("schild")}Anonymisierte ${kopieWort} erstellen<span class="zahl">${ersetzt} ${ersetzt === 1 ? "Angabe" : "Angaben"}</span></button>`);
     const fehler = z.fortschritt.fehler;
     view.innerHTML = `
       <section class="flaeche dokbereich" aria-label="Dokument" data-tour="dokument">
@@ -394,7 +399,7 @@
           <div class="fallzeile" data-tour="fallzeile">Fall: <span class="mono">${esc(z.fall || "noch keiner")}</span>${z.fall_bestaetigt ? "" : `<span class="muted small">(vorgeschlagen)</span>`}<button class="linkbtn" id="fall-aendern">ändern</button>${hilfeKnopf("fall")}</div>
           ${fehler ? `<div class="notice danger">${ico("warn")}<div><b>Das Anonymisieren hat nicht geklappt.</b> ${esc(fehler)} <button class="linkbtn" data-c="protokoll">Details</button></div></div>` : ""}
           ${unsicher ? `<div class="notice warn" role="status" data-tour="hinweis-ansehen">${ico("warn")}<div><b>${unsicher} ${unsicher === 1 ? "Angabe" : "Angaben"} bitte ansehen.</b> Lokanon ersetzt im Zweifel. Schalten Sie aus, was kein Personenbezug ist. <button class="linkbtn" data-f="unsicher">Nur diese zeigen</button></div></div>`
-            : `<div class="notice ok">${ico("check")}<div><b>Alles eindeutig.</b> Prüfen Sie die Liste und das Dokument, dann anonymisieren.</div></div>`}
+            : `<div class="notice ok">${ico("check")}<div><b>Alles eindeutig.</b> Prüfen Sie die Liste und das Dokument, dann „Anonymisierte ${kopieWort} erstellen“.</div></div>`}
         </div>
         <div class="pivot" role="tablist" aria-label="Filter" data-tour="filter">${["alle", ...gruppen, "unsicher"].map((g) => {
           const n = g === "alle" ? ids.length : g === "unsicher" ? unsicher : ids.filter((i) => i.gruppe === g).length;
@@ -402,6 +407,8 @@
         <div class="liste" id="liste"></div>
         <div class="nachtrag" data-tour="nachtrag"><span><label for="nachtrag">Fehlt etwas? Im Dokument markieren (Taste M) oder hier eintragen</label>${hilfeKnopf("markieren")}</span>
           <div class="row" style="flex-wrap:nowrap"><input class="input" id="nachtrag" placeholder="z. B. Kundennummer 48213, mehrere mit Komma"><button class="btn" id="btn-nachtrag">Suchen</button></div></div>
+        <div class="abschluss" data-tour="pruefen-abschluss"><p><b>Alles geprüft?</b> Dann schreibt Lokanon ${z.dateien.length === 1 ? "die anonymisierte Kopie" : `${z.dateien.length} anonymisierte Kopien`} ${z.ordner ? "neben die Originale" : "in den Ablageordner"}. Ihre Originale bleiben unverändert.</p>
+          <button class="btn primary" data-c="anon">${ico("schild")}Anonymisierte ${kopieWort} erstellen</button></div>
       </aside>`;
     renderListe();
     renderDocPanel();
@@ -488,13 +495,33 @@
   function leisteZeigen(html, rect, tour = "") {
     leisteZu();
     const p = $("#leinwand"); const pr = p.getBoundingClientRect();
+    const scrollRaum = p.scrollHeight - p.clientHeight - p.scrollTop;  // vor dem Einfügen messen: das Fenster selbst zählt sonst mit
     const l = document.createElement("div"); l.className = "leiste"; l.id = "leiste"; l.setAttribute("role", "dialog"); if (tour) l.dataset.tour = tour; l.innerHTML = html;
     p.appendChild(l);
-    const breite = l.offsetWidth, hoehe = l.offsetHeight;
-    let top = rect.bottom - pr.top + p.scrollTop + 8;
-    if (rect.bottom + hoehe + 16 > pr.bottom) top = Math.max(p.scrollTop + 8, rect.top - pr.top + p.scrollTop - hoehe - 8);
-    l.style.top = top + "px";
-    l.style.left = Math.max(8, Math.min(rect.left - pr.left + p.scrollLeft, p.scrollLeft + pr.width - breite - 8)) + "px";
+    $$("[data-lz=abbrechen]", l).forEach((b) => (b.onclick = () => { leisteZu(); getSelection().removeAllRanges(); melde("leiste-abgebrochen"); }));
+    // Sichtbarer Teil des Dokumentbereichs (auch wenn das Fenster ihn unten abschneidet). Unter der Auswahl, wenn dort
+    // Platz ist, sonst darüber, sonst dort, wo mehr Platz ist; nie oben oder unten aus dem sichtbaren Teil heraus.
+    const rahmenR = (p.closest(".dokbereich") || p).getBoundingClientRect();
+    const sichtOben = Math.max(pr.top, rahmenR.top, 0) + 8, sichtUnten = Math.min(pr.bottom, rahmenR.bottom, window.innerHeight) - 8;
+    l.style.maxHeight = Math.max(160, sichtUnten - sichtOben) + "px";
+    const breite = l.offsetWidth; let hoehe = l.offsetHeight;
+    let oben = rect.top, unten = rect.bottom, y, x = rect.left;
+    if (sichtUnten - unten >= hoehe + 8) y = unten + 8;
+    else if (oben - sichtOben >= hoehe + 8) y = oben - hoehe - 8;
+    else if (pr.right - 8 - rect.right >= breite + 8) { x = rect.right + 8; y = oben - 24; }
+    else if (rect.left - pr.left - 8 >= breite + 8) { x = rect.left - breite - 8; y = oben - 24; }
+    else {
+      // Niedriges, schmales Fenster: Dokument so weit hochschieben, dass unter dem Wort Platz ist; was dann noch
+      // fehlt, scrollt im Fenster selbst. Das Wort bleibt immer sichtbar.
+      const dy = Math.max(0, Math.min(unten + hoehe + 16 - sichtUnten, oben - sichtOben - 8, scrollRaum));
+      if (dy) { const vor = p.scrollTop; p.scrollTop += dy; const echt = p.scrollTop - vor; oben -= echt; unten -= echt; }
+      const platzUnten = sichtUnten - unten - 8, platzOben = oben - sichtOben - 8;
+      if (platzUnten >= Math.min(hoehe, 200) || platzUnten >= platzOben) { l.style.maxHeight = Math.max(120, platzUnten) + "px"; hoehe = l.offsetHeight; y = unten + 8; }
+      else { l.style.maxHeight = Math.max(120, platzOben) + "px"; hoehe = l.offsetHeight; y = oben - 8 - hoehe; }
+    }
+    y = Math.max(sichtOben, Math.min(y, sichtUnten - hoehe));
+    l.style.top = y - pr.top + p.scrollTop + "px";
+    l.style.left = Math.max(p.scrollLeft + 8, Math.min(x - pr.left + p.scrollLeft, p.scrollLeft + pr.width - breite - 8)) + "px";
     return l;
   }
   document.addEventListener("mousedown", (e) => { const l = $("#leiste"); if (l && !l.contains(e.target) && !e.target.closest("#docview") && !e.target.closest(".fuehrung")) leisteZu(); });
@@ -533,12 +560,15 @@
       const { neu, andere } = zaehlung(a);
       const l = leisteZeigen(`
         <div class="kopf"><b>„${esc(a.begriff)}“ anonymisieren</b><span class="muted small">${neu.length} ${neu.length === 1 ? "Stelle" : "Stellen"}</span></div>
-        <div class="arten" role="radiogroup" aria-label="Art" data-tour="markier-arten">${a.arten.map(([k, t]) => `<button type="button" role="radio" data-k="${k}" aria-checked="${k === art}">${esc(t)}</button>`).join("")}</div>
-        ${ids.length ? `<select id="lz-zu" aria-label="Gehört zu"><option value="">neue Angabe</option>${ids.map((i) => `<option value="${esc(i.ph)}">gehört zu ${esc(i.name)} · ${esc(i.anzeige)}</option>`).join("")}</select>` : ""}
+        <div class="gruppe"><span class="lbl" id="lz-art-t">Was ist es?</span>
+          <div class="arten" role="radiogroup" aria-labelledby="lz-art-t" data-tour="markier-arten">${a.arten.map(([k, t]) => `<button type="button" role="radio" data-k="${k}" aria-checked="${k === art}">${esc(t)}</button>`).join("")}</div></div>
+        ${ids.length ? `<label class="gruppe" data-tour="markier-zuordnung"><span class="lbl">Ersetzen durch</span>
+          <select id="lz-zu"><option value="">einen neuen Platzhalter</option>${ids.map((i) => `<option value="${esc(i.ph)}">denselben wie „${esc(i.name)}“ ${esc(i.anzeige)}</option>`).join("")}</select>
+          <small>Spitzname, Kürzel oder andere Schreibweise einer schon gefundenen Angabe? Dann deren Platzhalter wählen.</small></label>` : ""}
         <div class="muted small">${andere.length ? `Auch in ${andere.map((f) => esc(f.name) + ` (${f.stellen.filter((st) => !st.schon).length}×)`).join(", ")} · ` : ""}${neu.length > 1 ? `<button class="linkbtn" id="lz-einzeln">Stellen ansehen</button>` : ""}${a.gesamt - neu.length ? ` · ${a.gesamt - neu.length} schon markiert` : ""}</div>
         ${a.warnung ? `<div class="notice warn">${ico("warn")}<div>Sehr häufig. Bitte die Stellen einzeln ansehen.</div></div>` : ""}
-        <div class="aktionen">${neu.length > 1 ? `<button class="btn klein" id="lz-hier">Nur hier</button>` : ""}
-          <button class="btn klein primary" id="lz-alle" data-tour="markier-ueberall">${neu.length > 1 ? (a.warnung ? "Einzeln ansehen" : "Überall ersetzen") : "Anonymisieren"}</button></div>`, rect, "markierfenster");
+        <div class="aktionen"><button class="btn klein abbrechen" data-lz="abbrechen" title="Nichts markieren (Esc)">Abbrechen</button>${neu.length > 1 ? `<button class="btn klein" id="lz-hier">Nur hier</button>` : ""}
+          <button class="btn klein primary" id="lz-alle" data-tour="markier-ueberall">${neu.length > 1 ? (a.warnung ? "Einzeln ansehen" : "Überall ersetzen") : "Ersetzen"}</button></div>`, rect, "markierfenster");
       const zu = () => ($("#lz-zu", l) || {}).value || "";
       $$(".arten [data-k]", l).forEach((b) => (b.onclick = async () => { try { const n = await api("/auswahl", { json: { dok: a.dok, s: a.s, e: a.e, art: b.dataset.k } }); a = n; zeigen(n, b.dataset.k); melde("art-gewaehlt", { entity: b.dataset.k }); } catch (e) { toast(e.message, "danger"); } }));
       const hier = [{ dok: a.dok, s: a.s, e: a.e }];
@@ -591,14 +621,15 @@
     const i = S.z.identitaeten.find((x) => x.ph === m.dataset.ph);
     const rect = m.getBoundingClientRect();
     const l = m.classList.contains("bleibt")
-      ? leisteZeigen(`<div class="kopf"><b>„${esc(wort)}“ bleibt stehen</b></div><div class="aktionen"><button class="btn klein primary" data-a="wieder">Doch anonymisieren</button></div>`, rect)
+      ? leisteZeigen(`<div class="kopf"><b>„${esc(wort)}“ bleibt stehen</b></div><div class="aktionen"><button class="btn klein abbrechen" data-lz="abbrechen" title="Nichts ändern (Esc)">Abbrechen</button><button class="btn klein primary" data-a="wieder">Doch anonymisieren</button></div>`, rect)
       : leisteZeigen(`<div class="kopf"><b>„${esc(wort)}“ wird zu <span class="ph">${esc(i ? i.anzeige : "")}</span></b></div>
           <div class="muted small">Nicht anonymisieren:</div>
           <div class="wahl">
             <button data-a="hier">Nur hier<small>${/\.(pdf|docx|xlsx|csv)$/i.test(S.z.dokumente[dok].name) ? "In der PDF- oder Word-Kopie wird derselbe Text trotzdem überall ersetzt" : "Diese eine Stelle bleibt stehen"}</small></button>
             <button data-a="vorgang">Im ganzen Vorgang<small>${i ? `Alle ${i.anzahl} Stellen von „${esc(i.name)}“` : "Alle Stellen dieser Angabe"}</small></button>
             <button data-a="immer">Künftig immer stehen lassen<small>Wird verschlüsselt gemerkt, ohne Frist (meist Fachbegriffe)</small></button>
-          </div>`, rect);
+          </div>
+          <div class="aktionen"><button class="btn klein abbrechen" data-lz="abbrechen" title="Nichts ändern (Esc)">Abbrechen</button></div>`, rect);
     $$("[data-a]", l).forEach((b) => (b.onclick = async () => {
       try {
         S.z = await api("/stelle", { json: { dok, s, e, aktion: b.dataset.a } }); leisteZu(); renderPruefen();
@@ -728,7 +759,8 @@
       <button class="cmd" data-c="protokoll">${ico("uhr")}Protokoll</button>
       <span class="fill"></span><button class="btn primary" data-c="neu">${ico("datei")}Neuer Vorgang</button>`);
     const dateiZeile = (d) => d.status === "ok"
-      ? `<div class="ergebnis-datei"><span class="st">${ico("check")}</span><div style="flex:1;min-width:0"><b>${esc(d.ausgabe)}</b>${d.textfassung ? ` <span class="muted small">+ ${esc(d.textfassung)}</span>` : ""}<div class="muted small">aus ${esc(d.name)} · ${d.ersetzt} Stellen ersetzt · Gegenprüfung bestanden</div></div></div>`
+      ? `<div class="ergebnis-datei"><span class="st">${ico("check")}</span><div style="flex:1;min-width:0"><b>${esc(d.ausgabe)}</b>${d.textfassung ? ` <span class="muted small">+ ${esc(d.textfassung)}</span>` : ""}<div class="muted small">aus ${esc(d.name)} · ${d.ersetzt} Stellen ersetzt · Gegenprüfung bestanden</div></div>
+          <button class="btn klein" data-oeffne="${r.dateien.indexOf(d)}" data-tour="datei-oeffnen" title="${esc(d.ausgabe)} mit dem Standardprogramm öffnen">${ico("datei")}Öffnen</button></div>`
       : `<div class="ergebnis-datei fehl"><span class="st">${ico("warn")}</span><div style="flex:1;min-width:0"><b>${esc(d.name)}</b>: keine Kopie erzeugt
           <div class="small">${esc(d.hinweis)}</div>
           ${d.funde && d.funde.length ? `<ul class="funde">${d.funde.map((f) => `<li><b>„${esc(f.text)}“</b> ${esc(f.ort)}</li>`).join("")}</ul>` : ""}
@@ -747,6 +779,9 @@
     const tun = { ordner: () => oeffnen(r.ordner), neu: neuerVorgang, protokoll: () => zeige("protokoll"), anweisung: anweisungDialog, zurueck: zurueckDialog,
       pruefen: async () => { try { S.z = await api("/zurueck-zum-pruefen", { method: "POST" }); render(); } catch (e) { toast(e.message, "danger"); } } };
     $$("[data-c]").forEach((b) => (b.onclick = () => tun[b.dataset.c] && tun[b.dataset.c]()));
+    $$("[data-oeffne]").forEach((b) => (b.onclick = async () => {
+      try { await api("/ergebnis/oeffnen", { json: { i: +b.dataset.oeffne } }); melde("datei-geoeffnet"); } catch (e) { toast(e.message, "danger"); }
+    }));
     if ($("#merken")) merkenVerhalten(r);
   }
   async function neuerVorgang() { S.z = await api("/leeren", { method: "POST" }); S.docIndex = 0; S.filter = "alle"; S.gewaehlt = null; S.stelle = null; zeige("start"); }

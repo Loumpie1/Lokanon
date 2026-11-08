@@ -91,7 +91,7 @@ window.LokanonHilfe = {
   },
   markieren: {
     titel: "Übersehenes markieren",
-    kurz: "Klicken Sie auf „Übersehenes markieren“ (oder Taste M) und dann auf ein Wort im Dokument, oder überstreichen Sie mehrere Wörter. Ein Doppelklick geht immer. Lokanon sucht den Begriff in allen Dateien.",
+    kurz: "Klicken Sie auf „Übersehenes markieren“ (oder Taste M) und dann auf ein Wort im Dokument, oder überstreichen Sie mehrere Wörter. Ein Doppelklick geht immer. Lokanon sucht den Begriff in allen Dateien. Im Fenster an der Stelle wählen Sie die Art und den Platzhalter; „Abbrechen“ schließt es, ohne etwas zu ändern.",
     kapitel: "markieren",
   },
   aufbewahrung: {

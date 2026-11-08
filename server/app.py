@@ -505,6 +505,24 @@ def oeffnen(body: PfadBody):
     return {"ok": True}
 
 
+class DateiNrBody(BaseModel):
+    i: int
+
+
+@app.post("/api/ergebnis/oeffnen")
+def ergebnis_oeffnen(body: DateiNrBody):
+    """Eine gerade erzeugte Kopie mit dem Standardprogramm öffnen. Nur Dateien aus dem aktuellen Ergebnis,
+    keine beliebigen Pfade."""
+    e = aktiv().ergebnis or {}
+    dateien = e.get("dateien", [])
+    if not (0 <= body.i < len(dateien)) or dateien[body.i].get("status") != "ok":
+        raise ValueError("Diese Kopie gibt es im Ergebnis nicht.")
+    p = Path(dateien[body.i]["pfad"])
+    if not p.is_file():
+        raise ValueError("Die Kopie ist nicht mehr da. Wurde sie verschoben oder gelöscht?")
+    return oeffnen(PfadBody(pfad=str(p)))
+
+
 @app.post("/api/system/ordner-waehlen")
 def ordner_waehlen():
     """Nativer Ordnerdialog. Im Programmfenster über pywebview, sonst über tkinter."""

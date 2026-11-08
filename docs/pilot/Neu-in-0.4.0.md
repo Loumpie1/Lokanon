@@ -8,14 +8,19 @@ Nach Ihrer Rückmeldung sieht Lokanon jetzt aus wie Bürosoftware unter Windows:
 - **Befehlsleiste oben**, Navigation links (Start, Aktueller Vorgang, Fälle und gelernte Angaben, Protokoll, Einführung,
   Einstellungen), Statusleiste unten.
 - **Prüfen:** das Dokument als Seite in der Mitte, die Liste rechts. Ein Klick auf eine Zeile zeigt die Stelle mit einem
-  Fähnchen („[Mandantin] · 7 Stellen“). Der Knopf „Anonymisieren“ zeigt, wie viele Angaben ersetzt werden.
+  Fähnchen („[Mandantin] · 7 Stellen“).
+- **„Anonymisierte Kopie erstellen“** heißt der Knopf, der die Kopien schreibt (vorher „Anonymisieren“). Er steht oben
+  rechts mit der Zahl der Angaben, die ersetzt werden, und zusätzlich am Ende der Liste („Alles geprüft?“).
+- **Fertig-Seite:** Neben jeder erzeugten Kopie öffnet „Öffnen“ sie direkt in Word oder im PDF-Programm.
 - **Startseite:** Dateien hinzufügen, Fälle und Fristen, zuletzt bearbeitete Vorgänge. Dateien lassen sich an jede
   Stelle des Fensters ziehen.
 
 ## Übersehenes markieren, einfacher
 
 - Knopf „Übersehenes markieren“ (Taste M): Klick auf ein Wort markiert es. Doppelklick geht immer.
-- Ein kleines Fenster direkt an der Stelle: Art wählen, „Überall ersetzen“ oder „Nur hier“.
+- Ein kleines Fenster direkt an der Stelle: „Was ist es?“ (die Art), „Ersetzen durch“ (neuer Platzhalter oder derselbe
+  wie bei einer schon gefundenen Person), dann „Überall ersetzen“ oder „Nur hier“. „Abbrechen“ schließt es. Das Fenster
+  bleibt immer ganz sichtbar, auch ganz oben im Dokument.
 - Neue Art **„Projekt oder Kürzel“** für Begriffe ohne Personenbezug.
 
 ## Lokanon merkt sich, was Sie markieren, wenn Sie es wollen
